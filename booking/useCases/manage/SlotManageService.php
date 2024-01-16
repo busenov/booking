@@ -2,32 +2,30 @@
 
 namespace booking\useCases\manage;
 
-use booking\entities\Car\CarType;
-use booking\forms\manage\Car\CarTypeForm;
-use booking\repositories\CarTypeRepository;
-use booking\repositories\UserRepository;
-use booking\services\TransactionManager;
+use booking\entities\Slot\Slot;
+use booking\forms\manage\Slot\SlotForm;
+use booking\repositories\SlotRepository;
 
-class CarTypeManageService
+class SlotManageService
 {
-    private CarTypeRepository $repository;
+    private SlotRepository $repository;
 
     public function __construct(
-        CarTypeRepository $repository,
+        SlotRepository $repository
     )
     {
         $this->repository = $repository;
     }
 
-    public function create(CarTypeForm $form): CarType
+    public function create(SlotForm $form): Slot
     {
         $this->guardCanCreate();
-        $entity = CarType::create(
-            $form->name,
-            $form->description,
-            (int)$form->status,
+        $entity = Slot::create(
+            (int)$form->date,
+            (int)$form->begin,
+            (int)$form->end,
             (int)$form->qty,
-            (double)$form->pwr,
+            (int)$form->status,
             $form->note
         );
 
@@ -36,16 +34,16 @@ class CarTypeManageService
         return $entity;
     }
 
-    public function edit($entityOrId, CarTypeForm $form):void
+    public function edit($entityOrId, SlotForm $form):void
     {
         $entity=$this->repository->get($entityOrId);
         $this->guardCanEdit($entity);
         $entity->edit(
-            $form->name,
-            $form->description,
-            (int)$form->status,
+            (int)$form->date,
+            (int)$form->begin,
+            (int)$form->end,
             (int)$form->qty,
-            (double)$form->pwr,
+            (int)$form->status,
             $form->note
         );
         $this->repository->save($entity);
@@ -82,7 +80,7 @@ class CarTypeManageService
     /**
      * Можно редактировать
      *
-     * @param CarType|int $entityOrId
+     * @param Slot|int $entityOrId
      * @param bool $return
      * @return bool
      */
@@ -93,7 +91,7 @@ class CarTypeManageService
 
     /**
      * Можно удалять
-     * @param CarType|int $entityOrId
+     * @param Slot|int $entityOrId
      * @param bool $return
      * @return bool
      */
@@ -103,7 +101,7 @@ class CarTypeManageService
     }
     /**
      * Можно жестко удалять
-     * @param CarType|int $entityOrId
+     * @param Slot|int $entityOrId
      * @param bool $return
      * @return bool
      */

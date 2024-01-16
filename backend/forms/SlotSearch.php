@@ -2,21 +2,17 @@
 
 namespace backend\forms;
 
-use booking\repositories\UserRepository;
-use booking\entities\Car\CarType;
+use booking\entities\Slot\Slot;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use yii\helpers\ArrayHelper;
 
 
-class CarTypeSearch extends CarType
+class SlotSearch extends Slot
 {
 
-    private UserRepository $userRepository;
     public function __construct($config = [])
     {
         parent::__construct($config);
-        $this->userRepository = new UserRepository();
     }
     /**
      * {@inheritdoc}
@@ -24,9 +20,8 @@ class CarTypeSearch extends CarType
     public function rules()
     {
         return [
-            [['id', 'qty', 'status','created_at','updated_at', 'author_id','editor_id'], 'integer'],
-            [['name', 'description', 'note'], 'safe'],
-            [['pwr', ], 'double'],
+            [['id','date','begin','end', 'qty', 'status','created_at','updated_at', 'author_id','editor_id'], 'integer'],
+            [[ 'note'], 'safe'],
         ];
     }
 
@@ -47,7 +42,7 @@ class CarTypeSearch extends CarType
      */
     public function search($params)
     {
-        $query = CarType::find();
+        $query = Slot::find();
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
@@ -67,15 +62,17 @@ class CarTypeSearch extends CarType
             'id' => $this->id,
             'status' => $this->status,
             'qty' => $this->qty,
-            'pwr' => $this->pwr,
+            'date' => $this->date,
+            'begin' => $this->begin,
+            'end' => $this->end,
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'author_id' => $this->author_id,
             'editor_id' => $this->editor_id,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'description', $this->description])
+        $query
             ->andFilterWhere(['like', 'note', $this->note])
             ->andFilterWhere(['like', 'author_name', $this->author_name])
             ->andFilterWhere(['like', 'editor_name', $this->editor_name]);

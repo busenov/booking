@@ -1,29 +1,29 @@
 <?php
 
-use booking\entities\Car\CarType;
-use booking\helpers\CarHelper;
-use booking\useCases\manage\CarTypeManageService;
+use booking\entities\Slot\Slot;
+use booking\helpers\SlotHelper;
+use booking\useCases\manage\SlotManageService;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
-/** @var CarType $model */
+/** @var Slot $model */
 
-$this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Машины', 'url' => ['index']];
+$this->title = $model->getName();
+$this->params['breadcrumbs'][] = ['label' => 'Слоты', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 ?>
-<div class="car-view">
+<div class="slot-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?php if (CarTypeManageService::guardCanEdit($model,true)) :?>
+        <?php if (SlotManageService::guardCanEdit($model,true)) :?>
         <?= Html::a('Правка', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?php endif;?>
-        <?php if (CarTypeManageService::guardCanRemove($model,true)) :?>
+        <?php if (SlotManageService::guardCanRemove($model,true)) :?>
         <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
@@ -32,7 +32,7 @@ YiiAsset::register($this);
             ],
         ]) ?>
         <?php endif;?>
-        <?php if (CarTypeManageService::guardCanRemoveHard($model,true)) :?>
+        <?php if (SlotManageService::guardCanRemoveHard($model,true)) :?>
         <?= Html::a('Удалить Жестко', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
@@ -47,16 +47,16 @@ YiiAsset::register($this);
         'model' => $model,
         'attributes' => [
             'id',
-            'name',
-            'description',
+            'date:datetime',
+            'begin',
+            'end',
             'qty',
-            'pwr',
             'note',
             [
                 'attribute' => 'status',
                 'format' => 'raw',
-                'value' => function (CarType $data) {
-                    return CarHelper::statusLabel($data->status) ;
+                'value' => function (Slot $data) {
+                    return SlotHelper::statusLabel($data->status) ;
                 },
             ],
             'created_at:datetime',

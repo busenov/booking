@@ -3,8 +3,9 @@
 namespace booking\forms\manage\Car;
 
 use booking\entities\Car\CarType;
+use yii\base\Model;
 
-class CarTypeForm extends CarType
+class CarTypeForm extends Model
 {
     public ?string $name=null;
     public ?string $description=null;
@@ -13,18 +14,18 @@ class CarTypeForm extends CarType
     public ?int $qty=null;
     public ?float $pwr=null;
     public ?CarType $_carType;
-    public function __construct(CarType $carType=null, $config = [])
+    public function __construct(CarType $slot=null, $config = [])
     {
         parent::__construct($config);
-        if ($carType) {
-            $this->name=$carType->name;
-            $this->description=$carType->description;
-            $this->note=$carType->note;
-            $this->status=$carType->status;
-            $this->qty=$carType->qty;
-            $this->pwr=$carType->pwr;
+        if ($slot) {
+            $this->name=$slot->name;
+            $this->description=$slot->description;
+            $this->note=$slot->note;
+            $this->status=$slot->status;
+            $this->qty=$slot->qty;
+            $this->pwr=$slot->pwr;
 
-            $this->_carType = $carType;
+            $this->_carType = $slot;
         } else {
             $this->status=CarType::STATUS_ACTIVE;
         }
@@ -37,7 +38,7 @@ class CarTypeForm extends CarType
     public function rules()
     {
         return [
-            [['qty',], 'integer', 'min'=>1,'default'=>1],
+            [['qty',], 'integer', 'min'=>1],
             [['pwr',], 'double','min'=>0.1],
             [['name', 'note'], 'string', 'max' => 255],
             [['description'], 'string', 'max' => 1024],

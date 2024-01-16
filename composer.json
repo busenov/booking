@@ -22,7 +22,8 @@
         "filsh/yii2-oauth2-server": "^2.0",
         "la-haute-societe/yii2-save-relations-behavior": "*",
         "kartik-v/yii2-grid": "dev-master",
-        "kartik-v/yii2-datecontrol": "dev-master"
+        "kartik-v/yii2-datecontrol": "dev-master",
+        "kartik-v/yii2-widgets": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

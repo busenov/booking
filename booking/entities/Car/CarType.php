@@ -127,7 +127,7 @@ class CarType extends ActiveRecord
             'description' => 'Описание',
             'status' => 'Статус',
             'qty' => 'Количество',
-            'pwd' => 'Мощность',
+            'pwr' => 'Мощность',
             'note' => 'Примечание',
 
             'created_at' => 'Создано',

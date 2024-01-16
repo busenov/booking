@@ -9,10 +9,15 @@ use artel\forms\manage\User\AssignUserForm;
 use artel\repositories\TeamRepository;
 use artel\useCases\manage\TeamManageService;
 use backend\forms\CarTypeSearch;
+use backend\forms\SlotSearch;
 use booking\entities\Car\CarType;
+use booking\entities\Slot\Slot;
 use booking\forms\manage\Car\CarTypeForm;
+use booking\forms\manage\Slot\SlotForm;
 use booking\repositories\CarTypeRepository;
+use booking\repositories\SlotRepository;
 use booking\useCases\manage\CarTypeManageService;
+use booking\useCases\manage\SlotManageService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -24,15 +29,15 @@ use yii\filters\VerbFilter;
 /**
  * TeamController implements the CRUD actions for Teams model.
  */
-class CarController extends Controller
+class SlotController extends Controller
 {
 
-    private CarTypeManageService $service;
-    private CarTypeRepository $repository;
+    private SlotManageService $service;
+    private SlotRepository $repository;
 
     public function __construct($id, $module,
-                                CarTypeManageService $service,
-                                CarTypeRepository $repository,
+                                SlotManageService $service,
+                                SlotRepository $repository,
                                 $config = [])
     {
         parent::__construct($id, $module, $config);
@@ -80,7 +85,7 @@ class CarController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new CarTypeSearch();
+        $searchModel = new SlotSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -104,11 +109,12 @@ class CarController extends Controller
     }
 
     /**
+     * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $form = new CarTypeForm();
+        $form = new SlotForm();
 
         if ($this->request->isPost) {
             if ($form->load($this->request->post()) ) {
@@ -130,15 +136,15 @@ class CarController extends Controller
     public function actionUpdate($id)
     {
         $entity = $this->findModel($id);
-        $form= new CarTypeForm($entity);
+        $form= new SlotForm($entity);
 
         if ($this->request->isPost && $form->load($this->request->post())) {
             try {
                 $this->service->edit($entity,$form);
                 $entity = $this->findModel($id);
-                Yii::$app->session->setFlash('success', 'Успешно отредактирована запись: '.$entity->name);
+                Yii::$app->session->setFlash('success', 'Успешно отредактирована запись: '.$entity->getName());
             } catch (\Exception $ex) {
-                Yii::$app->session->setFlash('error', 'Ошибка при редактирования записи: '.$entity->name . ' '. $ex->getMessage());
+                Yii::$app->session->setFlash('error', 'Ошибка при редактирования записи: '.$entity->getName() . ' '. $ex->getMessage());
             }
 
 
@@ -160,9 +166,9 @@ class CarController extends Controller
         $entity = $this->findModel($id);
         try {
             $this->service->remove($entity);
-            Yii::$app->session->setFlash('success', 'Успешно удалена запись: '.$entity->name);
+            Yii::$app->session->setFlash('success', 'Успешно удалена запись: '.$entity->getName());
         } catch (\Exception $ex) {
-            Yii::$app->session->setFlash('error', 'Ошибка при удалении записи: '.$entity->name . ' '. $ex->getMessage());
+            Yii::$app->session->setFlash('error', 'Ошибка при удалении записи: '.$entity->getName() . ' '. $ex->getMessage());
         }
         return $this->redirect(['index']);
     }
@@ -171,9 +177,9 @@ class CarController extends Controller
         $entity = $this->findModel($id);
         try {
             $this->service->removeHard($entity);
-            Yii::$app->session->setFlash('success', 'Успешно удалена запись: '.$entity->name);
+            Yii::$app->session->setFlash('success', 'Успешно удалена запись: '.$entity->getName());
         } catch (\Exception $ex) {
-            Yii::$app->session->setFlash('error', 'Ошибка при удалении записи: '.$entity->name . ' '. $ex->getMessage());
+            Yii::$app->session->setFlash('error', 'Ошибка при удалении записи: '.$entity->getName() . ' '. $ex->getMessage());
         }
         return $this->redirect(['index']);
     }
@@ -183,12 +189,12 @@ class CarController extends Controller
      * Finds the Teams model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return CarType the loaded model
+     * @return Slot the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = CarType::findOne(['id' => $id])) !== null) {
+        if (($model = Slot::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

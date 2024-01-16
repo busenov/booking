@@ -38,10 +38,10 @@ AppAsset::register($this);
         ['label' => 'Главная', 'url' => ['/site/index']],
     ];
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => 'Войти', 'url' => ['/site/login']];
     } else {
         $menuItems = [
-            ['label' => 'Слоты', 'url' => ['/slots/index']],
+            ['label' => 'Слоты', 'url' => ['/slot/index']],
         ];
 
         if (Yii::$app->user->can('manager')) {

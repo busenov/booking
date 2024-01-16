@@ -9,6 +9,7 @@ $params = array_merge(
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
+    'language'=>'ru',
     'bootstrap' => [
         'log',
         'common\bootstrap\SetUp',
