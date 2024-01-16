@@ -1,0 +1,23 @@
+#БД, миграции и т.д.
+1. Название таблицы в множественном виде.
+Например, таблица User не верной. В этой таблицы userS, поэтому переименовываем в Users
+2. Добавлять поля для основных сущностей:
+            'created_at' => $this->integer()->unsigned(),
+            'updated_at' => $this->integer()->unsigned(),
+            'author_id' => $this->integer()->unsigned(),
+            'author_name' => $this->string(),
+            'editor_id' => $this->integer()->unsigned(),
+            'editor_name' => $this->string(),
+
+            $this->addForeignKey('{{%fk-TABLE-author_id}}', '{{%TABLE}}', 'author_id', '{{%users}}', 'id', 'SET NULL', 'CASCADE');
+            $this->addForeignKey('{{%fk-TABLE-editor_id}}', '{{%TABLE}}', 'editor_id', '{{%users}}', 'id', 'SET NULL', 'CASCADE');
+Но не обязательно, смотреть по необходимости
+3. Название миграций:
+    create_xxx_table
+    drop_xxx_table
+    add_xxx_column_to_yyy_table
+    drop_xxx_column_from_yyy_table
+    create_junction_table_for_xxx_and_yyy_tables
+Источник: https://www.yiiframework.com/doc/guide/2.0/ru/db-migrations
+4. При разворачивание с нуля не забыть миграцию:
+./yii migrate --migrationPath=@yii/rbac/migrations

@@ -8,18 +8,43 @@ $params = array_merge(
 
 return [
     'id' => 'app-backend',
+    'name'=>'Booking',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
-    'bootstrap' => ['log'],
+    'bootstrap' => [
+        'log',
+        'common\bootstrap\SetUp',
+        'backend\bootstrap\SetUp',
+    ],
+    'as access' => [
+        'class' => 'yii\filters\AccessControl',
+        'except'=> [
+            'auth/auth/login',
+            'auth/signup/signup',
+            'auth/signup/confirm',
+            'auth/reset/request',
+            'auth/reset/confirm',
+            'site/error',
+        ],
+        'rules' => [
+            [
+                'allow' => true,
+                'roles' => ['@'],
+            ],
+        ],
+    ],
+    'homeUrl' => '/admin',
     'modules' => [],
     'components' => [
         'request' => [
+            'baseUrl' => '/admin',
             'csrfParam' => '_csrf-backend',
         ],
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'booking\entities\User\User',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
+            'loginUrl' => ['auth/auth/login'],
         ],
         'session' => [
             // this is the name of the session cookie used for login on the backend
@@ -37,14 +62,15 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                '<_a:login|logout|signup>' => 'auth/auth/<_a>',
+#                '' => 'site/index',
+//                '<action:index|signup|request-password-reset|reset-password|access-denied|php-info|login>' => 'site/<action>',
             ],
         ],
-        */
     ],
     'params' => $params,
 ];

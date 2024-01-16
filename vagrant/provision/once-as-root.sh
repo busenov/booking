@@ -38,7 +38,7 @@ apt-get update && apt-get upgrade -y
 add-apt-repository -y ppa:ondrej/php
 
 info "Install additional software"
-apt-get install -y php8.2 php8.2-curl php8.2-cli php8.2-intl php8.2-mysqlnd php8.2-gd php8.2-fpm php8.2-mbstring php8.2-xml unzip nginx mariadb-server-10.3 php.xdebug php8.2-zip php8.2-bcmath
+apt-get install -y php8.2 php8.2-curl php8.2-cli php8.2-intl php8.2-mysqlnd php8.2-gd php8.2-fpm php8.2-mbstring php8.2-xml unzip nginx mariadb-server php.xdebug php8.2-zip php8.2-bcmath
 
 info "Configure MySQL"
 sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf

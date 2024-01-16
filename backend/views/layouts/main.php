@@ -35,11 +35,27 @@ AppAsset::register($this);
         ],
     ]);
     $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
+        ['label' => 'Главная', 'url' => ['/site/index']],
     ];
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
-    }     
+    } else {
+        $menuItems = [
+            ['label' => 'Слоты', 'url' => ['/slots/index']],
+        ];
+
+        if (Yii::$app->user->can('manager')) {
+            $manageItems=[];
+            $manageItems[]=['label' => 'Машины(карты)', 'url' => ['/car/index']];
+            $manageItems[]=['label' => 'Расписание', 'url' => ['/schedule/index']];
+            $menuItems[] = ['label' => 'Справочники', 'items'=>$manageItems];
+        }
+        if (Yii::$app->user->can('admin')) {
+            $manageItems=[];
+            $manageItems[]=['label' => 'Пользователи', 'url' => ['/user/index']];
+            $menuItems[] = ['label' => 'Управление', 'items'=>$manageItems];
+        }
+    }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav me-auto mb-2 mb-md-0'],
         'items' => $menuItems,
@@ -49,7 +65,7 @@ AppAsset::register($this);
     } else {
         echo Html::beginForm(['/site/logout'], 'post', ['class' => 'd-flex'])
             . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
+                'Выход (' . Yii::$app->user->identity->getShortName() . ')',
                 ['class' => 'btn btn-link logout text-decoration-none']
             )
             . Html::endForm();
