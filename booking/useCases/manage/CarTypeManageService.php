@@ -13,7 +13,7 @@ class CarTypeManageService
     private CarTypeRepository $repository;
 
     public function __construct(
-        CarTypeRepository $repository,
+        CarTypeRepository $repository
     )
     {
         $this->repository = $repository;

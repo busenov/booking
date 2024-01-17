@@ -3,6 +3,7 @@
 namespace booking\forms\manage\Slot;
 
 use booking\entities\Slot\Slot;
+use booking\repositories\CarTypeRepository;
 use yii\base\Model;
 
 class SlotForm extends Model
@@ -14,9 +15,11 @@ class SlotForm extends Model
     public ?int $qty=null;
     public ?string $note=null;
     public ?Slot $_slot;
+    public CarTypeRepository $carTypeRepository;
     public function __construct(Slot $slot=null, $config = [])
     {
         parent::__construct($config);
+        $this->carTypeRepository=new CarTypeRepository();
         if ($slot) {
             $this->date=$slot->date;
             $this->begin=$slot->begin;
@@ -37,8 +40,9 @@ class SlotForm extends Model
      */
     public function rules()
     {
+        $maxQty=$this->carTypeRepository->sumActiveCar();
         return [
-            [['qty',], 'integer', 'min'=>1],
+            [['qty',], 'integer', 'min'=>1,'max'=>$maxQty],
             [['date','begin','end'],'integer'],
             [['note'], 'string', 'max' => 255],
             [['status'], 'in', 'range' => array_keys(Slot::getStatusList())],

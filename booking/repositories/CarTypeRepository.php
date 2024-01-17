@@ -50,7 +50,11 @@ class CarTypeRepository
     {
         return static::find_st($entityOrId);
     }
-
+###Sum
+    public function sumActiveCar():int
+    {
+        return intval(CarType::find()->where(['status'=>CarType::STATUS_ACTIVE])->sum('qty'));
+    }
 
 ###
 
@@ -61,6 +65,8 @@ class CarTypeRepository
         }
         return $entity;
     }
+
+
 
     private function findAllBy(array $condition):array
     {
