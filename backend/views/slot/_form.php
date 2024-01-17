@@ -1,6 +1,7 @@
 <?php
 
 use booking\entities\Slot\Slot;
+use kartik\datecontrol\DateControl;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -13,12 +14,56 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'date')->textInput(['maxlength' => true]) ?>
+<!--    --><?php //= $form->field($model, 'date')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'date')->widget(DateControl::class, [
+        'type'=>DateControl::FORMAT_DATE,
+        'ajaxConversion'=>true,
+        'widgetOptions' => [
+            'removeButton' => false,
 
-    <?= $form->field($model, 'begin')->textInput(['maxlength' => true]) ?>
+            'options'=>[
+                'class'=>'slot-date',
+            ],
+            'pluginOptions' => [
+                'autoclose' => true,
+                'todayBtn'=>true,
+                'todayHighlight'=>true
+            ]
+        ]
+    ]);
+    ?>
 
-    <?= $form->field($model, 'end')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'begin')->widget(DateControl::class, [
+        'type'=>DateControl::FORMAT_TIME,
+        'displayFormat' => 'php:H:i',
+        'ajaxConversion'=>true,
+        'widgetOptions' => [
+            'options'=>[
+                'class'=>'slot-time',
+            ],
+            'pluginOptions' => [
+                'autoclose' => true,
+                'minuteStep' => 5,
+            ]
+        ]
+    ]);
+    ?>
 
+    <?= $form->field($model, 'end')->widget(DateControl::class, [
+        'type'=>DateControl::FORMAT_TIME,
+        'displayFormat' => 'php:H:i',
+        'ajaxConversion'=>true,
+        'widgetOptions' => [
+            'options'=>[
+                'class'=>'slot-time',
+            ],
+            'pluginOptions' => [
+                'autoclose' => true,
+                'minuteStep' => 5,
+            ]
+        ]
+    ]);
+    ?>
     <?= $form->field($model, 'qty')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'status')->dropDownList(Slot::getStatusList(), ['prompt' => '']) ?>
@@ -34,3 +79,30 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
+
+<?php
+$js = <<<JS
+$(".slot-time").on('changeTime.timepicker', function(e) {
+
+    // var hours = e.time.hours;
+    // var minutes = e.time.minutes;
+    //
+    // if (hours > 18) {
+    //     $(this).timepicker('setTime', '7:30');
+    // }
+    //
+    // if (hours < 7) {
+    //     $(this).timepicker('setTime', '18:30');
+    // }
+    //
+    // if (hours == 7 && minutes < 30 ) {
+    //     $(this).timepicker('setTime', '18:30');
+    // }
+    //
+    // if (hours == 18 && minutes > 30 ) {
+    //     $(this).timepicker('setTime', '7:30');
+    // }
+});
+JS;
+//$this->registerJs($js);
+?>

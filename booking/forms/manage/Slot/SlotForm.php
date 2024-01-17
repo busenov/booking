@@ -7,9 +7,9 @@ use yii\base\Model;
 
 class SlotForm extends Model
 {
-    public ?int $date=null;
-    public ?int $begin=null;
-    public ?int $end=null;
+    public ?string $date=null;
+    public ?string $begin=null;
+    public ?string $end=null;
     public ?int $status=null;
     public ?int $qty=null;
     public ?string $note=null;
@@ -20,7 +20,7 @@ class SlotForm extends Model
         if ($slot) {
             $this->date=$slot->date;
             $this->begin=$slot->begin;
-            $this->end=$slot->note;
+            $this->end=$slot->end;
             $this->note=$slot->note;
             $this->status=$slot->status;
             $this->qty=$slot->qty;
@@ -39,11 +39,14 @@ class SlotForm extends Model
     {
         return [
             [['qty',], 'integer', 'min'=>1],
-            [['date'],'integer'],
-            [['begin','end'],'integer', 'min'=>1],
+            [['date','begin','end'],'integer'],
             [['note'], 'string', 'max' => 255],
             [['status'], 'in', 'range' => array_keys(Slot::getStatusList())],
-            [['date','qty','begin','end','status'],'required']
+//            [['date','begin','end'], 'slotDateTimeValidator'],
+//            [['date'], 'slotDateTimeValidator'],
+            ['begin','compare', 'compareAttribute' => 'end','operator' => '<'],
+            ['end','compare', 'compareAttribute' => 'begin','operator' => '>'],
+            [['date','begin','end','qty','status'],'required']
         ];
     }
 
@@ -51,5 +54,16 @@ class SlotForm extends Model
     {
         return Slot::getAttributeLabels();
     }
-
+//    public function slotDateTimeValidator($attribute,$params)
+//    {
+//        dump('tut');
+//        dump($attribute);
+//        $this->addError($attribute, 'your password is not strong enough!');
+//        return "
+////if(".$condition.") {
+//    messages.push(your password is too weak, you fool!');
+////}
+//";
+////        exit;
+//    }
 }
