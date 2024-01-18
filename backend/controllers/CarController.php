@@ -22,7 +22,6 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * TeamController implements the CRUD actions for Teams model.
  */
 class CarController extends Controller
 {
@@ -74,7 +73,6 @@ class CarController extends Controller
     }
 
     /**
-     * Lists all Teams models.
      *
      * @return string
      */

@@ -14,18 +14,18 @@ class CarTypeForm extends Model
     public ?int $qty=null;
     public ?float $pwr=null;
     public ?CarType $_carType;
-    public function __construct(CarType $slot=null, $config = [])
+    public function __construct(CarType $carType=null, $config = [])
     {
         parent::__construct($config);
-        if ($slot) {
-            $this->name=$slot->name;
-            $this->description=$slot->description;
-            $this->note=$slot->note;
-            $this->status=$slot->status;
-            $this->qty=$slot->qty;
-            $this->pwr=$slot->pwr;
+        if ($carType) {
+            $this->name=$carType->name;
+            $this->description=$carType->description;
+            $this->note=$carType->note;
+            $this->status=$carType->status;
+            $this->qty=$carType->qty;
+            $this->pwr=$carType->pwr;
 
-            $this->_carType = $slot;
+            $this->_carType = $carType;
         } else {
             $this->status=CarType::STATUS_ACTIVE;
         }

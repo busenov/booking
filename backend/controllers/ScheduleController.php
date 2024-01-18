@@ -9,15 +9,15 @@ use artel\forms\manage\User\AssignUserForm;
 use artel\repositories\TeamRepository;
 use artel\useCases\manage\TeamManageService;
 use backend\forms\CarTypeSearch;
-use backend\forms\SlotSearch;
+use backend\forms\ScheduleSearch;
 use booking\entities\Car\CarType;
-use booking\entities\Slot\Slot;
+use booking\entities\Schedule\Schedule;
 use booking\forms\manage\Car\CarTypeForm;
-use booking\forms\manage\Slot\SlotForm;
+use booking\forms\manage\Schedule\ScheduleForm;
 use booking\repositories\CarTypeRepository;
-use booking\repositories\SlotRepository;
+use booking\repositories\ScheduleRepository;
 use booking\useCases\manage\CarTypeManageService;
-use booking\useCases\manage\SlotManageService;
+use booking\useCases\manage\ScheduleManageService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -28,15 +28,15 @@ use yii\filters\VerbFilter;
 
 /**
  */
-class SlotController extends Controller
+class ScheduleController extends Controller
 {
 
-    private SlotManageService $service;
-    private SlotRepository $repository;
+    private ScheduleManageService $service;
+    private ScheduleRepository $repository;
 
     public function __construct($id, $module,
-                                SlotManageService $service,
-                                SlotRepository $repository,
+                                ScheduleManageService $service,
+                                ScheduleRepository $repository,
                                 $config = [])
     {
         parent::__construct($id, $module, $config);
@@ -83,7 +83,7 @@ class SlotController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new SlotSearch();
+        $searchModel = new ScheduleSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -97,27 +97,34 @@ class SlotController extends Controller
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
-    {
-        $model = $this->findModel($id);
-
-        return $this->render('view', [
-            'model' =>$model,
-        ]);
-    }
+//    public function actionView($id)
+//    {
+//        $model = $this->findModel($id);
+//
+//        return $this->render('view', [
+//            'model' =>$model,
+//        ]);
+//    }
 
     /**
-     * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
-    public function actionCreate()
+    public function actionCreate($weekday=null)
     {
-        $form = new SlotForm();
-
+        $form = new ScheduleForm();
+        if ($weekday) {
+            $form->weekday=$weekday;
+        }
         if ($this->request->isPost) {
             if ($form->load($this->request->post()) ) {
-                $entity=$this->service->create($form);
-                return $this->redirect(['view', 'id' => $entity->id]);
+                try {
+                    $this->service->create($form);
+                    Yii::$app->session->setFlash('success', 'Успешно создано расписание');
+                } catch (\Exception $ex) {
+                    Yii::$app->session->setFlash('error', 'Ошибка при создании расписания: '. $ex->getMessage());
+                }
+
+                return $this->redirect(['index']);
             }
         }
 
@@ -134,15 +141,15 @@ class SlotController extends Controller
     public function actionUpdate($id)
     {
         $entity = $this->findModel($id);
-        $form= new SlotForm($entity);
+        $form= new ScheduleForm($entity);
 
         if ($this->request->isPost && $form->load($this->request->post())) {
             try {
                 $this->service->edit($entity,$form);
                 $entity = $this->findModel($id);
-                Yii::$app->session->setFlash('success', 'Успешно отредактирована запись: '.$entity->getName());
+                Yii::$app->session->setFlash('success', 'Успешно отредактирована запись: '.$entity->id);
             } catch (\Exception $ex) {
-                Yii::$app->session->setFlash('error', 'Ошибка при редактирования записи: '.$entity->getName() . ' '. $ex->getMessage());
+                Yii::$app->session->setFlash('error', 'Ошибка при редактирования записи: '.$entity->id . ' '. $ex->getMessage());
             }
 
 
@@ -153,7 +160,16 @@ class SlotController extends Controller
             'model' => $form,
         ]);
     }
-
+    public function actionClear()
+    {
+        try {
+            $this->service->clear();
+            Yii::$app->session->setFlash('success', 'Успешно прошла очистка расписания');
+        } catch (\Exception $ex) {
+            Yii::$app->session->setFlash('error', 'Ошибка при очистке расписания: '. $ex->getMessage());
+        }
+        return $this->redirect(['index']);
+    }
     /**
      * @param int $id ID
      * @return \yii\web\Response
@@ -164,9 +180,9 @@ class SlotController extends Controller
         $entity = $this->findModel($id);
         try {
             $this->service->remove($entity);
-            Yii::$app->session->setFlash('success', 'Успешно удалена запись: '.$entity->getName());
+            Yii::$app->session->setFlash('success', 'Успешно удалена запись: '.$entity->id);
         } catch (\Exception $ex) {
-            Yii::$app->session->setFlash('error', 'Ошибка при удалении записи: '.$entity->getName() . ' '. $ex->getMessage());
+            Yii::$app->session->setFlash('error', 'Ошибка при удалении записи: '.$entity->id . ' '. $ex->getMessage());
         }
         return $this->redirect(['index']);
     }
@@ -175,9 +191,9 @@ class SlotController extends Controller
         $entity = $this->findModel($id);
         try {
             $this->service->removeHard($entity);
-            Yii::$app->session->setFlash('success', 'Успешно удалена запись: '.$entity->getName());
+            Yii::$app->session->setFlash('success', 'Успешно удалена запись: '.$entity->id);
         } catch (\Exception $ex) {
-            Yii::$app->session->setFlash('error', 'Ошибка при удалении записи: '.$entity->getName() . ' '. $ex->getMessage());
+            Yii::$app->session->setFlash('error', 'Ошибка при удалении записи: '.$entity->id . ' '. $ex->getMessage());
         }
         return $this->redirect(['index']);
     }
@@ -187,12 +203,12 @@ class SlotController extends Controller
      * Finds the Teams model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return Slot the loaded model
+     * @return Schedule the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Slot::findOne(['id' => $id])) !== null) {
+        if (($model = Schedule::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

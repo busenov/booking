@@ -17,8 +17,8 @@ class m240116_114300_create_tables extends Migration
         $this->createTable('{{%slots}}', [
             'id' => $this->bigPrimaryKey()->unsigned(),
             'date' => $this->integer()->unsigned()->notNull(),
-            'begin' => $this->smallInteger()->unsigned()->notNull(),
-            'end' => $this->smallInteger()->unsigned()->notNull(),
+            'begin' => $this->integer()->unsigned()->notNull(),
+            'end' => $this->integer()->unsigned()->notNull(),
             'qty' => $this->smallInteger()->unsigned()->notNull(),
             'status' => $this->smallInteger()->unsigned()->notNull(),
             'note' => $this->string(),

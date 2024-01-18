@@ -36,6 +36,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'begin')->widget(DateControl::class, [
         'type'=>DateControl::FORMAT_TIME,
         'displayFormat' => 'php:H:i',
+        'displayTimezone'=>'GMT',
+        'saveTimezone'=>'GMT',
         'ajaxConversion'=>true,
         'widgetOptions' => [
             'options'=>[
@@ -52,6 +54,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'end')->widget(DateControl::class, [
         'type'=>DateControl::FORMAT_TIME,
         'displayFormat' => 'php:H:i',
+        'displayTimezone'=>'GMT',
+        'saveTimezone'=>'GMT',
         'ajaxConversion'=>true,
         'widgetOptions' => [
             'options'=>[

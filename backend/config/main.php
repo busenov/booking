@@ -44,7 +44,7 @@ return [
         ],
         'datecontrol' =>  [
             'class' => '\kartik\datecontrol\Module',
-            'displayTimezone'=>'Europe/Moscow',
+
             'displaySettings' => [
                 Module::FORMAT_DATE => 'dd.MM.yyyy',
                 Module::FORMAT_TIME => 'php:H:i:s',
