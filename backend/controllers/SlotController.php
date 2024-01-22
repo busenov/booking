@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  */
@@ -153,7 +154,28 @@ class SlotController extends Controller
             'model' => $form,
         ]);
     }
-
+    public function actionClear(?int $unixTime=null)
+    {
+        try {
+            $this->service->clear($unixTime);
+            Yii::$app->session->setFlash('success', 'Успешно прошла очистка');
+        } catch (\Exception $ex) {
+            Yii::$app->session->setFlash('error', 'Ошибка при очистке: '. $ex->getMessage());
+        }
+        return $this->redirect(['index']);
+    }
+    public function actionClearAjax(?int $unixTime=null)
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        try {
+            $this->service->clear($unixTime);
+            Yii::$app->session->setFlash('success', 'Успешно прошла очистка');
+            return ['status'=>'success'];
+        } catch (\Exception $ex) {
+            Yii::$app->session->setFlash('error', 'Ошибка при очистке: '. $ex->getMessage());
+            return ['status'=>'error','error'=>$ex->getMessage()];
+        }
+    }
     /**
      * @param int $id ID
      * @return \yii\web\Response
@@ -182,6 +204,29 @@ class SlotController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * Генерируем слоты на день $unixTime
+     * @param int|null $unixTime
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function actionGenerate(?int $unixTime=null)
+    {
+        $this->service->generateSlots(($unixTime?:time()));
+        return $this->goBack();
+    }
+    public function actionGenerateAjax(?int $unixTime=null)
+    {
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        try {
+            $this->service->generateSlots(($unixTime?:time()));
+            Yii::$app->session->setFlash('success', 'Cгенерированы слоты на день: '.date('d.m.Y', $unixTime));
+            return ['status'=>'success'];
+        } catch (\Exception $ex) {
+            Yii::$app->session->setFlash('error', 'Ошибка при создании слотов: '.$ex->getMessage());
+            return ['status'=>'error','error'=>$ex->getMessage()];
+        }
+    }
 
     /**
      * Finds the Teams model based on its primary key value.

@@ -4,6 +4,7 @@ namespace booking\entities\Slot;
 
 use booking\entities\behaviors\FillingServiceFieldsBehavior;
 use booking\entities\behaviors\LoggingBehavior;
+use booking\helpers\DateHelper;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -89,7 +90,34 @@ class Slot extends ActiveRecord
 
     public function getName(): string
     {
-        return 'XX.XX.XX XX:XX-XX:XX';
+        return date('d.m.y',$this->date) . ' ' . DateHelper::timeIntToStr($this->begin,false) .' - ' . DateHelper::timeIntToStr($this->end,false);
+    }
+
+    /**
+     * Возвращаем время начало слота в формате Unixtime
+     * @return int
+     */
+    public function getBeginUT():int
+    {
+        return ($this->date + $this->begin);
+    }
+
+    /**
+     * Возвращаем время окончания слота в формате Unixtime
+     * @return int
+     */
+    public function getEndUT():int
+    {
+        return ($this->date + $this->end);
+    }
+
+    /**
+     * Сколько свободно слотов
+     * @return int
+     */
+    public function getFree():int
+    {
+        return $this->qty;
     }
 #on
     public function onFree()
@@ -132,6 +160,21 @@ class Slot extends ActiveRecord
     public function isDeleted():bool
     {
         return $this->status===self::STATUS_DELETED;
+    }
+#hass
+    public function hasReserved():bool
+    {
+        //TODO: когда будут заказы надо переписать метод
+        return $this->qty!==$this->getFree();
+    }
+    /**
+     * Является ли слот детским?
+     * Детским слот является, если есть хотя б один слот с детской машиной
+     * @return bool
+     */
+    public function isChild():bool
+    {
+        return rand(0,1);
     }
     /**
      * {@inheritdoc}
@@ -177,5 +220,8 @@ class Slot extends ActiveRecord
             'editor_name' => 'Редактор',
         ];
     }
+
+
+
 
 }

@@ -2,6 +2,8 @@
 
 namespace backend\controllers;
 
+use booking\repositories\SlotRepository;
+use booking\useCases\manage\SlotManageService;
 use common\models\LoginForm;
 use Yii;
 use yii\filters\VerbFilter;
@@ -42,7 +44,18 @@ class SiteController extends Controller
             ],
         ];
     }
+    private SlotManageService $slotService;
+    private SlotRepository $slotRepository;
 
+    public function __construct(                  $id, $module,
+                                SlotManageService $slotService,
+                                SlotRepository    $slotRepository,
+                                                  $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->slotService = $slotService;
+        $this->slotRepository = $slotRepository;
+    }
     /**
      * {@inheritdoc}
      */
@@ -104,6 +117,14 @@ class SiteController extends Controller
 
     public function actionCalendar()
     {
-        return $this->render('calendar');
+        $calendar=$this->slotRepository->getCalendar();
+        //если слотов нет на текущее время, тогда генерируем слоты
+        if (empty($calendar)) {
+            $this->slotService->generateSlots();
+            $calendar=$this->slotRepository->getCalendar();
+        }
+        return $this->render('calendar',[
+            'calendar'=>$calendar
+        ]);
     }
 }

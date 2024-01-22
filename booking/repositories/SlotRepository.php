@@ -2,8 +2,10 @@
 namespace booking\repositories;
 
 use booking\entities\Slot\Slot;
+use booking\helpers\DateHelper;
 use Yii;
 use yii\caching\TagDependency;
+use yii\db\ActiveRecord;
 
 class SlotRepository
 {
@@ -49,8 +51,75 @@ class SlotRepository
     {
         return static::find_st($entityOrId);
     }
+###other
+    /**
+     * Получаем слоты на месяц разбитые по дням. Если не указан $unixtime, тогда текущее время
+     * @param int|null $unixTime
+     * @return array
+     */
+    public function getCalendar(?int $unixTime=null):array
+    {
+        $dateTime=$unixTime?:time();
+        $slots=$this->findSlotsByMonth($dateTime);
+        $calendar=[];
+
+        foreach ($slots as $slot) {
+            $day=date('j',$slot->date);
+            $year=date('Y',$slot->date);
+            $calendar[$year][$day][$slot->id]=[
+                'begin'=>$slot->begin,
+                'end'=>$slot->end,
+                'qty'=>$slot->qty,
+                'free'=>$slot->getFree(),
+                'isChild'=>$slot->isChild(),
+            ];
+            if (isset($calendar[$year][$day]['qtySlot'])) {
+                $calendar[$year][$day]['qtySlot']++;
+            }else {
+                $calendar[$year][$day]['qtySlot']=1;
+            }
+
+            if (isset($calendar[$year][$day]['qty'])) {
+                $calendar[$year][$day]['qty']+=$slot->getFree();
+            }else {
+                $calendar[$year][$day]['qty']=$slot->getFree();
+            }
+
+        }
 
 
+        return $calendar;
+    }
+    /**
+     * @param int $dateTime
+     * @return Slot[]
+     * @throws \Exception
+     */
+    public function findSlotsByDay(int $dateTime):array
+    {
+        return Slot::find()
+            ->andWhere([ '>=', 'date',DateHelper::beginDay($dateTime)])
+            ->andWhere([ '<=', 'date',DateHelper::endDay($dateTime)])
+            ->orderBy('date')
+            ->all();
+    }
+    /**
+     * @param int $dateTime
+     * @return Slot[]
+     * @throws \Exception
+     */
+    public function findSlotsByMonth(int $dateTime):array
+    {
+        return Slot::find()
+            ->andWhere([ '>=', 'date',DateHelper::beginMonthDayByUnixTime($dateTime)])
+            ->andWhere([ '<=', 'date',DateHelper::lastMonthDayByUnixTime($dateTime)])
+            ->orderBy('date')
+            ->all();
+    }
+    public function findAll():array
+    {
+        return $this->findAllBy([]);
+    }
 ###
 
     private static function getBy(array $condition): Slot
@@ -60,6 +129,9 @@ class SlotRepository
         }
         return $entity;
     }
+
+
+
 
     private function findAllBy(array $condition):array
     {

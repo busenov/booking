@@ -1,67 +1,152 @@
 <?php
 
+use backend\assets\CalendarAsset;
 use booking\entities\Car\CarType;
 use booking\helpers\CarHelper;
 use booking\useCases\manage\CarTypeManageService;
 use booking\useCases\manage\ScheduleManageService;
+use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
+/** @var array $calendar */
 
 $this->title = "Календарь";
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
+CalendarAsset::register($this);
 ?>
+<pre>
+    <?php
+//    dump($calendar);
+//    dump(json_encode($calendar));
+    ?>
+</pre>
+<script type='text/javascript'>
+    var $ykv_calendar=<?=json_encode($calendar)?>;
+    console.log($ykv_calendar);
+</script>
 <div class="calendar">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <table class="table table-bordered border-primary">
-        <tr>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
-            <td>4</td>
-            <td>5</td>
-            <td>6</td>
-            <td>7</td>
-        </tr>
-        <tr>
-            <td>8</td>
-            <td>9</td>
-            <td>10</td>
-            <td>11</td>
-            <td>12</td>
-            <td>13</td>
-            <td>14</td>
-        </tr>
-        <tr>
-            <td>15</td>
-            <td>16</td>
-            <td>17</td>
-            <td>18</td>
-            <td>19</td>
-            <td>20</td>
-            <td>21</td>
-        </tr>
-        <tr>
-            <td>22</td>
-            <td>23</td>
-            <td>24</td>
-            <td>25</td>
-            <td>26</td>
-            <td>27</td>
-            <td>28</td>
-        </tr>
-        <tr>
-            <td>29</td>
-            <td>30</td>
-            <td>31</td>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
-            <td>4</td>
-        </tr>
-    </table>
+
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center mb-5">
+                    <h2 class="heading-section"></h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="elegant-calencar d-md-flex">
+                        <div class="wrap-header d-flex align-items-center">
+                            <p id="reset">сброс</p>
+                            <div id="header" class="p-0">
+                                <div class="pre-button d-flex align-items-center justify-content-center"><i class="fa fa-chevron-left"></i></div>
+                                <div class="head-info">
+                                    <div class="head-day"></div>
+                                    <div class="head-slots"></div>
+                                    <div class="head-month"></div>
+                                    <div class="head-button align-bottom">
+                                        <div class=" position-relative">
+                                            <div class="btn-group  position-absolute end-0">
+                                                <a href="#"
+                                                   id="generate-btn"
+                                                   class="btn btn btn-success"
+                                                   data-url="<?=Url::to(['slot/generate-ajax'])?>"
+                                                   data-unixTime="<?=time()?>"
+                                                >Сгенерировать слоты</a>
+<!--                                                <a href="--><?php //=Url::to(['create','weekday'=>Schedule::WEEKDAY_WEEKEND])?><!--" class="btn btn-primary">Создать расписание на выходные</a>-->
+                                                <a href="#"
+                                                   id="clear-btn"
+                                                   class="btn btn-danger"
+                                                   data-url="<?=Url::to(['slot/clear-ajax'])?>"
+                                                   data-unixTime="<?=time()?>"
+                                                >Очистить</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="next-button d-flex align-items-center justify-content-center"><i class="fa fa-chevron-right"></i></div>
+                            </div>
+                        </div>
+                        <div class="calendar-wrap">
+                            <table id="calendar">
+                                <thead>
+                                <tr>
+                                    <th>Пн</th>
+                                    <th>Вт</th>
+                                    <th>Ср</th>
+                                    <th>Чт</th>
+                                    <th>Пт</th>
+                                    <th>Сб</th>
+                                    <th>Вс</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>

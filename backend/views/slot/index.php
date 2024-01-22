@@ -5,6 +5,7 @@ use backend\forms\SlotSearch;
 use booking\entities\Car\CarType;
 use booking\entities\Slot\Slot;
 use booking\helpers\CarHelper;
+use booking\helpers\DateHelper;
 use booking\helpers\SlotHelper;
 use booking\useCases\manage\CarTypeManageService;
 use booking\useCases\manage\SlotManageService;
@@ -26,11 +27,22 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?php if (SlotManageService::guardCanCreate(true)) :?>
-    <p>
-        <?= Html::a('Создать слот', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-    <?php endif;?>
+    <div class="row">
+        <div class="col-md-6">
+            <?php if (SlotManageService::guardCanCreate(true)) :?>
+                <?= Html::a('Создать слот', ['create'], ['class' => 'btn btn-success']) ?>
+            <?php endif;?>
+        </div>
+        <div class="col-md-6">
+            <div class=" position-relative">
+                <div class="btn-group  position-absolute end-0">
+<!--                    <a href="--><?php //=Url::to(['create','weekday'=>Schedule::WEEKDAY_WORK])?><!--" class="btn btn btn-success">Создать расписание на будни</a>-->
+<!--                    <a href="--><?php //=Url::to(['create','weekday'=>Schedule::WEEKDAY_WEEKEND])?><!--" class="btn btn-primary">Создать расписание на выходные</a>-->
+                    <a href="<?=Url::to(['clear'])?>" class="btn btn-danger">Очистить</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <?php Pjax::begin(); ?>
 
@@ -48,24 +60,30 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Html::a(Html::encode($data->getName()), Url::to(['view', 'id' => $data->id]));
                 },
                 'format' => 'raw',
+                'width' => '20%',
             ],
             [
                 'attribute' => 'begin',
-                'width' => '20%',
+                'value' => function (Slot $data) {
+                    return DateHelper::timeIntToStr($data->begin,false);
+                },
+                'format' => 'raw',
+
             ],
             [
                 'attribute' => 'end',
-                'width' => '20%',
+                'value' => function (Slot $data) {
+                    return DateHelper::timeIntToStr($data->end,false);
+                },
+                'format' => 'raw',
+            ],
+            [
+                'attribute' => 'qty',
             ],
             [
                 'attribute' => 'note',
                 'width' => '20%',
             ],
-            [
-                'attribute' => 'qty',
-                'width' => '20%',
-            ],
-
             [
                 'attribute' => 'status',
                 'width' => '10%',
@@ -93,7 +111,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             Url::to(['delete-hard', 'id' => $data->id]),
                             [
                                 'title' => 'Жестко удалить',
-                                'data-confirm'=>'Вы уверены, что хотите жестко удалить этот элемент? Восстановление не возможно.'
+                                'data-confirm'=>'Вы уверены, что хотите жестко удалить этот элемент? Восстановление не возможно.',
+                                'data-method'=>'post'
                             ]);
 
                     }

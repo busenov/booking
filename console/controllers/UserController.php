@@ -18,10 +18,10 @@ class UserController extends Controller
 {
     private UserManageService $service;
 
-    public function __construct($id, $module, UserManageService $service, $config = [])
+    public function __construct($id, $module, UserManageService $slotService, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->service = $service;
+        $this->service = $slotService;
     }
 
 
