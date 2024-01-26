@@ -12,15 +12,15 @@ class SlotHelper
     public static function statusLabel($status): string
     {
         switch ($status) {
-//            case Slot::STATUS_INACTIVE:
-//                $class = 'badge bg-secondary';
-//                break;
-//            case CarType::STATUS_ACTIVE:
-//                $class = 'badge bg-success';
-//                break;
-//            case CarType::STATUS_DELETED:
-//                $class = 'badge bg-warning text-dark';
-//                break;
+            case Slot::STATUS_NEW:
+                $class = 'badge bg-secondary';
+                break;
+            case Slot::STATUS_ACTIVE:
+                $class = 'badge bg-success';
+                break;
+            case CarType::STATUS_DELETED:
+                $class = 'badge bg-warning text-dark';
+                break;
             default:
                 $class = 'badge label-default';
         }

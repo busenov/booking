@@ -19,7 +19,7 @@ class UserManageService
     public function __construct(
         UserRepository $repository,
         RoleManager $roles,
-        TransactionManager $transaction,
+        TransactionManager $transaction
     )
     {
         $this->repository = $repository;
@@ -32,10 +32,10 @@ class UserManageService
         $user = User::create(
             $form->name,
             $form->email,
+            $form->telephone,
             $form->password,
             $form->surname,
             $form->patronymic,
-            $form->telephone,
             (int)$form->gender,
             (int)$form->status
         );

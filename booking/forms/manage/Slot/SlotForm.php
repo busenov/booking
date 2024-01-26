@@ -14,12 +14,11 @@ class SlotForm extends Model
     public ?int $status=null;
     public ?int $qty=null;
     public ?string $note=null;
+    public ?bool $is_child=null;
     public ?Slot $_slot;
-    public CarTypeRepository $carTypeRepository;
     public function __construct(Slot $slot=null, $config = [])
     {
         parent::__construct($config);
-        $this->carTypeRepository=new CarTypeRepository();
         if ($slot) {
             $this->date=$slot->date;
             $this->begin=$slot->begin;
@@ -27,10 +26,11 @@ class SlotForm extends Model
             $this->note=$slot->note;
             $this->status=$slot->status;
             $this->qty=$slot->qty;
+            $this->is_child=$slot->is_child;
 
             $this->_slot = $slot;
         } else {
-            $this->status=Slot::STATUS_FREE;
+            $this->status=Slot::STATUS_NEW;
         }
 
     }
@@ -40,7 +40,7 @@ class SlotForm extends Model
      */
     public function rules()
     {
-        $maxQty=$this->carTypeRepository->sumActiveCar();
+        $maxQty=Slot::getMaxQty();
         return [
             [['qty',], 'integer', 'min'=>1,'max'=>$maxQty],
             [['date','begin','end'],'integer'],
@@ -50,6 +50,7 @@ class SlotForm extends Model
 //            [['date'], 'slotDateTimeValidator'],
             ['begin','compare', 'compareAttribute' => 'end','operator' => '<'],
             ['end','compare', 'compareAttribute' => 'begin','operator' => '>'],
+            ['is_child','boolean'],
             [['date','begin','end','qty','status'],'required']
         ];
     }
@@ -58,16 +59,26 @@ class SlotForm extends Model
     {
         return Slot::getAttributeLabels();
     }
-//    public function slotDateTimeValidator($attribute,$params)
-//    {
-//        dump('tut');
-//        dump($attribute);
-//        $this->addError($attribute, 'your password is not strong enough!');
-//        return "
-////if(".$condition.") {
-//    messages.push(your password is too weak, you fool!');
-////}
-//";
-////        exit;
-//    }
+    /**
+     * Иногда нам надо отдать значение не как в базе идентификатор, а человечески понятное значение.
+     * Например не client_id, а имя клиента, не type, а название типа
+     * @param $attributeName
+     */
+    public function getValue($attributeName)
+    {
+        switch ($attributeName) {
+            case 'is_child':
+                return Slot::getIsChildLabel($this->is_child);
+//            case 'priority':
+//                return Slot::getPriorityLabel($this->priority);
+//            case 'client_id':
+//                return $this->getClientName($this->client_id);
+//            case 'responsible_id':
+//                return $this->getResponsibleName($this->responsible_id);
+//            case 'status':
+//                return $this->getStatusName($this->status);
+            default :
+                return $this->$attributeName;
+        }
+    }
 }

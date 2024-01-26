@@ -2,7 +2,9 @@
 
 namespace backend\controllers;
 
+use booking\forms\manage\Order\OrderCreateForm;
 use booking\repositories\SlotRepository;
+use booking\useCases\manage\OrderManageService;
 use booking\useCases\manage\SlotManageService;
 use common\models\LoginForm;
 use Yii;
@@ -46,15 +48,18 @@ class SiteController extends Controller
     }
     private SlotManageService $slotService;
     private SlotRepository $slotRepository;
+    private OrderManageService $orderService;
 
-    public function __construct(                  $id, $module,
-                                SlotManageService $slotService,
-                                SlotRepository    $slotRepository,
-                                                  $config = [])
+    public function __construct(                    $id, $module,
+                                SlotManageService   $slotService,
+                                SlotRepository      $slotRepository,
+                                OrderManageService  $orderService,
+                                                    $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->slotService = $slotService;
         $this->slotRepository = $slotRepository;
+        $this->orderService = $orderService;
     }
     /**
      * {@inheritdoc}
@@ -118,13 +123,32 @@ class SiteController extends Controller
     public function actionCalendar()
     {
         $calendar=$this->slotRepository->getCalendar();
+        $orderForm=new OrderCreateForm();
         //если слотов нет на текущее время, тогда генерируем слоты
         if (empty($calendar)) {
             $this->slotService->generateSlots();
             $calendar=$this->slotRepository->getCalendar();
         }
+        if ($this->request->isPost) {
+
+            if ($orderForm->load($this->request->post()) ) {
+                try {
+                    $entity=$this->orderService->create($orderForm);
+                    $calendar=$this->slotRepository->getCalendar();
+                    $orderForm=new OrderCreateForm();
+                    Yii::$app->session->setFlash('success', 'Слот успешно забронирован. Бронь №: '.$entity->id);
+                } catch (\RuntimeException $ex) {
+                    Yii::$app->session->setFlash('error', 'Ошибка при бронировании: ' . $ex->getMessage());
+                }
+            }
+        }
         return $this->render('calendar',[
-            'calendar'=>$calendar
+            'calendar'=>$calendar,
+            'model'=>$orderForm
         ]);
+    }
+    public function actionSuccess()
+    {
+
     }
 }

@@ -30,6 +30,7 @@ use yii\web\IdentityInterface;
  * @property integer $gender
  * @property string $shortName
  * @property array $roles
+ * @property integer $type
  *
  * @property integer $created_at
  * @property integer $updated_at
@@ -47,17 +48,22 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_ACTIVE = 10;
     const GENDER_MAN=1;
     const GENDER_WOMAN=2;
+
     const PWD_MIN_LENGTH=6;
+
+    const TYPE_USER=1;
+    const TYPE_CUSTOMER=2;
+    const TYPE_RACER=3;
 
     public static function create(
         string  $name,
         string  $email,
+        ?string $telephone,
         ?string $password,
         ?string $surname,
         ?string $patronymic,
-        ?string $telephone,
         ?int    $gender=null,
-        ?int    $status=null,
+        ?int    $status=null
     ): self
     {
         $user = new User();
@@ -70,6 +76,7 @@ class User extends ActiveRecord implements IdentityInterface
         $user->gender =$gender;
         $user->status = $status??self::STATUS_ACTIVE;
         $user->auth_key = Yii::$app->security->generateRandomString();
+        $user->type=self::TYPE_USER;
         return $user;
     }
 
@@ -82,7 +89,7 @@ class User extends ActiveRecord implements IdentityInterface
         ?string $patronymic=null,
         ?string $telephone=null,
         ?int    $gender=null,
-        ?int    $status=null,
+        ?int    $status=null
     ): void
     {
         $this->name = $name;
@@ -93,7 +100,17 @@ class User extends ActiveRecord implements IdentityInterface
         $this->gender =$gender;
         $this->status =$status;
     }
-
+    public static function createCustomer(
+        string  $name,
+        string $telephone
+    ): self
+    {
+        $user = new User();
+        $user->name = $name;
+        $user->telephone =$telephone;
+        $user->type=self::TYPE_USER;
+        return $user;
+    }
 
     public static function requestSignup(string $name,string $surname,string $email, string $password): self
     {

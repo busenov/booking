@@ -76,7 +76,10 @@ class UserRepository
     {
         return $this->findOneBy(['status'=>User::STATUS_ACTIVE,'email' => $value]);
     }
-
+    public function findByTelephone($value)
+    {
+        return $this->findOneBy(['telephone' => $value]);
+    }
     public function findActive():array
     {
         return $this->findAllBy(['status'=>User::STATUS_ACTIVE]);
@@ -122,6 +125,8 @@ class UserRepository
     {
         return User::find()->andWhere($condition)->one();
     }
+
+
 
 
 }

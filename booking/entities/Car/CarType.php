@@ -4,6 +4,10 @@ namespace booking\entities\Car;
 
 use booking\entities\behaviors\FillingServiceFieldsBehavior;
 use booking\entities\behaviors\LoggingBehavior;
+use booking\entities\Order\Order;
+use booking\entities\Slot\Slot;
+use booking\repositories\OrderRepository;
+use booking\repositories\SlotRepository;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -94,6 +98,17 @@ class CarType extends ActiveRecord
     {
         return $this->status===self::STATUS_DELETED;
     }
+
+    public function isIdEqualTo($id):bool
+    {
+        return $this->id == $id;
+    }
+#gets
+    public function getFreeBySlot(int $slotId=null)
+    {
+        return $this->qty - OrderRepository::findSumReservedCar_st($slotId,$this->id);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -151,4 +166,6 @@ class CarType extends ActiveRecord
     {
         return ArrayHelper::getValue(self::getStatusList(), $status);
     }
+
+
 }

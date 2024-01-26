@@ -10,6 +10,8 @@ use yii\db\ActiveRecord;
 class SlotRepository
 {
 
+
+
     public static function get_st($entityOrId): Slot
     {
         if (is_a($entityOrId,Slot::class)) {
@@ -51,6 +53,7 @@ class SlotRepository
     {
         return static::find_st($entityOrId);
     }
+
 ###other
     /**
      * Получаем слоты на месяц разбитые по дням. Если не указан $unixtime, тогда текущее время
@@ -62,15 +65,17 @@ class SlotRepository
         $dateTime=$unixTime?:time();
         $slots=$this->findSlotsByMonth($dateTime);
         $calendar=[];
+        $reservedCars=OrderRepository::findSumReservedCar_st();
 
         foreach ($slots as $slot) {
             $day=date('j',$slot->date);
             $year=date('Y',$slot->date);
+            $free=isset($reservedCars[$slot->id])?($slot->qty - $reservedCars[$slot->id]['qty']):$slot->qty;
             $calendar[$year][$day][$slot->id]=[
                 'begin'=>$slot->begin,
                 'end'=>$slot->end,
                 'qty'=>$slot->qty,
-                'free'=>$slot->getFree(),
+                'free'=>$free,
                 'isChild'=>$slot->isChild(),
             ];
             if (isset($calendar[$year][$day]['qtySlot'])) {
@@ -80,9 +85,9 @@ class SlotRepository
             }
 
             if (isset($calendar[$year][$day]['qty'])) {
-                $calendar[$year][$day]['qty']+=$slot->getFree();
+                $calendar[$year][$day]['qty']+=$free;
             }else {
-                $calendar[$year][$day]['qty']=$slot->getFree();
+                $calendar[$year][$day]['qty']=$free;
             }
 
         }

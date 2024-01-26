@@ -4,6 +4,7 @@ namespace booking\repositories;
 use booking\entities\Schedule\Schedule;
 use Yii;
 use yii\caching\TagDependency;
+use function Symfony\Component\String\s;
 
 class ScheduleRepository
 {
@@ -53,6 +54,11 @@ class ScheduleRepository
     {
         return $this->findOneBy(['weekday'=>$weekday]);
     }
+    public function findByDate(?int $unixTime=null):?Schedule
+    {
+        $unixTime=$unixTime??time();
+        return $this->findByWeekday(date('N',$unixTime));
+    }
 
     /**
      * @return Schedule[]
@@ -60,6 +66,14 @@ class ScheduleRepository
     public function findAll():array
     {
         return $this->findAllBy([]);
+    }
+    public static function findActive_st():?array
+    {
+        return Schedule::find()->where(['status'=>Schedule::STATUS_ACTIVE])->all();
+    }
+    public function findActive():?array
+    {
+        return static::findActive_st();
     }
 ###Sum
 
@@ -85,4 +99,6 @@ class ScheduleRepository
     {
         return Schedule::find()->andWhere($condition)->one();
     }
+
+
 }

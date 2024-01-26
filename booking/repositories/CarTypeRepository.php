@@ -50,10 +50,18 @@ class CarTypeRepository
     {
         return static::find_st($entityOrId);
     }
+    public static function findActive_st():?array
+    {
+        return CarType::find()->where(['status'=>CarType::STATUS_ACTIVE])->all();
+    }
 ###Sum
+    private ?int $_sumActiveCar=null;
     public function sumActiveCar():int
     {
-        return intval(CarType::find()->where(['status'=>CarType::STATUS_ACTIVE])->sum('qty'));
+        if (empty($this->_sumActiveCar)) {
+            $this->_sumActiveCar=intval(CarType::find()->where(['status'=>CarType::STATUS_ACTIVE])->sum('qty'));
+        }
+        return $this->_sumActiveCar;
     }
 
 ###

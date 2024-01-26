@@ -4,6 +4,7 @@ namespace booking\entities\Schedule;
 
 use booking\entities\behaviors\FillingServiceFieldsBehavior;
 use booking\entities\behaviors\LoggingBehavior;
+use booking\helpers\DateHelper;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -14,9 +15,13 @@ use yii\helpers\ArrayHelper;
  * @property int $id
  * @property int $weekday               //день недели
  * @property int $begin                 //начало дня(сек)
+ * @property int $begin_str                 //начало дня(формат ЧЧ:ММ)
  * @property int $end                   //конец дня(сек)
+ * @property int $end_str                 //конец дня(формат ЧЧ:ММ)
  * @property int $duration              //длительность заезда(сек)
+ * @property int $duration_min              //длительность заезда(мин)
  * @property int $interval              //интервал между слотами(сек)
+ * @property int $interval_min              //интервал между слотами(мин)
  * @property int $sort                  //сортировка
  *
  * @property string|null $note
@@ -119,7 +124,7 @@ class Schedule extends ActiveRecord
             'id' => 'ID',
             'weekday' => 'День недели',
             'begin' => 'Начало',
-            'end' => 'Конец',
+            'end' => 'Окончание',
             'duration' => 'Продолжительность заезда',
             'interval' => 'Интервал между заездами',
             'sort' => 'сортировка',
@@ -174,6 +179,28 @@ class Schedule extends ActiveRecord
     {
         return [1,2,3,4,5];
     }
+    public function getName():string
+    {
+        return static::weekdayName($this->weekday) .', '.
+            DateHelper::timeIntToStr($this->begin,false) .'-' . DateHelper::timeIntToStr($this->end,false) .
+            ' (заезд:'.round($this->duration/60) .' мин, интервал: ' .round($this->interval/60).' мин)';
+    }
+    public function getDuration_min():int
+    {
+        return intval($this->duration/60);
+    }
+    public function getInterval_min():int
+    {
+        return intval($this->interval/60);
+    }
+    public function getBegin_str():string
+    {
+        return DateHelper::timeIntToStr($this->begin,false);
+    }
+    public function getEnd_str():string
+    {
+        return DateHelper::timeIntToStr($this->end,false);
+    }
     /**
      * {@inheritdoc}
      */
@@ -199,5 +226,7 @@ class Schedule extends ActiveRecord
     {
         return static::getAttributeLabels();
     }
+
+
 
 }

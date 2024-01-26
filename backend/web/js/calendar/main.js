@@ -11,8 +11,12 @@
             days = document.getElementsByTagName('td'),
             selectedDay,
             setDate,
-            daysLen = days.length;
-    // options should like '2014-01-01'
+            daysLen = days.length,
+            formSlotId = document.getElementById('form-slot_id'),
+            btnSlot = document.getElementsByClassName('btn-slot'),
+            step2Times = document.getElementById('step2-times'),
+            step2Title = document.getElementById('step2-title');
+
         function Calendar(selector, options) {
             this.options = options;
             this.draw();
@@ -34,6 +38,12 @@
                 reset.addEventListener('click', function(){that.reset(); });
                 generateSlots.addEventListener('click', function(){that.generateSlots(this); });
                 clearSlots.addEventListener('click', function(){that.clearSlots(this); });
+
+
+            for (var i = 0; i < btnSlot.length; i++) {
+                btnSlot[i].addEventListener('click', function(){that.clickSlot(this);});
+            }
+
             while(daysLen--) {
                 days[daysLen].addEventListener('click', function(){that.clickDay(this); });
             }
@@ -42,37 +52,66 @@
 
         Calendar.prototype.drawHeader = function(e) {
             var headDay = document.getElementsByClassName('head-day'),
-                headMonth = document.getElementsByClassName('head-month'),
-                headSlots = document.getElementsByClassName('head-slots')
-            ;
+                headMonth = document.getElementsByClassName('head-month');
 
                 e?headDay[0].innerHTML = e : headDay[0].innerHTML = day;
                 headMonth[0].innerHTML = monthTag[month] +" - " + year;
-                headSlots[0].innerHTML ='slots';
          };
 
+        Calendar.prototype.drawStep2 = function (e) {
+            step2Title.innerHTML=selectedDay.toLocaleString("ru-RU",{
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+            });
+            if ($ykv_calendar) {
+                let slotsByDay,html='';
+                console.log($ykv_calendar[year][e])
+
+                if (slotsByDay=$ykv_calendar[year][e]) {
+                    for(let key in slotsByDay) {
+                        if (!isNaN(key)) {
+                            html += '<button class="btn btn-success small btn-slot" type="button" data-slot_id="' + key +'">'+ this.getTime(slotsByDay[key]['begin'])+' '+ slotsByDay[key]['qty']+'('+slotsByDay[key]['free']+')'+'</button>';
+                        }
+                    };
+
+                } else {
+                    html='Нет свободных заездов';
+                }
+                step2Times.innerHTML = html
+                btnSlot = document.getElementsByClassName('btn-slot');
+                for (var i = 0; i < btnSlot.length; i++) {
+                    btnSlot[i].addEventListener('click', function(){calendar.clickSlot(this);});
+                }
+            }
+
+        }
         Calendar.prototype.drawDays = function() {
             var startDay = new Date(year, month, 1).getDay(),
     //      Ниже указано общее количество дней в этом месяце.
                 nDays = new Date(year, month + 1, 0).getDate(),
-                n = startDay-1;
+                n = startDay;
     //      Очистить оригинальный стиль и дату
-            for(var k = 0; k <42; k++) {
+            for(var k = 0; k < 42; k++) {
                 days[k].innerHTML = '';
                 days[k].id = '';
                 days[k].className = '';
             }
 
             for(var i  = 1; i <= nDays ; i++) {
-                let $free=0;
+                let $free=0,$countSlot=0;
                 if ($ykv_calendar[year]) {
                     if ($ykv_calendar[year][i]) {
                         $free=$ykv_calendar[year][i]['qty'];
+                        $countSlot=$ykv_calendar[year][i]['qtySlot'];
                     }
                 }
 
-                days[n].innerHTML = i + "<br>детс<br>свободно: " + $free;
-                days[n].dataset.day = i;
+                days[n-1].innerHTML = "<b>" + i + "</b>"+"<br>[" + $free + "]";
+                let title="Заездов: " + $countSlot + ". Мест свободно: " + $free;
+                days[n-1].setAttribute('title',title)
+                days[n-1].dataset.day = i;
+
                 n++;
             }
 
@@ -80,16 +119,16 @@
                 if(days[j].innerHTML === ""){
                     days[j].id = "disabled";
 
-                }else if(j === day + startDay - 1){
+                }else if((j+1) === day + startDay){
                     if((this.options && (month === setDate.getMonth()) && (year === setDate.getFullYear())) || (!this.options && (month === today.getMonth())&&(year===today.getFullYear()))){
                         this.drawHeader(day);
-                        days[j].id = "today";
+                        days[j-1].id = "today";
                     }
                 }
                 if(selectedDay){
                     if((j === selectedDay.getDate() + startDay - 1)&&(month === selectedDay.getMonth())&&(year === selectedDay.getFullYear())){
-                    days[j-1].className = "selected";
-                    this.drawHeader(selectedDay.getDate());
+                        days[j-1].className = "selected";
+                        this.drawHeader(selectedDay.getDate());
                     }
                 }
             }
@@ -98,12 +137,14 @@
         Calendar.prototype.clickDay = function(o) {
             var selected = document.getElementsByClassName("selected"),
                 len = selected.length;
+
             if(len !== 0){
                 selected[0].className = "";
             }
             o.className = "selected";
             selectedDay = new Date(year, month, o.dataset.day);
             this.drawHeader(o.dataset.day);
+            this.drawStep2(o.dataset.day);
             this.setCookie('selected_day', 1);
 
         };
@@ -158,6 +199,7 @@
                 var expires = "";
             }
             document.cookie = name + "=" + selectedDay + expires + "; path=/";
+            document.cookie = name + "_unx" + "=" + Math.floor(selectedDay.getTime() / 1000) + expires + "; path=/";
         };
 
         Calendar.prototype.getCookie = function(name) {
@@ -189,6 +231,7 @@
                 });
             return false;
         };
+
         Calendar.prototype.clearSlots = function(o) {
             console.log("click");
             let url=o.dataset.url + '?unixTime=' + Math.floor(selectedDay.getTime() / 1000)
@@ -204,6 +247,20 @@
             return false;
         };
 
+        Calendar.prototype.clickSlot = function(o) {
+            formSlotId.value=o.dataset.slot_id;
+
+            console.log(o);
+            console.log(o.dataset.slot_id);
+            console.log(formSlotId.value);
+            return false;
+        }
+        Calendar.prototype.getTime = function (timeUnx) {
+            let hour,minute
+            hour = Math.floor(timeUnx/(60*60));
+            minute = Math.floor((timeUnx-(hour*60*60))/60);
+            return ('00'+hour).slice(-2) + ':' + ('00'+minute).slice(-2);
+        }
         var calendar = new Calendar();
     
         

@@ -4,8 +4,14 @@ namespace booking\entities\Slot;
 
 use booking\entities\behaviors\FillingServiceFieldsBehavior;
 use booking\entities\behaviors\LoggingBehavior;
+use booking\entities\Order\Order;
 use booking\helpers\DateHelper;
+use booking\repositories\CarTypeRepository;
+use booking\repositories\OrderRepository;
+use Codeception\Constraint\Page;
+use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -20,6 +26,7 @@ use yii\helpers\ArrayHelper;
  * @property int $qty                   //возможное кол-во людей
  *
  * @property string|null $note          //примечание
+ * @property boolean $is_child          //Детский заезд?
  *
  * @property int|null $created_at
  * @property int|null $updated_at
@@ -27,13 +34,13 @@ use yii\helpers\ArrayHelper;
  * @property string|null $author_name
  * @property int|null $editor_id
  * @property string|null $editor_name
+ *
+ * @property Order[] $orders
  */
 class Slot extends ActiveRecord
 {
-    const STATUS_FREE=10;              //Свободен
-    const STATUS_FROZEN=20;             //Заморожен
-    const STATUS_PAID=30;               //Оплачен
-    const STATUS_RESERVED=40;           //Забронирован
+    const STATUS_NEW=10;                //Новый
+    const STATUS_ACTIVE=20;             //Активный
     const STATUS_DELETED=100;           //Удален
 
     public static function create(
@@ -41,7 +48,7 @@ class Slot extends ActiveRecord
                                 int     $begin,
                                 int     $end,
                                 int     $qty,
-                                int     $status=self::STATUS_FREE,
+                                int     $status=self::STATUS_NEW,
                                 ?string  $note=null
                             ):self
     {
@@ -54,12 +61,17 @@ class Slot extends ActiveRecord
             'note'=>$note
         ]);
     }
+
+
+
+
     public function edit(
         int     $date,
         int     $begin,
         int     $end,
         int     $qty,
         int     $status,
+        bool     $isChild,
         ?string  $note=null
     ):void
     {
@@ -68,6 +80,7 @@ class Slot extends ActiveRecord
         $this->end=$end;
         $this->status=$status;
         $this->qty=$qty;
+        $this->is_child=$isChild;
         $this->note=$note;
 
     }
@@ -75,10 +88,8 @@ class Slot extends ActiveRecord
     public static function getStatusList(): array
     {
         return [
-            self::STATUS_FREE => 'Свободен',
-            self::STATUS_FROZEN => 'Заморожен',
-            self::STATUS_PAID => 'Оплачен',
-            self::STATUS_RESERVED => 'Забронирован',
+            self::STATUS_NEW => 'Новый',
+            self::STATUS_ACTIVE => 'Активный',
             self::STATUS_DELETED => 'Удален',
         ];
     }
@@ -110,56 +121,89 @@ class Slot extends ActiveRecord
     {
         return ($this->date + $this->end);
     }
+    public function getOrders(): ActiveQuery
+    {
+        return $this->hasMany(Order::class, ['slot_id' => 'id']);
+    }
 
     /**
-     * Сколько свободно слотов
+     * Сколько свободно слотов. Если передали $carTypeId, тогда смотрим сколько можем заказать именно этой машины
+     * Например.
+     * По слоту у нас возможно участвовать 10 людей. Машин с типом 2 у нас всего 5, причем 1 уже заказали. Поэтому
+     * в рамках этого слота машину с типом 2 у нас можно заказать только 4, но всевго машин можно заказать 9
+     * @param int|null $carTypeId
      * @return int
      */
-    public function getFree():int
+    public function getFree(int $carTypeId=null):int
     {
-        return $this->qty;
+        $carType=CarTypeRepository::find_st($carTypeId);
+        if ($reserved=OrderRepository::findSumReservedCar_st($this->id) and $reserved[$this->id]['qty'] ) {
+            $allReservedCnt=$reserved[$this->id]['qty'];
+            $allFree=$this->qty-$allReservedCnt;
+
+            if ($carTypeId) {
+                $reservedCar=$reserved[$this->id][$carTypeId];
+                $freeCarByType=$carType->qty - $reservedCar;
+                if ($freeCarByType<$allFree) {
+                    return $freeCarByType;
+                }
+            }
+            return $allFree;
+
+        } else {
+            return $this->qty;
+        }
+    }
+    public static function getIsChildLabels():array
+    {
+        return [
+            true => 'детский',
+            false => 'взрослый'
+        ];
+    }
+    public static function getIsChildLabel($attribute)
+    {
+        $result=ArrayHelper::getValue(self::getIsChildLabels(), $attribute);
+        return $result??$attribute;
+    }
+    public static function getMaxQty():int
+    {
+        return \Yii::$app->params['slot.maxQty'];
     }
 #on
-    public function onFree()
+    public function onNew()
     {
-        $this->status=self::STATUS_FREE;
+        $this->status=self::STATUS_NEW;
     }
-    public function onFrozen()
+    public function onActive()
     {
-        $this->status=self::STATUS_FROZEN;
-    }
-    public function onPaid()
-    {
-        $this->status=self::STATUS_PAID;
-    }
-    public function onReserved()
-    {
-        $this->status=self::STATUS_RESERVED;
+        $this->status=self::STATUS_ACTIVE;
     }
     public function onDeleted()
     {
         $this->status=self::STATUS_DELETED;
     }
 #is
-    public function isFree():bool
+    public function isNew():bool
     {
-        return $this->status===self::STATUS_FREE;
+        return $this->status===self::STATUS_NEW;
     }
-    public function isFrozen():bool
+    public function isActive():bool
     {
-        return $this->status===self::STATUS_FROZEN;
-    }
-    public function isPaid():bool
-    {
-        return $this->status===self::STATUS_PAID;
-    }
-    public function isReserved():bool
-    {
-        return $this->status===self::STATUS_RESERVED;
+        return $this->status===self::STATUS_ACTIVE;
     }
     public function isDeleted():bool
     {
         return $this->status===self::STATUS_DELETED;
+    }
+    /**
+     * Является ли слот детским?
+     * (не используется)Детским слот является, если есть хотя б один слот с детской машиной
+     * @return bool
+     */
+    public function isChild():bool
+    {
+        return $this->is_child;
     }
 #hass
     public function hasReserved():bool
@@ -167,15 +211,26 @@ class Slot extends ActiveRecord
         //TODO: когда будут заказы надо переписать метод
         return $this->qty!==$this->getFree();
     }
+
+    public function hasOrders():bool
+    {
+        return count($this->orders)>0;
+    }
     /**
-     * Является ли слот детским?
-     * Детским слот является, если есть хотя б один слот с детской машиной
+     * Разрешено ли редактировать при след. условиях:
+     * - если нет заказов на этот сло
+     *
      * @return bool
      */
-    public function isChild():bool
+    public function readOnly():bool
     {
-        return rand(0,1);
+        if ($this->hasOrders()) {
+            return true;
+        } else {
+            return false;
+        }
     }
+
     /**
      * {@inheritdoc}
      */
@@ -190,7 +245,11 @@ class Slot extends ActiveRecord
             FillingServiceFieldsBehavior::class,
             [
                 'class' => LoggingBehavior::class,
-            ]
+            ],
+            [
+                'class' => SaveRelationsBehavior::class,
+                'relations' => ['orders'],
+            ],
         ];
     }
 
@@ -207,10 +266,12 @@ class Slot extends ActiveRecord
             'id' => 'ID',
             'date' => 'Дата',
             'begin' => 'Начало',
-            'end' => 'Конец',
+            'end' => 'Окончание',
             'status' => 'Статус',
             'qty' => 'Количество',
             'note' => 'Примечание',
+            'is_child' => 'Детский',
+            'countOrders' => 'Броней',
 
             'created_at' => 'Создано',
             'updated_at' => 'Отредактировано',

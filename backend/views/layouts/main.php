@@ -41,7 +41,10 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Войти', 'url' => ['/site/login']];
     } else {
         $menuItems = [
-            ['label' => 'Слоты', 'url' => ['/slot/index']],
+            ['label' => 'Календарь', 'url' => ['/site/calendar']],
+            ['label' => 'Заезды', 'url' => ['/slot/index']],
+            ['label' => 'Заказы', 'url' => ['/order/index']],
+
         ];
 
         if (Yii::$app->user->can('manager')) {
