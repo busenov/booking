@@ -99,9 +99,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         </li>
                     </ul>
                 </div>
-                <?= Html::a('Активировать', '#', [
-                    'class' => 'btn btn-primary btn-generate'
-                ]) ?>
             <?php endif;?>
             </div>
         </div>
