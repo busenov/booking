@@ -15,8 +15,10 @@ $this->title = Yii::$app->name;
 
 <section class="body">
     <div class="header">
-        <div class="month">Февраль 2024</div>
-        <a class="head-link" href="<?= Url::to(['index','step'=>2])?>">Перейти к оформлению ></a>
+        <div class="header__wrapper">
+            <div class="month">Февраль 2024</div>
+            <a class="head-link" href="<?= Url::to(['index','step'=>2])?>">Перейти к оформлению ></a>
+        </div>
     </div>
     <div class="week">
         <div class="day past">
