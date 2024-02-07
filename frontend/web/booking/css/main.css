@@ -135,6 +135,9 @@
 .week__date.past  .week__date-label {
     display: none;
 }
+.week__date-label.hidden {
+    display: none;
+}
 .week__date-label.dostupno {
     background: #528B4D;
 }

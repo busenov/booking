@@ -42,6 +42,21 @@ $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==
         </div>
         <div class="week__dates">
             <? foreach ($calendar as $wDay=> $day) :?>
+                <?php
+                    $colorLabel='';
+                    if (isset($day['qty'])) {
+                        if ($day['qty']==0) {
+                            $colorLabel='busy';
+                        } elseif ($day['qty']<=100) {
+                            $colorLabel='malo';
+                        } elseif($day['qty']<=200) {
+                            $colorLabel='malo';
+                        } elseif($day['qty']<=400) {
+                            $colorLabel='dostupno';
+                        }
+                    }
+
+                ?>
                 <div class="week__date
                 <?=$day['isPast']?'past':''?>
                 <?=$day['isCurrent']?'current':''?>
@@ -52,7 +67,9 @@ $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==
                      data-day="<?=$day['unixTime']?>"
                 >
                     <div class="week__date-count"><?=$day['day']?></div>
-                    <div class="week__date-label dostupno malo busy">100</div>
+                    <div class="week__date-label
+                         <?=$colorLabel?>
+                        "><?=$day['qty']??''?></div>
                 </div>
             <?endforeach;?>
         </div>
