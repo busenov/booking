@@ -15,7 +15,8 @@
             raceDayEl=document.getElementById('race-day'),
             onlyChildrenEl=document.getElementById('only-children'),
             clubRacesEl=document.getElementById('club-races'),
-            racesTableEl=document.getElementsByClassName('result-table')[0]
+            racesTableEl=document.getElementsByClassName('result-table')[0],
+            nomerPravEl=document.getElementsByClassName('nomer-prav')[0]
             // formSlotId = document.getElementById('form-slot_id'),
             // btnSlot = document.getElementsByClassName('btn-slot'),
             // step2Times = document.getElementById('step2-times'),
@@ -197,6 +198,16 @@
         Booking.prototype.changeClubRaces = function(o) {
             console.log('changeClubRaces');
             clubRaces=o.checked;
+
+            console.log(o.checked);
+            console.log(clubRaces);
+            //проверяем права
+            if (o.checked) {
+                nomerPravEl.classList.remove('hidden');
+            } else {
+                nomerPravEl.classList.add('hidden');
+            }
+
             this.setCookie('clubRaces',clubRaces);
             this.drawRaces(selectedWDay);
         }
