@@ -62,6 +62,7 @@ class Slot extends ActiveRecord
             'end'=>$end,
             'qty'=>$qty,
             'status'=>$status,
+            'type'=>Slot::TYPE_ADULT,
             'note'=>$note
         ]);
     }
@@ -76,6 +77,7 @@ class Slot extends ActiveRecord
         int     $qty,
         int     $status,
         bool     $isChild,
+        ?int     $type=Slot::TYPE_ADULT,
         ?string  $note=null
     ):void
     {
@@ -85,6 +87,7 @@ class Slot extends ActiveRecord
         $this->status=$status;
         $this->qty=$qty;
         $this->is_child=$isChild;
+        $this->type=$type;
         $this->note=$note;
 
     }

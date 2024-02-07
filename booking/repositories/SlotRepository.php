@@ -111,6 +111,11 @@ class SlotRepository
         $beginWeek=DateHelper::beginWeekDayByUnixTime($dateTime);
         for ($i=1; $i<=7; $i++) {
             $calendar[$i]['unixTime']=$beginWeek+(($i-1)*60*60*24);
+            $calendar[$i]['day']=date('d',$calendar[$i]['unixTime']);
+            $calendar[$i]['isPast']=DateHelper::beginWeekDayByUnixTime(time())>$calendar[$i]['unixTime'];;
+            $calendar[$i]['isCurrent']=DateHelper::beginWeekDayByUnixTime(time())===$calendar[$i]['unixTime'];;
+            $calendar[$i]['isSelected']=(array_key_exists('selected_wday',$_COOKIE) AND intval($_COOKIE['selected_wday'])===$i);
+            $calendar[$i]['isNoActive']=true;
         }
         foreach ($slots as $slot) {
 //            $day=date('j',$slot->date);
@@ -136,6 +141,9 @@ class SlotRepository
                 $calendar[$wDay]['qty']+=$free;
             }else {
                 $calendar[$wDay]['qty']=$free;
+            }
+            if ($slot->isActive()) {
+                $calendar[$wDay]['isNoActive']=false;
             }
 
         }

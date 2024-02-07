@@ -59,6 +59,7 @@ class SlotManageService
             (int)$form->qty,
             (int)$form->status,
             (bool)$form->is_child,
+            (int)$form->type,
             $form->note
         );
         $this->repository->save($entity);

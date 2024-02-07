@@ -41,55 +41,20 @@ $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==
             <div class="week__day red">ВС</div>
         </div>
         <div class="week__dates">
-            <div class="week__date past"
-                 data-wday="1"
-                 data-day="<?=$calendar[1]['unixTime']?>"
-            >
-                <div class="week__date-count">29</div>
-                <div class="week__date-label">100</div>
-            </div>
-            <div class="week__date past"
-                 data-wday="2"
-                 data-day="<?=$calendar[2]['unixTime']?>"
-            >
-                <div class="week__date-count">30</div>
-                <div class="week__date-label">100</div>
-            </div>
-            <div class="week__date past"
-                 data-wday="3"
-                 data-day="<?=$calendar[3]['unixTime']?>"
-            >
-                <div class="week__date-count">31</div>
-                <div class="week__date-label">100</div>
-            </div>
-            <div class="week__date current"
-                 data-wday="4"
-                 data-day="<?=$calendar[4]['unixTime']?>"
-            >
-                <div class="week__date-count">1</div>
-                <div class="week__date-label dostupno">140</div>
-            </div>
-            <div class="week__date isActive"
-                 data-wday="5"
-                 data-day="<?=$calendar[5]['unixTime']?>"
-            >
-                <div class="week__date-count">2</div>
-                <div class="week__date-label malo">20</div>
-            </div>
-            <div class="week__date"
-                 data-wday="6"
-                 data-day="<?=$calendar[6]['unixTime']?>"
-            >
-                <div class="week__date-count">3</div>
-                <div class="week__date-label busy">20</div>
-            </div>
-            <div class="week__date noActive"
-                 data-wday="7"
-                 data-day="<?=$calendar[7]['unixTime']?>"
-            >
-                <div class="week__date-count">4</div>
-                <div class="week__date-label">20</div>
-            </div>
+            <? foreach ($calendar as $wDay=> $day) :?>
+                <div class="week__date
+                <?=$day['isPast']?'past':''?>
+                <?=$day['isCurrent']?'current':''?>
+                <?=$day['isSelected']?'isActive':''?>
+                <?=$day['isNoActive']?'noActive':''?>
+                "
+                     data-wday="<?=$wDay?>"
+                     data-day="<?=$day['unixTime']?>"
+                >
+                    <div class="week__date-count"><?=$day['day']?></div>
+                    <div class="week__date-label dostupno malo busy">100</div>
+                </div>
+            <?endforeach;?>
         </div>
     </div>
     <div class="label-list">

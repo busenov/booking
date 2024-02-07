@@ -216,6 +216,37 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'class' => 'kartik\grid\EditableColumn',
+                'attribute' => 'type',
+                'value' => function (Slot $data) {
+                    return Slot::getTypeName($data->type);
+                },
+                'format' => 'raw',
+                'width' => '10%',
+                'readonly' => function(Slot $model, $key, $index, $widget) {
+                    return ($model->readOnly());
+                },
+                'editableOptions' =>  function ($model, $key, $index) {
+                    return [
+                        'header'=>'Тип заезда',
+                        'size'=>'md',
+                        'inputType' => Editable::INPUT_HIDDEN,
+                        'beforeInput' => function ($form, $widget) use ($model, $index) {
+                            $model=new SlotForm($model);
+                            echo $form->field($model, 'type')->radioList(Slot::getTypeList(), ['prompt' => ''])->label(false);
+                        },
+                    ];
+                },
+                'filterType' => GridViewInterface::FILTER_SELECT2,
+                'filter' => Slot::getTypeList(),
+                'filterWidgetOptions' => [
+                    'hideSearch' => true,
+                    'pluginOptions' => ['allowClear' => true],
+                ],
+                'filterInputOptions' => ['placeholder' => '', 'multiple' => false],
+
+            ],
+            [
+                'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'note',
                 'width' => '20%',
                 'editableOptions' =>  function ($model, $key, $index) {

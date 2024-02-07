@@ -99,7 +99,7 @@
         Booking.prototype.draw  = function() {
             let
                 that = this,
-                wDay =  document.getElementsByClassName('day-date');
+                wDay =  document.getElementsByClassName('week__date');
 
             //изменение фильтра Только дети
             onlyChildrenEl.addEventListener('change',function (){that.changeOnlyChildren(this);})
@@ -168,13 +168,16 @@
             racesTableEl.innerHTML=html
         }
         Booking.prototype.clickDay = function(o) {
-            let selected = document.getElementsByClassName("selected"),
+            let selected = document.getElementsByClassName("isActive"),
                 len = selected.length;
 
             if(len !== 0){
-                selected[0].className = "";
+                selected[0].classList.remove("isActive");
             }
-            o.className = "selected";
+            console.log(selected)
+            console.log(o)
+            o.classList.add("isActive");
+
             selectedDay = new Date(new Date(o.dataset.day * 1000));
             selectedWDay=o.dataset.wday;
             raceDayEl.innerHTML=this.getDateStr(o.dataset.day);

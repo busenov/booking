@@ -15,6 +15,7 @@ class SlotForm extends Model
     public ?int $qty=null;
     public ?string $note=null;
     public ?bool $is_child=null;
+    public ?int $type=null;
     public ?Slot $_slot;
     public function __construct(Slot $slot=null, $config = [])
     {
@@ -27,6 +28,7 @@ class SlotForm extends Model
             $this->status=$slot->status;
             $this->qty=$slot->qty;
             $this->is_child=$slot->is_child;
+            $this->type=$slot->type;
 
             $this->_slot = $slot;
         } else {
@@ -46,6 +48,7 @@ class SlotForm extends Model
             [['date','begin','end'],'integer'],
             [['note'], 'string', 'max' => 255],
             [['status'], 'in', 'range' => array_keys(Slot::getStatusList())],
+            [['type'], 'in', 'range' => array_keys(Slot::getTypeList())],
 //            [['date','begin','end'], 'slotDateTimeValidator'],
 //            [['date'], 'slotDateTimeValidator'],
             ['begin','compare', 'compareAttribute' => 'end','operator' => '<'],
@@ -69,8 +72,8 @@ class SlotForm extends Model
         switch ($attributeName) {
             case 'is_child':
                 return Slot::getIsChildLabel($this->is_child);
-//            case 'priority':
-//                return Slot::getPriorityLabel($this->priority);
+            case 'type':
+                return Slot::getTypeName($this->type);
 //            case 'client_id':
 //                return $this->getClientName($this->client_id);
 //            case 'responsible_id':
