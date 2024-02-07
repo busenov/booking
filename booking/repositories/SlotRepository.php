@@ -91,8 +91,52 @@ class SlotRepository
             }
 
         }
+        return $calendar;
+    }
 
+    /**
+     * Возвращаем массив с днями неделями. Так что 1 - это понедельник, 7 - воскресенье
+     *
+     * @param int|null $unixTime
+     * @return array
+     */
+    public function calendarWeekly(?int $unixTime=null):array
+    {
+        $dateTime=$unixTime?:time();
+        $slots=$this->findSlotsByWeek($dateTime);
+        $calendar=[];
+        $reservedCars=OrderRepository::findSumReservedCar_st();
 
+        $beginWeek=DateHelper::beginWeekDayByUnixTime($dateTime);
+        for ($i=1; $i<=7; $i++) {
+            $calendar[$i]['unixTime']=$beginWeek+(($i-1)*60*60*24);
+        }
+        foreach ($slots as $slot) {
+//            $day=date('j',$slot->date);
+            $wDay=date('N',$slot->date);
+//            $year=date('Y',$slot->date);
+            $free=isset($reservedCars[$slot->id])?($slot->qty - $reservedCars[$slot->id]['qty']):$slot->qty;
+
+            $calendar[$wDay][$slot->id]=[
+                'begin'=>$slot->begin,
+                'end'=>$slot->end,
+                'qty'=>$slot->qty,
+                'free'=>$free,
+                'isChild'=>$slot->isChild(),
+            ];
+            if (isset($calendar[$wDay]['qtySlot'])) {
+                $calendar[$wDay]['qtySlot']++;
+            }else {
+                $calendar[$wDay]['qtySlot']=1;
+            }
+
+            if (isset($calendar[$wDay]['qty'])) {
+                $calendar[$wDay]['qty']+=$free;
+            }else {
+                $calendar[$wDay]['qty']=$free;
+            }
+
+        }
         return $calendar;
     }
     /**
@@ -118,6 +162,19 @@ class SlotRepository
         return Slot::find()
             ->andWhere([ '>=', 'date',DateHelper::beginMonthDayByUnixTime($dateTime)])
             ->andWhere([ '<=', 'date',DateHelper::lastMonthDayByUnixTime($dateTime)])
+            ->orderBy('date')
+            ->all();
+    }
+    /**
+     * @param int $dateTime
+     * @return Slot[]
+     * @throws \Exception
+     */
+    public function findSlotsByWeek(int $dateTime):array
+    {
+        return Slot::find()
+            ->andWhere([ '>=', 'date',DateHelper::beginWeekDayByUnixTime($dateTime)])
+            ->andWhere([ '<=', 'date',DateHelper::lastWeekDayByUnixTime($dateTime)])
             ->orderBy('date')
             ->all();
     }

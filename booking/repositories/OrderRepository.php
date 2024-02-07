@@ -84,10 +84,13 @@ class OrderRepository
         ];
         $query = new Query;
         $query
-            ->select('orders.slot_id as slot_id,carType_id,sum(qty) as sum')
-            ->from(OrderItem::tableName())
+            ->select('orders.slot_id as slot_id,carType_id,sum(items.qty) as sum')
+            ->from(OrderItem::tableName().' as items')
             ->leftJoin([Order::tableName()=>'orders'],'orders.id=order_id')
-            ->andWhere(['orders.status'=>$statuses]);
+            ->leftJoin([Slot::tableName()=>'slots'],'slots.id=orders.slot_id')
+            ->andWhere(['orders.status'=>$statuses])
+            ->andWhere(['>=','slots.date',DateHelper::beginDay()])
+        ;
 
         $groupColumn=[];
         $groupColumn[]='slot_id';

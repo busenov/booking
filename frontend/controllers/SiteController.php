@@ -2,6 +2,10 @@
 
 namespace frontend\controllers;
 
+use booking\forms\manage\Order\OrderCreateForm;
+use booking\repositories\SlotRepository;
+use booking\useCases\manage\OrderManageService;
+use booking\useCases\manage\SlotManageService;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -51,7 +55,21 @@ class SiteController extends Controller
             ],
         ];
     }
+    private SlotManageService $slotService;
+    private SlotRepository $slotRepository;
+    private OrderManageService $orderService;
 
+    public function __construct(                    $id, $module,
+                                                    SlotManageService   $slotService,
+                                                    SlotRepository      $slotRepository,
+                                                    OrderManageService  $orderService,
+        $config = [])
+    {
+        parent::__construct($id, $module, $config);
+        $this->slotService = $slotService;
+        $this->slotRepository = $slotRepository;
+        $this->orderService = $orderService;
+    }
     /**
      * {@inheritdoc}
      */
@@ -75,7 +93,12 @@ class SiteController extends Controller
     public function actionIndex(?int $step=1)
     {
         $this->layout = 'blank';
-        return $this->render('step'.$step);
+        $calendar=$this->slotRepository->calendarWeekly();
+        $orderForm=new OrderCreateForm();
+        return $this->render('step'.$step,[
+            'calendar'=>$calendar,
+            'orderForm'=>$orderForm
+        ]);
     }
 
     /**

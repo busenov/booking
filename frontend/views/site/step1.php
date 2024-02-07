@@ -1,16 +1,26 @@
 <?php
-
-
-/** @var yii\web\View $this */
-
+use booking\forms\manage\Order\OrderCreateForm;
 use frontend\assets\BookingAsset;
 use yii\helpers\Url;
+use yii\web\YiiAsset;
+
+/** @var yii\web\View $this */
+/** @var array $calendar */
+/** @var OrderCreateForm $model */
+
+YiiAsset::register($this);
 BookingAsset::register($this);
 $this->title = Yii::$app->name;
+
+$selected_day=(array_key_exists('selected_day_unx',$_COOKIE)AND(is_int($_COOKIE['selected_day_unx'])))?$_COOKIE['selected_day_unx']:time();
+$onlyChildren= ((array_key_exists('onlyChildren',$_COOKIE))AND($_COOKIE['onlyChildren']==='true'));
+$clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==='true'));
 ?>
-<!--
-<h1>Выбор заезда</h1>
--->
+<script type='text/javascript'>
+    var $ykv_calendar=<?=json_encode($calendar)?>;
+    console.log($ykv_calendar);
+</script>
+
 <a href="<?= Url::to(['index','step'=>2])?>" style="display: none">Перейти к оформлению--></a>
 
 <section class="body">
@@ -23,49 +33,70 @@ $this->title = Yii::$app->name;
     <div class="week">
         <div class="day past">
             <div class="day-name">ПН</div>
-            <div class="day-date">
+            <div class="day-date"
+                 data-wday="1"
+                 data-day="<?=$calendar[1]['unixTime']?>"
+            >
                 <div class="day-date__count">29</div>
                 <div class="day-date__label">100</div>
             </div>
         </div>
         <div class="day past">
             <div class="day-name">ВТ</div>
-            <div class="day-date">
+            <div class="day-date"
+                 data-wday="2"
+                 data-day="<?=$calendar[2]['unixTime']?>"
+            >
                 <div class="day-date__count">30</div>
                 <div class="day-date__label">100</div>
             </div>
         </div>
         <div class="day past">
             <div class="day-name">СР</div>
-            <div class="day-date">
+            <div class="day-date"
+                 data-wday="3"
+                 data-day="<?=$calendar[3]['unixTime']?>"
+            >
                 <div class="day-date__count">31</div>
                 <div class="day-date__label">100</div>
             </div>
         </div>
         <div class="day dostupno">
             <div class="day-name">ЧТ</div>
-            <div class="day-date">
+            <div class="day-date"
+                 data-wday="4"
+                 data-day="<?=$calendar[4]['unixTime']?>"
+            >
                 <div class="day-date__count">1</div>
                 <div class="day-date__label">140</div>
             </div>
         </div>
         <div class="day malo">
             <div class="day-name">ПТ</div>
-            <div class="day-date">
+            <div class="day-date"
+                 data-wday="5"
+                 data-day="<?=$calendar[5]['unixTime']?>"
+            >
                 <div class="day-date__count">2</div>
                 <div class="day-date__label">20</div>
             </div>
         </div>
         <div class="day zabronirovano">
             <div class="day-name red">СБ</div>
-            <div class="day-date">
+            <div class="day-date"
+                 data-wday="6"
+                 data-day="<?=$calendar[6]['unixTime']?>"
+            >
                 <div class="day-date__count">3</div>
                 <div class="day-date__label">20</div>
             </div>
         </div>
         <div class="day noActive">
             <div class="day-name red">ВС</div>
-            <div class="day-date">
+            <div class="day-date"
+                 data-wday="7"
+                 data-day="<?=$calendar[7]['unixTime']?>"
+            >
                 <div class="day-date__count">4</div>
                 <div class="day-date__label">20</div>
             </div>
@@ -89,21 +120,21 @@ $this->title = Yii::$app->name;
             Забронировано
         </div>
     </div>
-    <div class="step-title">Заезды 29 января 2024г.</div>
+    <div class="step-title">Заезды <span id="race-day">29 января 2024</span>г.</div>
     <form class="form">
         <div class="for-childs">
             <img src="/booking/img/child.png" class="child-img">
             <span class="form-text">Показать только детские заезды:</span>
             <label class="switch">
-                <input type="checkbox">
+                <input type="checkbox" id="only-children" <?=$onlyChildren?'checked':''?>>
                 <span class="slider round"></span>
             </label>
         </div>
         <div class="clubs-enter">
             <img src="/booking/img/star.png" class="child-img">
-            <span class="form-text">Показать только детские заезды:</span>
+            <span class="form-text">Показать только клубные заезды:</span>
             <label class="switch">
-                <input type="checkbox">
+                <input type="checkbox" id="club-races" <?=$clubRaces?'checked':''?>>
                 <span class="slider round"></span>
             </label>
         </div>
