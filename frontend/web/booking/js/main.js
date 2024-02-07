@@ -212,7 +212,18 @@
             this.drawRaces(selectedWDay);
         }
 
+
         var booking = new Booking();
     }, false);
 
 })(jQuery);
+
+//количество в таблице
+function buttonPlus() {
+    document.getElementById('inc').value++;
+}
+function buttonMinus() {
+    if (document.getElementById('inc').value > 0) {
+        document.getElementById('inc').value--;
+    }
+}

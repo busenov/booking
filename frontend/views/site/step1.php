@@ -93,7 +93,7 @@ $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==
         </div>
     </div>
     <div class="step-title">Заезды <span id="race-day">29 января 2024</span>г.</div>
-    <form class="form" action="<?=Url::to(['license/check'])?>" id="form-check_license">
+    <div class="forms-block">
         <div class="for-childs">
             <img src="/booking/img/child.png" class="child-img">
             <span class="form-text">Показать только детские заезды:</span>
@@ -119,13 +119,14 @@ $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==
             </label>
         </div>
         <div class="nomer-prav <?=$clubRaces?'':'hidden'?>">
-<!--form-->
+            <form class="form" action="<?=Url::to(['license/check'])?>" id="form-check_license">
                 <label for="prava">Номер прав:</label>
                 <input type="text" name="license" class="prava">
                 <button>Проверить</button>
-<!--form-->
+            </form>
         </div>
-    </form>
+    </div>
+
     <div class="result-table">
         <div class="result-table__time-row">12:00</div>
         <div class="result-table__row">
