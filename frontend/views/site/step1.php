@@ -31,74 +31,64 @@ $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==
         </div>
     </div>
     <div class="week">
-        <div class="day past">
-            <div class="day-name">ПН</div>
-            <div class="day-date"
+        <div class="week__days">
+            <div class="week__day">ПН</div>
+            <div class="week__day">ВТ</div>
+            <div class="week__day">СР</div>
+            <div class="week__day">ЧТ</div>
+            <div class="week__day">ПТ</div>
+            <div class="week__day red">СБ</div>
+            <div class="week__day red">ВС</div>
+        </div>
+        <div class="week__dates">
+            <div class="week__date past"
                  data-wday="1"
                  data-day="<?=$calendar[1]['unixTime']?>"
             >
-                <div class="day-date__count">29</div>
-                <div class="day-date__label">100</div>
+                <div class="week__date-count">29</div>
+                <div class="week__date-label">100</div>
             </div>
-        </div>
-        <div class="day past">
-            <div class="day-name">ВТ</div>
-            <div class="day-date"
+            <div class="week__date past"
                  data-wday="2"
                  data-day="<?=$calendar[2]['unixTime']?>"
             >
-                <div class="day-date__count">30</div>
-                <div class="day-date__label">100</div>
+                <div class="week__date-count">30</div>
+                <div class="week__date-label">100</div>
             </div>
-        </div>
-        <div class="day past">
-            <div class="day-name">СР</div>
-            <div class="day-date"
+            <div class="week__date past"
                  data-wday="3"
                  data-day="<?=$calendar[3]['unixTime']?>"
             >
-                <div class="day-date__count">31</div>
-                <div class="day-date__label">100</div>
+                <div class="week__date-count">31</div>
+                <div class="week__date-label">100</div>
             </div>
-        </div>
-        <div class="day dostupno">
-            <div class="day-name">ЧТ</div>
-            <div class="day-date"
+            <div class="week__date"
                  data-wday="4"
                  data-day="<?=$calendar[4]['unixTime']?>"
             >
-                <div class="day-date__count">1</div>
-                <div class="day-date__label">140</div>
+                <div class="week__date-count">1</div>
+                <div class="week__date-label dostupno">140</div>
             </div>
-        </div>
-        <div class="day malo">
-            <div class="day-name">ПТ</div>
-            <div class="day-date"
+            <div class="week__date isActive"
                  data-wday="5"
                  data-day="<?=$calendar[5]['unixTime']?>"
             >
-                <div class="day-date__count">2</div>
-                <div class="day-date__label">20</div>
+                <div class="week__date-count">2</div>
+                <div class="week__date-label malo">20</div>
             </div>
-        </div>
-        <div class="day zabronirovano">
-            <div class="day-name red">СБ</div>
-            <div class="day-date"
+            <div class="week__date"
                  data-wday="6"
                  data-day="<?=$calendar[6]['unixTime']?>"
             >
-                <div class="day-date__count">3</div>
-                <div class="day-date__label">20</div>
+                <div class="week__date-count">3</div>
+                <div class="week__date-label busy">20</div>
             </div>
-        </div>
-        <div class="day noActive">
-            <div class="day-name red">ВС</div>
-            <div class="day-date"
+            <div class="week__date noActive"
                  data-wday="7"
                  data-day="<?=$calendar[7]['unixTime']?>"
             >
-                <div class="day-date__count">4</div>
-                <div class="day-date__label">20</div>
+                <div class="week__date-count">4</div>
+                <div class="week__date-label">20</div>
             </div>
         </div>
     </div>

@@ -57,6 +57,7 @@
     width: 90%;
     max-width: 840px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: stretch;
     border: 1px solid #000000;
@@ -64,31 +65,59 @@
     position: relative;
     margin-bottom: 16px;
 }
-.day {
-    width: 125px;
+.week__days {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: stretch;
 }
-.day-name {
+.week__day {
+    width: 125px;
     background: #F5F5F5;
     color: #000000;
     padding: 13px 0;
     text-align: center;
     font-weight: 600;
 }
-.day-date {
+.week__day.red {
+    color: #FF0707;
+}
+.week__dates {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+}
+.week__date {
+    width: 125px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     padding: 4px 0;
 }
-.day-date__count {
-    margin-bottom: 50px;
+.week__date.past {
+    background: #D9D9D9;
 }
-.day-date__label {
+.week__date.isActive {
+    background: #5C5F62;
+}
+.week__date.noActive {
+    background: #D9D9D9;
+}
+.week__date:hover {
+    background: #eeeeee;
+}
+.week__date-count {
+    margin-bottom: 50px;
+    font-size: 18px;
+    font-weight: 600;
+}
+.week__date.past .week__date-count {
+    color: #AAAAAA;
+}
+.week__date.isActive .week__date-count {
+    color: #ffffff;
+}
+.week__date-label {
     width: 70px;
     height: 14px;
     border-radius: 7px;
@@ -100,31 +129,20 @@
     line-height: 11px;
     color: #000000;
 }
-.day.past .day-date {
-    background: #D9D9D9;
+.week__date.past  .week__date-label {
+    display: none;
 }
-.day.past .day-date .day-date__count {
-    color: #AAAAAA;
-}
-.day.past .day-date .day-date__label {
-    visibility: hidden;
-}
-.day.dostupno .day-date .day-date__label {
+.week__date-label.dostupno {
     background: #528B4D;
 }
-.day.malo .day-date .day-date__label {
+.week__date-label.malo {
     background: #FFA800;
     color: #ffffff;
 }
-.day.zabronirovano .day-date .day-date__label {
+.week__date-label.busy {
     background: #FF0707;
 }
-.day.noActive .day-date .day-date__label {
-    background: #8A8A8A;
-}
-.day-name.red {
-    color: #FF0707;
-}
+
 .week::before {
     content: '';
     display: block;
@@ -138,6 +156,7 @@
     top: 50%;
     transform: translateY(-50%);
 }
+
 .week::after {
     content: '';
     display: block;
@@ -286,6 +305,9 @@ input:checked + .slider:before {
     justify-content: flex-end;
     align-items: center;
     margin-top: 5px;
+}
+.nomer-prav.hidden {
+    visibility: hidden;
 }
 .nomer-prav label {
     font-size: 14px;
