@@ -9,11 +9,13 @@
             WeeklyTag =["ПН","ВТ","СР","ЧТ","ПТ","СБ","ВС"],
             day = today.getDate(),
             selectedDay,
+            selectedWDay,
             onlyChildren=false,
             clubRaces=false,
             raceDayEl=document.getElementById('race-day'),
             onlyChildrenEl=document.getElementById('only-children'),
-            clubRacesEl=document.getElementById('club-races')
+            clubRacesEl=document.getElementById('club-races'),
+            racesTableEl=document.getElementsByClassName('result-table')[0]
             // formSlotId = document.getElementById('form-slot_id'),
             // btnSlot = document.getElementsByClassName('btn-slot'),
             // step2Times = document.getElementById('step2-times'),
@@ -34,6 +36,12 @@
                 selectedDay = cSelectedDay;
             } else {
                 selectedDay = today;
+            }
+            let cSelectedWDay=this.getCookie('selected_wday')
+            if (cSelectedWDay) {
+                selectedWDay = cSelectedWDay;
+            } else {
+                // selectedWDay = today;
             }
             console.log(selectedDay);
             this.draw();
@@ -68,12 +76,18 @@
                 return null;
             }
         };
-        //получаем время из юникс времени в формает ЧЧ:ММ
-        Booking.prototype.getTime = function (timeUnix) {
+        //получаем время из кол-ва секунд с начала дня в формате ЧЧ:ММ
+        Booking.prototype.getTimeBySec = function (secBeginningDay) {
             let hour,minute
-            hour = Math.floor(timeUnix/(60*60));
-            minute = Math.floor((timeUnix-(hour*60*60))/60);
+            hour = Math.floor(secBeginningDay/(60*60));
+            minute = Math.floor((secBeginningDay-(hour*60*60))/60);
             return ('00'+hour).slice(-2) + ':' + ('00'+minute).slice(-2);
+        }
+        //получаем Час из кол-ва секунд с начала дня в формате ЧЧ
+        Booking.prototype.getHourBySec = function (secBeginningDay) {
+            let hour
+            hour = Math.floor(secBeginningDay/(60*60));
+            return ('00'+hour).slice(-2);
         }
         //возращаем дату в формате ДД МЕСЯЦА ГГГГ
         Booking.prototype.getDateStr = function (timeUnix) {
@@ -99,6 +113,59 @@
         // Выводим заезды
         Booking.prototype.drawRaces  = function(wDay) {
             console.log($ykv_calendar[wDay]);
+            let
+                slotsByDay,
+                html='',
+                currentTime=null,
+                hour=null
+            ;
+
+            if (slotsByDay=$ykv_calendar[wDay]) {
+                for(let key in slotsByDay) {
+
+                    if (!isNaN(key)) {
+                        let currentHour = this.getHourBySec(slotsByDay[key]['begin']);
+
+                        //показывать только детские?
+                        if (onlyChildren) {
+                            if (slotsByDay[key]['isChild']===false) {
+                                continue;
+                            }
+                        }
+                        //показывать клубные?
+                        if (!clubRaces) {
+                            if (slotsByDay[key]['isClub']!==false) {
+                                continue;
+                            }
+                        }
+
+                        if (currentHour!==hour) {
+                            if (hour!==null) {
+
+                            }
+                            hour=currentHour;
+                            html += '<div class="result-table__time-row">'+ hour +':00</div>'
+
+                        }
+
+                        html += '<div class="result-table__row">';
+                        html+='' +
+                        '<div class="result-table__info-block">'+
+                            '<div class="result-table__time">'+this.getTimeBySec(slotsByDay[key]['begin'])+' - '+this.getTimeBySec(slotsByDay[key]['end'])+'</div>'+
+                            '<div class="result-table__info">Свободно: ' + slotsByDay[key]['qty'] + ' мест</div>'+
+                        '</div>'+
+                        '<button class="result-table__btn btn" data-bs-toggle="modal" data-bs-target="#exampleModal">Забронировать</button>'
+                        ;
+                        html += '</div>';
+                    }
+                };
+
+            }
+            if (html==='') {
+                html='Нет свободных заездов по заданным критериям';
+            }
+
+            racesTableEl.innerHTML=html
         }
         Booking.prototype.clickDay = function(o) {
             let selected = document.getElementsByClassName("selected"),
@@ -109,21 +176,26 @@
             }
             o.className = "selected";
             selectedDay = new Date(new Date(o.dataset.day * 1000));
-            console.log(selectedDay);
-            this.drawRaces(o.dataset.wday);
+            selectedWDay=o.dataset.wday;
             raceDayEl.innerHTML=this.getDateStr(o.dataset.day);
             this.setCookie('selected_day', selectedDay);
+            this.setCookie('selected_wday', selectedWDay);
+
+            this.drawRaces(o.dataset.wday);
 
         };
 
         Booking.prototype.changeOnlyChildren = function(o) {
+            console.log('changeOnlyChildren');
             onlyChildren=o.checked;
             this.setCookie('onlyChildren',onlyChildren);
-            console.log('changeOnlyChildren');
-            console.log(o.checked);
+            this.drawRaces(selectedWDay);
         }
         Booking.prototype.changeClubRaces = function(o) {
             console.log('changeClubRaces');
+            clubRaces=o.checked;
+            this.setCookie('clubRaces',clubRaces);
+            this.drawRaces(selectedWDay);
         }
 
         var booking = new Booking();

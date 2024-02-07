@@ -77,6 +77,7 @@ class SlotRepository
                 'qty'=>$slot->qty,
                 'free'=>$free,
                 'isChild'=>$slot->isChild(),
+                'isClub'=>$slot->isClub(),
             ];
             if (isset($calendar[$year][$day]['qtySlot'])) {
                 $calendar[$year][$day]['qtySlot']++;
@@ -123,6 +124,7 @@ class SlotRepository
                 'qty'=>$slot->qty,
                 'free'=>$free,
                 'isChild'=>$slot->isChild(),
+                'isClub'=>$slot->isClub(),
             ];
             if (isset($calendar[$wDay]['qtySlot'])) {
                 $calendar[$wDay]['qtySlot']++;

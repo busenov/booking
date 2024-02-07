@@ -27,6 +27,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property string|null $note          //примечание
  * @property boolean $is_child          //Детский заезд?
+ * @property int $type                  //Тип заезда(взрослый, детский, клубный)
  *
  * @property int|null $created_at
  * @property int|null $updated_at
@@ -42,6 +43,9 @@ class Slot extends ActiveRecord
     const STATUS_NEW=10;                //Новый
     const STATUS_ACTIVE=20;             //Активный
     const STATUS_DELETED=100;           //Удален
+    const TYPE_ADULT=10;                //Взрослый(по умолчанию)
+    const TYPE_CHILD=20;                //Детский
+    const TYPE_CLUB=30;                 //Клубный
 
     public static function create(
                                 int     $date,
@@ -97,6 +101,19 @@ class Slot extends ActiveRecord
     public static function getStatusName($status): string
     {
         return ArrayHelper::getValue(self::getStatusList(), $status);
+    }
+    public static function getTypeList(): array
+    {
+        return [
+            self::TYPE_ADULT => 'Взрослый',
+            self::TYPE_CHILD => 'Детский',
+            self::TYPE_CLUB => 'Клубный',
+        ];
+    }
+
+    public static function getTypeName($type): string
+    {
+        return ArrayHelper::getValue(self::getTypeList(), $type);
     }
 
     public function getName(): string
@@ -198,12 +215,19 @@ class Slot extends ActiveRecord
     }
     /**
      * Является ли слот детским?
-     * (не используется)Детским слот является, если есть хотя б один слот с детской машиной
      * @return bool
      */
     public function isChild():bool
     {
-        return $this->is_child;
+        return $this->type===self::TYPE_CHILD;
+    }
+    public function isClub():bool
+    {
+        return $this->type===self::TYPE_CLUB;
+    }
+    public function isAdult():bool
+    {
+        return $this->type===self::TYPE_ADULT;
     }
 #hass
     public function hasReserved():bool
