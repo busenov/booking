@@ -62,7 +62,7 @@ $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==
                 <div class="week__date-count">31</div>
                 <div class="week__date-label">100</div>
             </div>
-            <div class="week__date"
+            <div class="week__date current"
                  data-wday="4"
                  data-day="<?=$calendar[4]['unixTime']?>"
             >
