@@ -1,14 +1,16 @@
 <?php
 
-namespace booking\entities\Car;
+namespace booking\entities\License;
 
 use booking\entities\behaviors\FillingServiceFieldsBehavior;
 use booking\entities\behaviors\LoggingBehavior;
 use booking\entities\Order\Order;
 use booking\entities\Slot\Slot;
+use booking\entities\User\User;
 use booking\repositories\OrderRepository;
 use booking\repositories\SlotRepository;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -16,14 +18,11 @@ use yii\helpers\ArrayHelper;
  * This is the model class for table "car_types".
  *
  * @property int $id
- * @property string|null $name
- * @property string|null $description
- * @property string|null $note
+ * @property int|null $number
+ * @property int|null $user_id
  * @property int|null $status
- * @property int $qty
- * @property double $pwr
- * @property int $type
- *
+ * @property int|null $date
+ * @property string|null $note
  *
  * @property int|null $created_at
  * @property int|null $updated_at
@@ -31,50 +30,44 @@ use yii\helpers\ArrayHelper;
  * @property string|null $author_name
  * @property int|null $editor_id
  * @property string|null $editor_name
+ *
+ * @property User $user
  */
-class CarType extends ActiveRecord
+class License extends ActiveRecord
 {
     const STATUS_ACTIVE=10;              //Активный
     const STATUS_INACTIVE=5;             //Не активный
     const STATUS_DELETED=100;            //Удален
 
     public static function create(
-                                string  $name,
-                                string  $description,
+                                int  $number,
+                                int  $user_id,
                                 int     $status=self::STATUS_ACTIVE,
-                                int     $qty = 1,
-                                ?float  $pwr=null,
-                                ?string $note=null,
-                                ?int    $type=Slot::TYPE_ADULT
+                                ?int $date=null,
+                                ?string $note=null
                             ):self
     {
         return new self([
-            'name'=>$name,
-            'description'=>$description,
+            'number'=>$number,
+            'user_id'=>$user_id,
             'status'=>$status,
-            'qty'=>$qty,
-            'pwr'=>$pwr,
-            'note'=>$note,
-            'type'=>$type
+            'date'=>$date??time(),
+            'note'=>$note
         ]);
     }
     public function edit(
-        string  $name,
-        string  $description,
+        int  $number,
+        int  $user_id,
         int     $status=self::STATUS_ACTIVE,
-        int     $qty = 1,
-        ?float  $pwr=null,
-        ?string $note=null,
-        ?int    $type=Slot::TYPE_ADULT
+        ?int $date=null,
+        ?string $note=null
     ):void
     {
-        $this->name=$name;
-        $this->description=$description;
+        $this->number=$number;
+        $this->user_id=$user_id;
         $this->status=$status;
-        $this->qty=$qty;
-        $this->pwr=$pwr;
+        $this->date=$date;
         $this->note=$note;
-        $this->type=$type;
 
     }
 #on
@@ -90,19 +83,6 @@ class CarType extends ActiveRecord
     {
         $this->status=self::STATUS_DELETED;
     }
-
-    public function onAdult()
-    {
-        $this->type=Slot::TYPE_ADULT;
-    }
-    public function onChild()
-    {
-        $this->type=Slot::TYPE_CHILD;
-    }
-    public function onClub()
-    {
-        $this->type=Slot::TYPE_CLUB;
-    }
 #is
     public function isActive():bool
     {
@@ -116,34 +96,22 @@ class CarType extends ActiveRecord
     {
         return $this->status===self::STATUS_DELETED;
     }
-    public function isAdult():bool
-    {
-        return $this->status===Slot::TYPE_ADULT;
-    }
-    public function isChild():bool
-    {
-        return $this->status===Slot::TYPE_CHILD;
-    }
-    public function isClub():bool
-    {
-        return $this->status===Slot::TYPE_CLUB;
-    }
+
     public function isIdEqualTo($id):bool
     {
         return $this->id == $id;
     }
 #gets
-    public function getFreeBySlot(int $slotId=null)
+    public function getUser(): ActiveQuery
     {
-        return $this->qty - OrderRepository::findSumReservedCar_st($slotId,$this->id);
+        return $this->hasOne(User::class, ['id' => 'customer_id']);
     }
-
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return '{{car_types}}';
+        return '{{licenses}}';
     }
     public function behaviors()
     {
@@ -167,13 +135,10 @@ class CarType extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Название',
-            'description' => 'Описание',
+            'number' => 'Номер',
             'status' => 'Статус',
-            'qty' => 'Количество',
-            'pwr' => 'Мощность',
+            'date' => 'Дата выдачи',
             'note' => 'Примечание',
-            'type' => 'Тип',
 
             'created_at' => 'Создано',
             'updated_at' => 'Отредактировано',

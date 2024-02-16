@@ -13,21 +13,27 @@ use yii\db\Query;
 class OrderRepository
 {
 
-    public static function get_st($entityOrId): Order
+    public static function get_st($entityOrIdOrGuid): Order
     {
-        if (is_a($entityOrId,Order::class)) {
-            return $entityOrId;
+        if (is_a($entityOrIdOrGuid,Order::class)) {
+            return $entityOrIdOrGuid;
+        } else if (is_int($entityOrIdOrGuid)) {
+            return static::getBy(['id' => $entityOrIdOrGuid]);
         } else {
-            return static::getBy(['id' => $entityOrId]);
+            return static::getBy(['guid' => $entityOrIdOrGuid]);
         }
     }
-    public function get($entityOrId): Order
+    public function get($entityOrIdOrGuid): Order
     {
-        return static::get_st($entityOrId);
+        return static::get_st($entityOrIdOrGuid);
     }
-    public function getItem($id):OrderItem
+    public function getItem($itemOrItemId):OrderItem
     {
-        if (!$orderItem = OrderItem::findOne($id)) {
+        if (is_a($itemOrItemId,OrderItem::class)) {
+            return $itemOrItemId;
+        }
+
+        if (!$orderItem = OrderItem::findOne($itemOrItemId)) {
             throw new NotFoundException('OrderItem is not found.');
         }
         return $orderItem;
@@ -84,25 +90,24 @@ class OrderRepository
         ];
         $query = new Query;
         $query
-            ->select('orders.slot_id as slot_id,carType_id,sum(items.qty) as sum')
+            ->select('items.slot_id as slot_id,carType_id,sum(items.qty) as sum')
             ->from(OrderItem::tableName().' as items')
             ->leftJoin([Order::tableName()=>'orders'],'orders.id=order_id')
-            ->leftJoin([Slot::tableName()=>'slots'],'slots.id=orders.slot_id')
+            ->leftJoin([Slot::tableName()=>'slots'],'slots.id=items.slot_id')
             ->andWhere(['orders.status'=>$statuses])
-            ->andWhere(['>=','slots.date',DateHelper::beginDay()])
+//            ->andWhere(['>=','slots.date',DateHelper::beginDay()])
         ;
 
         $groupColumn=[];
         $groupColumn[]='slot_id';
         $groupColumn[]='carType_id';
         if ($slotId) {
-            $query->andWhere(['orders.slot_id'=>$slotId]);
+            $query->andWhere(['items.slot_id'=>$slotId]);
         }
         if ($carTypeId) {
             $query->andWhere(['carType_id'=>$carTypeId]);
         }
         $result = $query->groupBy($groupColumn)->all();
-
         $result2=[];
         foreach ($result as $item) {
             if (empty($result2[$item['slot_id']])) {

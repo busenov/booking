@@ -23,14 +23,15 @@ use yii\base\Model;
 class OrderCreateForm extends CompositeForm
 {
     public ?int $slot_id=null;
+    public ?int $order_id=null;
     public ?string $note=null;
     public ?int $status=null;
     public ?bool $isChild=null;
-    public function __construct( $config = [])
+    public function __construct($config = [])
     {
         parent::__construct($config);
         $this->status=Order::STATUS_NEW;
-        $this->customer=new CustomerForm();
+//        $this->customer=new CustomerForm();
         $this->items=[];
         $this->items=array_map(function (CarType $carType){
             return new OrderItemForm(null,[
@@ -48,7 +49,6 @@ class OrderCreateForm extends CompositeForm
     {
         return [
             [['note'], 'string', 'max' => 255],
-            [['isChild'], 'boolean'],
             [['slot_id'], 'exist', 'skipOnError' => true, 'targetClass' => Slot::class, 'targetAttribute' => ['slot_id' => 'id']],
             [['status'], 'in', 'range' => array_keys(Order::getStatusList())],
             [['slot_id','qty','status'],'required']
@@ -56,7 +56,7 @@ class OrderCreateForm extends CompositeForm
     }
     protected function internalForms(): array
     {
-        return ['customer','items'];
+        return ['items'];
     }
     public function attributeLabels():array
     {

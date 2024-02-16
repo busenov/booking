@@ -50,6 +50,10 @@ class CarTypeRepository
     {
         return static::find_st($entityOrId);
     }
+
+    /**
+     * @return CarType[]|null
+     */
     public static function findActive_st():?array
     {
         return CarType::find()->where(['status'=>CarType::STATUS_ACTIVE])->all();

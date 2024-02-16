@@ -2,12 +2,19 @@
 
 namespace frontend\controllers;
 
+use booking\entities\Order\Order;
+use booking\entities\Order\OrderItem;
+use booking\entities\Slot\Slot;
 use booking\forms\manage\Order\OrderCreateForm;
+use booking\forms\manage\Order\OrderEditForm;
+use booking\forms\manage\Order\SlotCreateForm;
+use booking\repositories\OrderRepository;
 use booking\repositories\SlotRepository;
 use booking\useCases\manage\OrderManageService;
 use booking\useCases\manage\SlotManageService;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
+use PharIo\Version\Exception;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
@@ -19,6 +26,9 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use yii\web\Cookie;
+use yii\web\NotFoundHttpException;
+use yii\web\Response;
 
 /**
  * Site controller
@@ -58,17 +68,20 @@ class SiteController extends Controller
     private SlotManageService $slotService;
     private SlotRepository $slotRepository;
     private OrderManageService $orderService;
+    private OrderRepository $orderRepository;
 
     public function __construct(                    $id, $module,
                                                     SlotManageService   $slotService,
                                                     SlotRepository      $slotRepository,
                                                     OrderManageService  $orderService,
+                                                    OrderRepository     $orderRepository,
         $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->slotService = $slotService;
         $this->slotRepository = $slotRepository;
         $this->orderService = $orderService;
+        $this->orderRepository = $orderRepository;
     }
     /**
      * {@inheritdoc}
@@ -94,52 +107,181 @@ class SiteController extends Controller
     {
         $this->layout = 'blank';
         $calendar=$this->slotRepository->calendarWeekly();
-        $orderForm=new OrderCreateForm();
+        $order=null;
+        if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)){
+            $order=$this->findOrder($orderGuid);
+        }
+//        dump($orderGuid);exit;
+        if (empty($order)and $step!==1) {
+            return $this->redirect(['index','step'=>1]);
+        };
+
         return $this->render('step'.$step,[
             'calendar'=>$calendar,
-            'orderForm'=>$orderForm
+            'order'=>$order
         ]);
     }
-
     /**
-     *
-     * @return mixed
+     * Шаг1. Генерируем модального окно заказал по Слоту
+     * @param int $slot_id
+     * @return array|Response
+     * @throws NotFoundHttpException
      */
-    public function actionStep1()
+    public function actionOrderModalAjax(int $slot_id)
     {
-        $this->layout = 'blank';
-        return $this->render('step1');
+//        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $order=null;
+        try {
+            if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)) {
+                $order = $this->findOrder($orderGuid->value);
+                $orderForm=new SlotCreateForm($slot_id,$order);
+            } else {
+                $orderForm=new SlotCreateForm($slot_id);
+            }
+            $orderForm->slot_id=$slot_id;
+
+
+
+            $slot=$this->findSlot($slot_id);
+            $data=$this->renderAjax('_orderModal',[
+                'order'=>$order,
+                'slot'=>$slot,
+                'orderForm'=>$orderForm
+            ]);
+            return $this->asJson(['status'=>'success','data'=>$data]);
+        } catch (\DomainException $ex) {
+            return ['status'=>'error','data'=>$ex->getMessage()];
+        }
+
+
     }
 
     /**
-     *
-     * @return mixed
+     * Добавляем(изменяем) позицию в заказ
+     * @param int|null $slot_id
+     * @return array|string[]
+     * @throws NotFoundHttpException
      */
-    public function actionStep2()
+    public function actionAddToOrderAjax(?int $slot_id=null)
     {
-        $this->layout = 'blank';
-        return $this->render('step2');
+        \Yii::$app->response->format = Response::FORMAT_JSON;
+        $order=null;
+        if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)){
+            $order=$this->findOrder($orderGuid->value);
+
+            $form=new SlotCreateForm($slot_id,$order);
+        } else {
+            $form=new SlotCreateForm($slot_id);
+        }
+
+
+        if ($this->request->isPost && $form->load($this->request->post())) {
+
+            $order=$this->orderService->addToOrder($form);
+            $cookies=Yii::$app->response->cookies;
+            $cookies->add(new Cookie([
+                'name' => Order::COOKIE_NAME_GUID,
+                'value' => $order->guid,
+                'expire'=> time() + 60*60*24
+            ]));
+            return ['status'=>'success', 'order_guid'=>$order->guid,'order'=>$order->toJs()];
+        } else {
+            return ['status'=>'error'];
+        }
     }
 
+    public function actionChangeQtyToOrderAjax(int $item,int $qty): Response
+    {
+        $item = $this->findOrderItem($item);
+
+        try {
+            if (!(
+                $orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID) AND
+                $order=$this->findOrder($orderGuid->value) AND
+                $order->hasItem($item)
+            )){
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
+            if ($order = $this->orderService->changeItem($item,$qty)) {
+                return $this->asJson(['status'=>'success', 'order'=>$order->toJs()]);
+            } else {
+                return $this->asJson(['status'=>'error']);
+            }
+
+        } catch (Exception $ex) {
+            return  $this->asJson(['status'=>'error', 'msg'=>$ex->getMessage()]);
+        }
+    }
+    public function actionDeleteItem(int $item,int $step=2):Response
+    {
+        $item = $this->findOrderItem($item);
+        try {
+            if (!(
+                $orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID) AND
+                $order=$this->findOrder($orderGuid->value) AND
+                $order->hasItem($item)
+            )){
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
+            $this->orderService->removeItem($order,$item->id);
+            Yii::$app->session->setFlash('success', 'Позиция в заезде успешно удалена.');
+        }catch (Exception $ex) {
+            Yii::$app->session->setFlash('error', 'Ошибка удаление позиции в заезде: '. $ex->getMessage());
+        }
+        return $this->redirect(['index','step'=>$step]);
+    }
+    public function actionDeleteSlot(int $slot,int $step=2):Response
+    {
+        $slot = $this->findSlot($slot);
+        try {
+            if (!(
+                $orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID) AND
+                $order=$this->findOrder($orderGuid->value)
+            )){
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
+            $this->orderService->removeSlot($order,$slot->id);
+            Yii::$app->session->setFlash('success', 'Заезд успешно удален.');
+        }catch (Exception $ex) {
+            Yii::$app->session->setFlash('error', 'Ошибка удаление заезда: '. $ex->getMessage());
+        }
+        return $this->redirect(['index','step'=>$step]);
+    }
+###
     /**
-     *
-     * @return mixed
+     * Finds the Teams model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param string $orderGuid
+     * @return Order the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionStep3()
+    protected function findOrder(string $orderGuid):Order
     {
-        $this->layout = 'blank';
-        return $this->render('step3');
+        if (($model = $this->orderRepository->get($orderGuid)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+    protected function findSlot(int $slot_id):Slot
+    {
+        if (($model = $this->slotRepository->get($slot_id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+    protected function findOrderItem(int $orderItemId):OrderItem
+    {
+        if (($model = $this->orderRepository->getItem($orderItemId)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-    /**
-     *
-     * @return mixed
-     */
-    public function actionStep4()
-    {
-        $this->layout = 'blank';
-        return $this->render('step4');
-    }
-
-
+//    private function checkOrderAndItem(int $orderItemId)
+//    {
+//
+//    }
 }

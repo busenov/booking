@@ -30,8 +30,8 @@ class CustomerForm extends Model
     {
         return [
             [['name',], 'string', 'max' => 255],
-            ['telephone', 'string', 'min' => 2, 'max' => 255],
-            [['name','telephone'],'required']
+//            ['telephone', 'string', 'min' => 2, 'max' => 255],
+//            [['name','telephone'],'required']
         ];
     }
 

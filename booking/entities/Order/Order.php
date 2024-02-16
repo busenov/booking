@@ -8,21 +8,22 @@ use booking\entities\Car\CarType;
 use booking\entities\Slot\Slot;
 use booking\entities\User\User;
 use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
+use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "car_types".
+ * This is the model class for table "orders".
  *
  * @property int $id
- * @property int $slot_id
  * @property int $customer_id
  * @property int|null $status
  * @property bool $isChild
  *
- * @property string|null $note
+ * @property string $note
+ * @property string $guid
  *
  * @property int|null $created_at
  * @property int|null $updated_at
@@ -33,7 +34,7 @@ use yii\helpers\ArrayHelper;
  *
  * @property OrderItem[] $items
  * @property User $customer
- * @property Slot $slot
+ * @property float $total
  */
 class Order extends ActiveRecord
 {
@@ -42,31 +43,37 @@ class Order extends ActiveRecord
     const STATUS_PAID=30;                   //Оплачен
     const STATUS_COMPLETED=40;              //Завершен
     const STATUS_DELETED=100;               //Удален
+    const GUID_LENGTH=16;
+
+    const COOKIE_NAME_GUID='orderGuid';
 
     public static function create(
-                                int     $slotId,
                                 int     $status=self::STATUS_NEW,
-                                ?bool     $isChild = false,
                                 ?string $note=null
                             ):self
     {
         return new self([
-            'slot_id'=>$slotId,
             'status'=>$status,
-            'isChild'=>$isChild,
-            'note'=>$note
+            'note'=>$note,
+            'guid'=>Order::generateGuid(),
         ]);
     }
     public function edit(
         int     $status=self::STATUS_NEW,
-        ?bool     $isChild = false,
         ?string $note=null
     ):void
     {
         $this->status=$status;
-        $this->isChild=$isChild;
         $this->note=$note;
 
+    }
+    public static function generateGuid():string
+    {
+        do {
+            $guid=strtolower(Yii::$app->security->generateRandomString(self::GUID_LENGTH));
+
+        } while ((Order::findOne($guid)));
+        return $guid;
     }
 #on
     public function onNew()
@@ -113,37 +120,73 @@ class Order extends ActiveRecord
 #gets
     public function getItems(): ActiveQuery
     {
-        return $this->hasMany(OrderItem::class, ['order_id' => 'id']);
+        return $this->hasMany(OrderItem::class, ['order_id' => 'id'])->orderBy('slot_id');
     }
     public function getCustomer(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'customer_id']);
     }
-    public function getSlot(): ActiveQuery
+    public function getQtyBySlotId(int $slotId):?int
     {
-        return $this->hasOne(Slot::class, ['id' => 'slot_id']);
+        $sum=0;
+        foreach ($this->items as $item) {
+            if ($item->slot->isIdEqualTo($slotId)) {
+                $sum+=$item->qty;
+            }
+        }
+        return $sum;
+    }
+    private ?float $_total=null;
+    public function getTotal():?float
+    {
+        $total=0;
+        if (!isset($this->_total)) {
+            foreach ($this->items as $item) {
+                $total+=$item->total;
+            }
+        }
+        $this->_total=$total;
+        return $this->_total;
     }
 #sets
     public function setCustomer(User $customer)
     {
         $this->customer=$customer;
     }
-    public function addItem($carTypeId,int $qty=1): void
+#hass
+
+    /**
+     * @param OrderItem|int $item
+     * @return bool
+     */
+    public function hasItem($itemOrItemId):bool
+    {
+        if (is_a($itemOrItemId,self::class)) {
+            $itemOrItemId=$itemOrItemId->id;
+        }
+        foreach ($this->items as $item) {
+            if ($item->isIdEqualTo($itemOrItemId->id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public function changeItem(int $slotId, int $carTypeId, int $qty=0): void
     {
         $items = $this->items;
         $notInOrder = true;
         foreach ($items as $item) {
-            if ($item->carType->isIdEqualTo($carTypeId)) {
-                $item->qty += $qty;
+            if ($item->isIdSlotIdEqualTo($slotId,$carTypeId)) {
+                $item->qty = $qty;
                 $notInOrder = false;
             }
         }
         if ($notInOrder)
-            $items[] = OrderItem::create($carTypeId,$qty);
+            $items[] = OrderItem::create($slotId,$carTypeId,$qty);
 
         $this->items = $items;
     }
-    public function editItem($item_id,int $qty=1): void
+    public function editItem($item_id,int $qty=0): void
     {
         $items = $this->items;
         foreach ($items as $item) {
@@ -165,6 +208,37 @@ class Order extends ActiveRecord
         }
 
     }
+
+    /**
+     * Подготавливаем к JS, в виде массива
+     * @return array
+     */
+    public function toJs():array
+    {
+        $result=$this->toArray();
+
+        $items=[];
+        foreach ($this->items as $item) {
+            if (!array_key_exists($item->slot_id,$items)) {
+                $items[$item->slot_id]=[];
+                $items[$item->slot_id]['qty']=0;
+            }
+            if (!array_key_exists($item->carType_id,$items[$item->slot_id])) {
+                $items[$item->slot_id][$item->carType_id]=[];
+            }
+
+            $items[$item->slot_id][$item->carType_id]['qty']=$item->qty;
+            $items[$item->slot_id][$item->carType_id]['price']=$item->price;
+            $items[$item->slot_id][$item->carType_id]['total']=$item->total;
+            $items[$item->slot_id]['qty']+=$item->qty;
+            $items[$item->slot_id]['total']=$item->slot->total;
+
+        }
+        $result['items']=$items;
+        $result['total']=$this->total;
+        return $result;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -204,11 +278,11 @@ class Order extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'slot_id' => 'Слот',
             'customer_id' => 'Заказчик',
             'status' => 'Статус',
-            '$isChild' => 'Детский?',
+            'isChild' => 'Детский?',
             'note' => 'Примечание',
+            'guid' => 'GUID',
 
             'created_at' => 'Создано',
             'updated_at' => 'Отредактировано',
@@ -233,6 +307,13 @@ class Order extends ActiveRecord
     {
         return ArrayHelper::getValue(self::getStatusList(), $status);
     }
+
+    public function totalBySlot(int $slot_id)
+    {
+        return 3000;
+    }
+
+
 
 
 }

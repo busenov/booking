@@ -5,18 +5,21 @@ namespace booking\entities\Order;
 use booking\entities\behaviors\FillingServiceFieldsBehavior;
 use booking\entities\behaviors\LoggingBehavior;
 use booking\entities\Car\CarType;
+use booking\entities\Slot\Slot;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "car_types".
+ * This is the model class for table "order_items".
  *
  * @property int $id
  * @property int $order_id
+ * @property int $slot_id
  * @property int $carType_id
  * @property int $qty
+ * @property float $price
  *
  * @property int|null $created_at
  * @property int|null $updated_at
@@ -27,17 +30,21 @@ use yii\helpers\ArrayHelper;
  *
  * @property CarType $carType
  * @property Order $order
+ * @property Slot $slot
+ * @property float $total
  */
 class OrderItem extends ActiveRecord
 {
 
     public static function create(
+                                int     $slot_id,
                                 int     $carType_id,
                                 int     $qty
                             ):self
     {
         return new self([
-            'carType_id'=>$carType_id,
+            'slot_id'   => $slot_id,
+            'carType_id'=> $carType_id,
             'qty'=>     $qty
         ]);
     }
@@ -49,10 +56,15 @@ class OrderItem extends ActiveRecord
 
     }
 #iss
-    public function isIdEqualTo($id):bool
+    public function isIdEqualTo(int $id):bool
     {
-        return $this->id == $id;
+        return ($this->id === $id) ;
     }
+    public function isIdSlotIdEqualTo(int $slotId,int $cartTypeId):bool
+    {
+        return (($this->carType_id === $cartTypeId) and ($this->slot_id===$slotId));
+    }
+
 #gets
     public function getCarType(): ActiveQuery
     {
@@ -61,6 +73,18 @@ class OrderItem extends ActiveRecord
     public function getOrder(): ActiveQuery
     {
         return $this->hasOne(Order::class, ['id' => 'order_id']);
+    }
+    public function getSlot(): ActiveQuery
+    {
+        return $this->hasOne(Slot::class, ['id' => 'slot_id']);
+    }
+    public function getPrice():float
+    {
+        return 1000;
+    }
+    public function getTotal():?float
+    {
+        return $this->price*$this->qty;
     }
 
     /**
@@ -92,6 +116,7 @@ class OrderItem extends ActiveRecord
     {
         return [
             'order_id' => 'Заказ',
+            'slot_id' => 'Заезд',
             'carType_id' => 'Машина',
             'qty' => 'Количество',
 

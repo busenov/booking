@@ -24,7 +24,7 @@ class SlotSearch extends Slot
     public function rules()
     {
         return [
-            [['id','date','begin','end', 'qty', 'status','created_at','updated_at', 'author_id','editor_id','period','is_child'], 'integer'],
+            [['id','date','begin','end', 'qty', 'status','created_at','updated_at', 'author_id','editor_id','period','is_child','type'], 'integer'],
             ['period','in','range' => array_keys($this->getPeriodList())],
             [[ 'note'], 'safe'],
         ];

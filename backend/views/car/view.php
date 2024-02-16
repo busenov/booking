@@ -1,6 +1,7 @@
 <?php
 
 use booking\entities\Car\CarType;
+use booking\entities\Slot\Slot;
 use booking\helpers\CarHelper;
 use booking\useCases\manage\CarTypeManageService;
 use yii\helpers\Html;
@@ -57,6 +58,13 @@ YiiAsset::register($this);
                 'format' => 'raw',
                 'value' => function (CarType $data) {
                     return CarHelper::statusLabel($data->status) ;
+                },
+            ],
+            [
+                'attribute' => 'type',
+                'format' => 'raw',
+                'value' => function (CarType $data) {
+                    return Slot::getTypeName($data->type);
                 },
             ],
             'created_at:datetime',

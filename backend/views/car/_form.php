@@ -1,6 +1,7 @@
 <?php
 
 use booking\entities\Car\CarType;
+use booking\entities\Slot\Slot;
 use booking\forms\manage\Car\CarTypeForm;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -21,6 +22,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'qty')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'status')->dropDownList(CarType::getStatusList(), ['prompt' => '']) ?>
+
+    <?= $form->field($model, 'type')->dropDownList(Slot::getTypeList(), ['prompt' => '']) ?>
 
     <?= $form->field($model, 'pwr')->textInput(['maxlength' => true]) ?>
 

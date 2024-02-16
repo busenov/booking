@@ -29,7 +29,7 @@ use yii\web\IdentityInterface;
  * @property string $telephone
  * @property integer $gender
  * @property string $shortName
- * @property array $roles
+ * @property string $role
  * @property integer $type
  *
  * @property integer $created_at

@@ -10,6 +10,7 @@ use booking\entities\User\User;
 use booking\forms\manage\Order\OrderCreateForm;
 use booking\forms\manage\Order\OrderEditForm;
 use booking\forms\manage\Order\OrderItemForm;
+use booking\forms\manage\Order\SlotCreateForm;
 use booking\forms\manage\Slot\SlotForm;
 use booking\helpers\DateHelper;
 use booking\repositories\CarTypeRepository;
@@ -37,7 +38,6 @@ class OrderManageService
     {
         $this->guardCanCreate();
         $entity = Order::create(
-            (int)$form->slot_id,
             (int)$form->status,
             (int)$form->isChild,
             $form->note,
@@ -55,7 +55,7 @@ class OrderManageService
         if ($form->items) {
             foreach ($form->items as $item) {
                 if ($item->qty) {
-                    $entity->addItem($item->cartTypeId,intval($item->qty));
+                    $entity->changeItem($item->carType_id,intval($item->qty));
                 }
             }
         }
@@ -72,8 +72,7 @@ class OrderManageService
         $this->guardCanEdit($entity);
         $entity->edit(
             (int)$form->status,
-            (int)$form->isChild,
-            (int)$form->note,
+            (string)$form->note,
         );
         #customer
         if (!($customer=$this->userRepository->findByTelephone($form->customer->telephone))) {
@@ -88,23 +87,70 @@ class OrderManageService
             if ($item->_orderItem) {
                 $entity->editItem($item->_orderItem->id,$item->qty);
             } else {
-                $entity->addItem($item->cartTypeId,$item->qty);
+                $entity->changeItem($item->carType_id,$item->qty);
             }
         }
         $this->repository->save($entity);
+    }
+
+    /**
+     * Добавляет(изменяет заказ)
+     * @param SlotCreateForm $form
+     * @return Order
+     */
+    public function addToOrder(SlotCreateForm $form):Order
+    {
+        if (!$entity=$form->_order) {
+            $entity = Order::create();
+        }
+        foreach ($form->items as $item) {
+            $entity->changeItem($form->slot_id, $item->carType_id, intval($item->qty));
+        }
+        $this->repository->save($entity);
+        return $entity;
+    }
+    public function changeItem($itemOrItemId,int $qty):?Order
+    {
+        $item=$this->repository->getItem($itemOrItemId);
+        if ($this->guardCanChangeItem($itemOrItemId,$qty,true)) {
+            $items=$item->order->items;
+            foreach ($items as $orderItem) {
+                if ($orderItem->isIdEqualTo($item->id)) {
+                    $orderItem->qty=$qty;
+                }
+            }
+            $item->order->items=$items;
+
+            $this->repository->save($item->order);
+            return $item->order;
+        }
+        return null;
+
+
     }
     public function addItem($entityOrId, OrderItemForm $orderItemForm):void
     {
         $entity=$this->repository->get($entityOrId);
         $this->guardCanAddItem($entity);
-        $entity->addItem($orderItemForm->cartTypeId,$orderItemForm->qty);
+        $entity->changeItem($orderItemForm->carType_id,$orderItemForm->qty);
         $this->repository->save($entity);
     }
-    public function removeItem($entityOrId,$itemId)
+    public function removeItem($entityOrId,int $itemId)
     {
         $entity=$this->repository->get($entityOrId);
         $this->guardCanRemoveItem($entity);
         $entity->removeItem($itemId);
+        $this->repository->save($entity);
+    }
+    public function removeSlot($entityOrId,int $slotId)
+    {
+        $entity=$this->repository->get($entityOrId);
+        $this->guardCanRemoveSlot($entity);
+        foreach ($entity->items as $item) {
+            if ($item->slot->isIdEqualTo($slotId)) {
+                $entity->removeItem($item->id);
+            }
+        }
         $this->repository->save($entity);
     }
 
@@ -190,12 +236,47 @@ class OrderManageService
         return \Yii::$app->user->can('admin');
     }
 
-    private function guardCanAddItem($entityOrId)
+    public static function guardCanAddItem($entityOrId)
     {
         return true;
     }
-    private function guardCanRemoveItem($entityOrId)
+    public static function guardCanRemoveItem($entityOrId)
     {
+        return true;
+    }
+    public static function guardCanRemoveSlot($entityOrId)
+    {
+        return true;
+    }
+
+
+    /**
+     * Можем ли мы менять кол-во в позиции. Условия:
+     * - Заказ статус Новый
+     * - Итоговое кол-во не превышает разрешенное в заезде
+     * - Есть доступные машины на этот заезд
+     *
+     * @param OrderItem $itemOrItemId
+     * @param int $newQty
+     * @param bool $return
+     * @return void
+     */
+    public static function guardCanChangeItem(OrderItem $item, int $newQty, bool $return=false):bool
+    {
+        if (!$item->order->isNew()) {
+            if ($return) {
+                return false;
+            }
+            throw new \DomainException('Ошибка! Заказ на этапе обработки. Запрет редактирования.');
+        }
+
+        $free=$item->slot->getFree($item->carType_id);
+        if (($newQty) > ($free + $item->qty) ) {
+            if ($return) {
+                return false;
+            }
+            throw new \DomainException('Ошибка! Достигнут максимальное кол-во машин в заезде.');
+        }
         return true;
     }
 ### private

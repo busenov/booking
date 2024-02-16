@@ -72,7 +72,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'status')->dropDownList(Slot::getStatusList(), ['prompt' => '']) ?>
 
-    <?= $form->field($model, 'status')->radioList(Slot::getTypeList(), ['prompt' => '']) ?>
+    <?= $form->field($model, 'type')->radioList(Slot::getTypeList(), ['prompt' => '']) ?>
 
     <?= $form->field($model, 'note')->textInput(['maxlength' => true]) ?>
 

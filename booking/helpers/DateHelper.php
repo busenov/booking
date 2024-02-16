@@ -4,6 +4,7 @@
 namespace booking\helpers;
 
 
+use common\fixtures\UserFixture;
 use DateTime;
 
 class DateHelper
@@ -292,10 +293,10 @@ class DateHelper
         return null;
     }
     /**
-     * Конвертируем строку вида ЧЧ:ММ.СЕК из кол-во секунд
-     * @param string|null $strTime
+     * Конвертируем строку вида ЧЧ:ММ.СЕК из кол-во секунд от начала дня
+     * @param int|null $intTime
      * @param bool|null $withSecond         Если false тогда возвращаем: ЧЧ:ММ
-     * @return int|null
+     * @return string|null
      */
     public static function timeIntToStr(?int $intTime, ?bool $withSecond=true):?string
     {
@@ -324,5 +325,32 @@ class DateHelper
         }
         return null;
     }
-
+    /**
+     * Конвертируем строку вида ЧЧ из кол-во секунд от начала дня
+     * @param int|null $intTime
+     * @return string|null
+     */
+    public static function hourIntToStr(?int $intTime):?string
+    {
+        if ($intTime) {
+            $hour = $intTime/(60*60);
+            if ($hour>=1) {
+                $hour=intval($hour);
+                $intTime=$intTime - $hour*60*60;
+            } else {
+                $hour=0;
+            }
+            return sprintf("%1$02d",$hour);
+        }
+        return null;
+    }
+    public static function getMonthRu(int $month):?string
+    {
+        $monthList=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+        if (array_key_exists($month,$monthList)){
+            return $monthList[$month];
+        } else {
+            return null;
+        }
+    }
 }

@@ -1,32 +1,53 @@
 <?php
+
+use booking\entities\Order\Order;
 use booking\forms\manage\Order\OrderCreateForm;
+use booking\forms\manage\Order\SlotCreateForm;
+use booking\helpers\DateHelper;
 use frontend\assets\BookingAsset;
+use kartik\widgets\TouchSpin;
+use yii\bootstrap5\ActiveForm;
+use yii\bootstrap5\Html;
 use yii\helpers\Url;
 use yii\web\YiiAsset;
 
 /** @var yii\web\View $this */
 /** @var array $calendar */
-/** @var OrderCreateForm $model */
+/** @var Order $order */
 
 YiiAsset::register($this);
 BookingAsset::register($this);
 $this->title = Yii::$app->name;
 
-$selected_day=(array_key_exists('selected_day_unx',$_COOKIE)AND(is_int($_COOKIE['selected_day_unx'])))?$_COOKIE['selected_day_unx']:time();
+
+$selected_day=array_key_exists('selected_day',$_COOKIE)?$_COOKIE['selected_day']:time();
+$selected_wday=array_key_exists('selected_wday',$_COOKIE)?$_COOKIE['selected_wday']:date('N',time());
 $onlyChildren= ((array_key_exists('onlyChildren',$_COOKIE))AND($_COOKIE['onlyChildren']==='true'));
 $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==='true'));
+$urlPre='';
+$urlNxt=Url::to(['index','step'=>2]);
 ?>
 <script type='text/javascript'>
+    var $ykv_step=1;
     var $ykv_calendar=<?=json_encode($calendar)?>;
-    console.log($ykv_calendar);
+    var $ykv_order=<?=($order?json_encode($order->toJs()):'""')?>;
+    var $ykv_toIssue=false;
+    var $ykv_urlPre='';
+    var $ykv_urlNxt='<?=$urlNxt?>';
+    var $ykv_urlOrderModalAjax='<?=Url::to(['site/order-modal-ajax'])?>';
+    // console.log($ykv_step);
 </script>
 
-<a href="<?= Url::to(['index','step'=>2])?>" style="display: none">Перейти к оформлению--></a>
+<a href="<?= $urlNxt ?>" style="display: none">Перейти к оформлению--></a>
 
 <section class="body">
     <div class="header">
         <div class="header__wrapper">
-            <div class="month">Февраль 2024</div>
+            <?
+//                dump($selected_day=time());
+//                dump(date('n',$selected_day)-1);exit;
+            ?>
+            <div class="month"><?=DateHelper::getMonthRu(date('n',$selected_day)-1).' '.date('Y',$selected_day)?></div>
             <a class="head-link" href="<?= Url::to(['index','step'=>2])?>">Перейти к оформлению ></a>
         </div>
     </div>
@@ -92,7 +113,7 @@ $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==
             Забронировано
         </div>
     </div>
-    <div class="step-title">Заезды <span id="race-day">29 января 2024</span>г.</div>
+    <div class="step-title">Заезды <span id="race-day"><?=date('j',$selected_day).' '.DateHelper::getMonthRu(date('n',$selected_day)-1).' '.date('Y',$selected_day)?></span>г.</div>
     <div class="forms-block">
         <div class="for-childs">
             <img src="/booking/img/child.png" class="child-img">
@@ -128,44 +149,63 @@ $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==
     </div>
 
     <div class="result-table">
-        <div class="result-table__time-row">12:00</div>
-        <div class="result-table__row">
-            <div class="result-table__info-block">
-                <div class="result-table__time">12:00 - 12:15</div>
-                <div class="result-table__info">Свободно: 10 мест</div>
-            </div>
-            <button class="result-table__btn btn" data-bs-toggle="modal" data-bs-target="#exampleModal">Забронировать</button>
-        </div>
-        <div class="result-table__row">
-            <div class="result-table__info-block">
-                <div class="result-table__time">12:15 - 12:30</div>
-                <div class="result-table__info purple"><img src="/booking/img/child.png" class="result-table__icon"> Свободно: 10 мест</div>
-            </div>
-            <button class="result-table__btn btn" data-bs-toggle="modal" data-bs-target="#exampleModal">Забронировать</button>
-        </div>
-        <div class="result-table__time-row">13:00</div>
-        <div class="result-table__row">
-            <div class="result-table__info-block">
-                <div class="result-table__time">13:00 - 13:15</div>
-                <div class="result-table__info yellow"><img src="/booking/img/star.png" class="result-table__icon"> Свободно: 10 мест</div>
-            </div>
-            <button class="result-table__btn btn" data-bs-toggle="modal" data-bs-target="#exampleModal">Забронировать</button>
-        </div>
-        <div class="result-table__row">
-            <div class="result-table__info-block">
-                <div class="result-table__time">13:15 - 13:30</div>
-                <div class="result-table__info">Свободно: 10 мест</div>
-            </div>
-            <button class="result-table__btn btn" data-bs-toggle="modal" data-bs-target="#exampleModal">Забронировать</button>
-        </div>
-        <div class="result-table__row">
-            <div class="result-table__info-block noActive">
-                <div class="result-table__time">13:30 - 13:45</div>
-                <div class="result-table__info">Свободно: 10 мест</div>
-            </div>
-            <button class="result-table__btn btn" data-bs-toggle="modal" data-bs-target="#exampleModal">Забронировать</button>
-        </div>
+    <?php
+        $hour=null;
+        $notSlots=true;
+    ?>
+    <?foreach ( $calendar[$selected_wday] as $slotId=>$item) :?>
+    <?php
+        if (!is_int($slotId)) continue;
+        $currentHour = DateHelper::hourIntToStr($item['begin']);
+        //показывать только детские?
+        if ($onlyChildren AND $item['isChild']===false) {
+            continue;
+        }
+        //показывать клубные?
+        if (!$clubRaces AND $item['isClub']!==false)  {
+            continue;
+        }
+        $notSlots=false;
+        if ($currentHour!==$hour) {
+            $hour=$currentHour;
+            echo '<div class="result-table__time-row">' . $hour . ':00</div>';
+
+        }
+        $dateTimeStr=DateHelper::timeIntToStr($item['begin'],false).' - '. DateHelper::timeIntToStr($item['end'],false).' '. date('d.m.Y',$item['date']);
+
+        $icon='';
+        if ($item['isChild']) {
+            $icon.='<img src="/booking/img/child.png" class="result-table__icon"> ';
+        }
+        if ($item['isClub']) {
+            $icon.='<img src="/booking/img/star.png" class="result-table__icon"> ';
+        }
+        echo '<div class="result-table__row">';
+        echo
+            '   <div class="result-table__info-block">
+                    <div class="result-table__time">'. DateHelper::timeIntToStr($item['begin'],false).' - '. DateHelper::timeIntToStr($item['end'],false).'</div>
+                    <div class="result-table__info">'.
+                        $icon .
+                        $item['typeName'] .
+                        ' Свободно: ' . $item['qty'] . ' мест
+                    </div>
+                    <div class="result-table__order" id="result-table__slot_id_'.$slotId.'">'. (($order AND $order->getQtyBySlotId($slotId)>0)?$order->getQtyBySlotId($slotId):'').'</div>
+                </div>
+                <button 
+                    class="result-table__btn btn" 
+                    data-action="'.Url::to(['site/order-modal-ajax','slot_id'=>$slotId]).'"
+                >Забронировать</button>
+            </div>'
+        ;
+    ?>
+    <?endforeach;?>
+    <?php
+        if ($notSlots) {
+            echo 'Нет свободных заездов по заданным критериям';
+        }
+    ?>
     </div>
+
     <div class="timer-block">
         <div class="timer">
             <span class="timer-title">Оформить в течении</span>
@@ -174,33 +214,15 @@ $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==
     </div>
 </section>
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-date">23.01.2024</div>
-                <div class="modal-time">12:25</div>
-                <div class="modal-name">Взрослый заезд</div>
-            </div>
-            <div class="modal-body">
-                <form class="modal-form">
-                    <div class="modal-form__row">
-                        <label>SODi RT8:</label>
-                        <input type="text">
-                    </div>
-                    <div class="modal-form__row">
-                        <label>SPORT 9:</label>
-                        <input type="text">
-                    </div>
-                    <div class="modal-form__row">
-                        <button class="add-in-zakaz">Добавить в заказ</button>
-                        <button class="add-issue">Добавить и оформить</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+<div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="" aria-hidden="true">
+
 </div>
+<!-- Modal -->
+
+<pre>
+<!--    --><?//dump($order);?>
+<!--    --><?//dump($order->items);?>
+<!--    --><?//dump($order->toJs());?>
+</pre>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>

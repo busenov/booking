@@ -105,6 +105,7 @@ class SlotRepository
     {
         $dateTime=$unixTime?:time();
         $slots=$this->findSlotsByWeek($dateTime);
+//        dump(count($slots));exit;
         $calendar=[];
         $reservedCars=OrderRepository::findSumReservedCar_st();
 
@@ -116,6 +117,7 @@ class SlotRepository
             $calendar[$i]['isCurrent']=DateHelper::beginWeekDayByUnixTime(time())===$calendar[$i]['unixTime'];;
             $calendar[$i]['isSelected']=(array_key_exists('selected_wday',$_COOKIE) AND intval($_COOKIE['selected_wday'])===$i);
             $calendar[$i]['isNoActive']=true;
+
         }
         foreach ($slots as $slot) {
 //            $day=date('j',$slot->date);
@@ -124,12 +126,14 @@ class SlotRepository
             $free=isset($reservedCars[$slot->id])?($slot->qty - $reservedCars[$slot->id]['qty']):$slot->qty;
 
             $calendar[$wDay][$slot->id]=[
+                'date'=>$slot->date,
                 'begin'=>$slot->begin,
                 'end'=>$slot->end,
                 'qty'=>$slot->qty,
                 'free'=>$free,
                 'isChild'=>$slot->isChild(),
                 'isClub'=>$slot->isClub(),
+                'typeName'=>Slot::getTypeName($slot->type),
             ];
             if (isset($calendar[$wDay]['qtySlot'])) {
                 $calendar[$wDay]['qtySlot']++;
@@ -185,7 +189,8 @@ class SlotRepository
         return Slot::find()
             ->andWhere([ '>=', 'date',DateHelper::beginWeekDayByUnixTime($dateTime)])
             ->andWhere([ '<=', 'date',DateHelper::lastWeekDayByUnixTime($dateTime)])
-            ->orderBy('date')
+            ->andWhere([ 'status'=>Slot::STATUS_ACTIVE])
+            ->orderBy('date,begin')
             ->all();
     }
     public function findAll():array

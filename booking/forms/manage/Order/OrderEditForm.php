@@ -10,9 +10,9 @@ use yii\base\Model;
 
 /**
  * @property int $slot_id
+ * @property int $order_id
  * @property int $customer_id
  * @property int $status
- * @property int $isChild
  * @property string $note
  *
  * @property CustomerForm $customer
@@ -21,15 +21,24 @@ use yii\base\Model;
 
 class OrderEditForm extends CompositeForm
 {
+    public int $order_id;
+    public ?int $slot_id=null;
     public ?string $note=null;
     public ?int $status=null;
-    public ?bool $isChild=null;
     public Order $_order;
     public function __construct(Order $order, $config = [])
     {
         parent::__construct($config);
+        $this->order_id=$order->id;
         $this->_order=$order;
+        $this->customer=new CustomerForm();
 
+//        $this->items=[];
+//        $this->items=array_map(function (CarType $carType){
+//            return new OrderItemForm(null,[
+//                'cartTypeId'=>$carType->id,
+//                '_carType'=>$carType
+//            ]);
     }
 
     /**

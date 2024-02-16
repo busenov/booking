@@ -5,6 +5,7 @@ namespace booking\entities\Slot;
 use booking\entities\behaviors\FillingServiceFieldsBehavior;
 use booking\entities\behaviors\LoggingBehavior;
 use booking\entities\Order\Order;
+use booking\entities\Order\OrderItem;
 use booking\helpers\DateHelper;
 use booking\repositories\CarTypeRepository;
 use booking\repositories\OrderRepository;
@@ -26,7 +27,7 @@ use yii\helpers\ArrayHelper;
  * @property int $qty                   //возможное кол-во людей
  *
  * @property string|null $note          //примечание
- * @property boolean $is_child          //Детский заезд?
+ * @property boolean $is_child          //Детский заезд?            (НЕ ИСПОЛЬЗУЕТСЯ)
  * @property int $type                  //Тип заезда(взрослый, детский, клубный)
  *
  * @property int|null $created_at
@@ -37,6 +38,8 @@ use yii\helpers\ArrayHelper;
  * @property string|null $editor_name
  *
  * @property Order[] $orders
+ * @property OrderItem[] $orderItems
+ * @property float $total
  */
 class Slot extends ActiveRecord
 {
@@ -141,9 +144,13 @@ class Slot extends ActiveRecord
     {
         return ($this->date + $this->end);
     }
-    public function getOrders(): ActiveQuery
+    public function getOrderItems(): ActiveQuery
     {
-        return $this->hasMany(Order::class, ['slot_id' => 'id']);
+        return $this->hasMany(OrderItem::class, ['slot_id' => 'id']);
+    }
+    public function getOrders():ActiveQuery
+    {
+        return $this->hasMany(self::class, ['id' => 'order_id'])->via('orderItems');
     }
 
     /**
@@ -190,6 +197,17 @@ class Slot extends ActiveRecord
     {
         return \Yii::$app->params['slot.maxQty'];
     }
+    private $_total=null;
+    public function getTotal():float
+    {
+        if (!isset($this->_total)) {
+            $this->_total=0;
+            foreach ($this->orderItems as $orderItem) {
+                $this->_total+=$orderItem->total;
+            }
+        }
+        return $this->_total;
+    }
 #on
     public function onNew()
     {
@@ -232,6 +250,10 @@ class Slot extends ActiveRecord
     {
         return $this->type===self::TYPE_ADULT;
     }
+    public function isIdEqualTo(int $slotId):bool
+    {
+        return $this->id===$slotId;
+    }
 #hass
     public function hasReserved():bool
     {
@@ -239,6 +261,10 @@ class Slot extends ActiveRecord
         return $this->qty!==$this->getFree();
     }
 
+    public function hasOrderItems():bool
+    {
+        return count($this->orderItems)>0;
+    }
     public function hasOrders():bool
     {
         return count($this->orders)>0;
