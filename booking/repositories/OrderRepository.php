@@ -84,7 +84,7 @@ class OrderRepository
     {
         $statuses=[
             Order::STATUS_NEW,
-            Order::STATUS_AWAITING_PAYMENT,
+            Order::STATUS_CHECKOUT,
             Order::STATUS_PAID,
             Order::STATUS_COMPLETED,
         ];

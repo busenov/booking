@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use booking\entities\Order\Order;
 use booking\entities\Order\OrderItem;
 use booking\entities\Slot\Slot;
+use booking\forms\manage\Order\CustomerForm;
 use booking\forms\manage\Order\OrderCreateForm;
 use booking\forms\manage\Order\OrderEditForm;
 use booking\forms\manage\Order\SlotCreateForm;
@@ -108,6 +109,7 @@ class SiteController extends Controller
         $this->layout = 'blank';
         $calendar=$this->slotRepository->calendarWeekly();
         $order=null;
+        $customerOrder=new CustomerForm();
         if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)){
             $order=$this->findOrder($orderGuid);
         }
@@ -115,10 +117,17 @@ class SiteController extends Controller
         if (empty($order)and $step!==1) {
             return $this->redirect(['index','step'=>1]);
         };
+        if ($step==2) {
+            if ($this->request->isPost && $customerOrder->load($this->request->post())) {
+                $this->orderService->checkout($order,$customerOrder);
+                return $this->redirect(['index','step'=>3]);
+            }
+        }
 
         return $this->render('step'.$step,[
             'calendar'=>$calendar,
-            'order'=>$order
+            'order'=>$order,
+            'customerOrder'=>$customerOrder
         ]);
     }
     /**

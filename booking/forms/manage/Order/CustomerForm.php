@@ -9,7 +9,9 @@ use yii\base\Model;
 class CustomerForm extends Model
 {
     public ?string $name=null;
+    public ?string $surname=null;
     public ?string $telephone=null;
+    public ?string $email=null;
     public ?User $_customer;
     public function __construct(User $customer=null, $config = [])
     {
@@ -29,9 +31,10 @@ class CustomerForm extends Model
     public function rules()
     {
         return [
-            [['name',], 'string', 'max' => 255],
-//            ['telephone', 'string', 'min' => 2, 'max' => 255],
-//            [['name','telephone'],'required']
+            [['name','surname'], 'string', 'max' => 255],
+            [['email'], 'email'],
+            ['telephone', 'string', 'min' => 2, 'max' => 255],
+            [['name','telephone'],'required']
         ];
     }
 

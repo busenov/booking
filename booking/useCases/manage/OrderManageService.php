@@ -7,6 +7,7 @@ use booking\entities\Order\OrderItem;
 use booking\entities\Schedule\Schedule;
 use booking\entities\Slot\Slot;
 use booking\entities\User\User;
+use booking\forms\manage\Order\CustomerForm;
 use booking\forms\manage\Order\OrderCreateForm;
 use booking\forms\manage\Order\OrderEditForm;
 use booking\forms\manage\Order\OrderItemForm;
@@ -185,6 +186,28 @@ class OrderManageService
         }
     }
 
+    /**
+     * Оформление заказа
+     * @param Order $order
+     * @param CustomerForm $customerOrder
+     * @return void
+     */
+    public function checkout(Order $order, CustomerForm $customerOrder)
+    {
+        $this->guardCheckout($order);
+        if (!$customer=$this->userRepository->findByTelephone($customerOrder->telephone)) {
+            $customer=User::createCustomer(
+                $customerOrder->name,
+                $customerOrder->telephone,
+                $customerOrder->email,
+                $customerOrder->surname,
+            );
+        }
+        $order->setCustomer($customer);
+        $order->onCheckout();
+        $this->repository->save($order);
+
+    }
 ###guards
     public static function guardCanView($entityOrId, bool $return=false):bool
     {
@@ -277,6 +300,10 @@ class OrderManageService
             }
             throw new \DomainException('Ошибка! Достигнут максимальное кол-во машин в заезде.');
         }
+        return true;
+    }
+    public static function guardCheckout(Order $order, bool $return=false):bool
+    {
         return true;
     }
 ### private

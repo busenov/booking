@@ -2,8 +2,10 @@
 
 use booking\entities\Order\Order;
 use booking\entities\Slot\Slot;
+use booking\forms\manage\Order\CustomerForm;
 use booking\helpers\DateHelper;
 use frontend\assets\BookingAsset;
+use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
 use yii\helpers\Url;
 use yii\web\YiiAsset;
@@ -11,6 +13,7 @@ use yii\web\YiiAsset;
 /** @var yii\web\View $this */
 /** @var array $calendar */
 /** @var Order $order */
+/** @var CustomerForm $customerOrder */
 
 YiiAsset::register($this);
 BookingAsset::register($this);
@@ -90,26 +93,28 @@ $urlNxt=Url::to(['index','step'=>3]);
     </div>
     <div class="order-form__block">
         <div class="order-form__title">Данные для заказа</div>
-        <form class="order-form">
-            <div class="order-form__item">
-                <label>Имя</label>
-                <input type="text" name="name" placeholder="Имя">
-            </div>
-            <div class="order-form__item">
-                <label>Фамилия</label>
-                <input type="text" name="surname" placeholder="Фамилия">
-            </div>
-            <div class="order-form__item">
-                <label>Телефон</label>
-                <input type="text" name="phone" placeholder="+7(___) ___ -___-___*">
-            </div>
-            <div class="order-form__item">
-                <label>Email</label>
-                <input type="text" name="email" placeholder="Email">
-            </div>
-        </form>
+        <?php $form = ActiveForm::begin([
+            'options'=>[
+                'class'=>"order-form",
+            ],
+            'method'=>"post",
+            'action'=>Url::to(['index','step'=>2])
+        ]); ?>
+        <div class="order-form__item">
+            <?= $form->field($customerOrder, 'name')->textInput(['maxlength' => true,]) ?>
+        </div>
+        <div class="order-form__item">
+            <?= $form->field($customerOrder, 'surname')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="order-form__item">
+            <?= $form->field($customerOrder, 'telephone')->textInput(['maxlength' => true,'placeholder'=>"+7(___) ___ -___-___*"]) ?>
+        </div>
+        <div class="order-form__item">
+            <?= $form->field($customerOrder, 'email')->textInput(['maxlength' => true]) ?>
+        </div>
+        <?php ActiveForm::end(); ?>
     </div>
-    <div class="timer-block">
+    <div class="timer-block" id="step2_btn_timer">
         <div class="timer">
             <span class="timer-title">Оформить в течении</span>
             <div class="timer-time">10:00</div>

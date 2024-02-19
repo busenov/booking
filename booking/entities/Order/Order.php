@@ -39,7 +39,8 @@ use yii\helpers\ArrayHelper;
 class Order extends ActiveRecord
 {
     const STATUS_NEW=10;                    //Новый
-    const STATUS_AWAITING_PAYMENT=20;       //Ожидает оплаты
+    const STATUS_RESERVED=15;               //Статус в работе, добавлены заезды
+    const STATUS_CHECKOUT=20;               //Оформление. Ожидает оплаты
     const STATUS_PAID=30;                   //Оплачен
     const STATUS_COMPLETED=40;              //Завершен
     const STATUS_DELETED=100;               //Удален
@@ -80,9 +81,13 @@ class Order extends ActiveRecord
     {
         $this->status=self::STATUS_NEW;
     }
-    public function onAwaitingPayment()
+    public function onReserved()
     {
-        $this->status=self::STATUS_AWAITING_PAYMENT;
+        $this->status=self::STATUS_RESERVED;
+    }
+    public function onCheckout()
+    {
+        $this->status=self::STATUS_CHECKOUT;
     }
     public function onPaid()
     {
@@ -103,7 +108,7 @@ class Order extends ActiveRecord
     }
     public function isAwaitingPayment():bool
     {
-        return $this->status===self::STATUS_AWAITING_PAYMENT;
+        return $this->status===self::STATUS_CHECKOUT;
     }
     public function isPaid():bool
     {
@@ -296,7 +301,8 @@ class Order extends ActiveRecord
     {
         return [
             self::STATUS_NEW => 'Новый',
-            self::STATUS_AWAITING_PAYMENT => 'Ожидает оплаты',
+            self::STATUS_RESERVED => 'Заполняется',
+            self::STATUS_CHECKOUT => 'Ожидает оплаты',
             self::STATUS_PAID => 'Оплачен',
             self::STATUS_COMPLETED => 'Завершен',
             self::STATUS_DELETED => 'Удален',

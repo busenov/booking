@@ -102,12 +102,16 @@ class User extends ActiveRecord implements IdentityInterface
     }
     public static function createCustomer(
         string  $name,
-        string $telephone
+        string $telephone,
+        ?string $email=null,
+        ?string $surname=null
     ): self
     {
         $user = new User();
         $user->name = $name;
         $user->telephone =$telephone;
+        $user->email =$email;
+        $user->surname =$surname;
         $user->type=self::TYPE_USER;
         return $user;
     }

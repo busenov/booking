@@ -18,7 +18,8 @@
             modalFormSlot_id=document.getElementById('modal-form-slot_id'),
             orderModal=document.getElementById('orderModal'),
             //step2
-            step2_incs=document.getElementsByClassName('btn-inc')
+            step2_incs=document.getElementsByClassName('btn-inc'),
+            step2_btnTimer=document.getElementById('step2_btn_timer')
             ;
         function Booking() {
             if (this.getCookie('onlyChildren')==='true') {
@@ -311,6 +312,11 @@
                 for (let i = 0; i < step2_incs.length; i++) {
                     step2_incs[i].addEventListener('click', function(){that.step2_clickInc(this)});
                 }
+            }
+            if (step2_btnTimer) {
+                let
+                    form = document.getElementsByClassName('order-form')[0];
+                step2_btnTimer.addEventListener('click', function(){form.submit()});
             }
         }
         //при клике на изменение кол-в позиций
