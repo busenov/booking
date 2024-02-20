@@ -82,14 +82,14 @@
 }
 .week__day {
     width: 125px;
-    background: #F5F5F5;
-    color: #000000;
+    background: #D60000;
+    color: #ffffff;
     padding: 13px 0;
     text-align: center;
     font-weight: 600;
 }
-.week__day.red {
-    color: #FF0707;
+.week__day.black {
+    color: #000000;
 }
 .week__dates {
     display: flex;
@@ -224,6 +224,17 @@
 .label-color.red {
     background: #FF0707;
 }
+.order-block {
+    width: 90%;
+    max-width: 840px;
+    box-sizing: border-box;
+    background: #F7F7F7;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+}
 .step-title {
     text-align: center;
     font-size: 22px;
@@ -296,7 +307,7 @@ input:checked + .slider:before {
 }
 /*конец свич*/
 .forms-block {
-    width: 90%;
+    width: 96%;
     max-width: 840px;
     display: flex;
     justify-content: space-between;
@@ -361,7 +372,7 @@ input:checked + .slider:before {
     border-radius: 3px;
 }
 .result-table {
-    width: 90%;
+    width: 96%;
     max-width: 840px;
     border: 1px solid #000000;
     background: #D9D9D9;

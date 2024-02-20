@@ -54,8 +54,8 @@ $urlNxt=Url::to(['index','step'=>2]);
             <div class="week__day">СР</div>
             <div class="week__day">ЧТ</div>
             <div class="week__day">ПТ</div>
-            <div class="week__day red">СБ</div>
-            <div class="week__day red">ВС</div>
+            <div class="week__day black">СБ</div>
+            <div class="week__day black">ВС</div>
         </div>
         <div id="week__dates">
             <?=$this->render('_week_dates',['calendar'=>$calendar,'week'=>time()])?>
@@ -83,100 +83,105 @@ $urlNxt=Url::to(['index','step'=>2]);
             Забронировано
         </div>
     </div>
-    <div class="step-title">Заезды <span id="race-day"><?=date('j',$selected_day).' '.DateHelper::getMonthRu(date('n',$selected_day)-1).' '.date('Y',$selected_day)?></span>г.</div>
-    <div class="forms-block">
-        <div class="for-childs">
-            <img src="/booking/img/child.png" class="child-img">
-            <span class="form-text">Показать только детские заезды:</span>
-            <label class="switch">
-                <input type="checkbox" id="only-children" <?=$onlyChildren?'checked':''?>>
-                <span class="slider round"></span>
-            </label>
-        </div>
-        <div class="clubs-enter"
-             data-bs-toggle="tooltip"
-             title="Для бронирование клубных заездов, необходимо иметь клубные права. Давайте проверим их:"
-             data-bs-placement="top"
-        >
-            <img src="/booking/img/star.png" class="child-img">
-            <span class="form-text">Показать клубные заезды:</span>
-            <label class="switch">
-                <input
-                    type="checkbox"
-                    id="club-races"
-                    <?=$clubRaces?'checked':''?>
-                >
-                <span class="slider round"></span>
-            </label>
-        </div>
-        <div class="nomer-prav <?=$clubRaces?'':'hidden'?>">
-            <form class="form" action="<?=Url::to(['license/check'])?>" id="form-check_license">
-                <label for="prava">Номер прав:</label>
-                <input type="text" name="license" class="prava">
-                <button>Проверить</button>
-            </form>
-        </div>
-    </div>
 
-    <div class="result-table">
-    <?php
-        $hour=null;
-        $notSlots=true;
-    ?>
-    <?foreach ( $calendar[$selected_wday] as $slotId=>$item) :?>
-    <?php
-        if (!is_int($slotId)) continue;
-        $currentHour = DateHelper::hourIntToStr($item['begin']);
-        //показывать только детские?
-        if ($onlyChildren AND $item['isChild']===false) {
-            continue;
-        }
-        //показывать клубные?
-        if (!$clubRaces AND $item['isClub']!==false)  {
-            continue;
-        }
-        $notSlots=false;
-        if ($currentHour!==$hour) {
-            $hour=$currentHour;
-            echo '<div class="result-table__time-row">' . $hour . ':00</div>';
+    <div class="order-block">
+        <div class="step-title">Заезды <span id="race-day"><?=date('j',$selected_day).' '.DateHelper::getMonthRu(date('n',$selected_day)-1).' '.date('Y',$selected_day)?></span>г.</div>
+        <div class="forms-block">
+            <div class="for-childs">
+                <img src="/booking/img/child.png" class="child-img">
+                <span class="form-text">Показать только детские заезды:</span>
+                <label class="switch">
+                    <input type="checkbox" id="only-children" <?=$onlyChildren?'checked':''?>>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="clubs-enter"
+                 data-bs-toggle="tooltip"
+                 title="Для бронирование клубных заездов, необходимо иметь клубные права. Давайте проверим их:"
+                 data-bs-placement="top"
+            >
+                <img src="/booking/img/star.png" class="child-img">
+                <span class="form-text">Показать клубные заезды:</span>
+                <label class="switch">
+                    <input
+                        type="checkbox"
+                        id="club-races"
+                        <?=$clubRaces?'checked':''?>
+                    >
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="nomer-prav <?=$clubRaces?'':'hidden'?>">
+                <form class="form" action="<?=Url::to(['license/check'])?>" id="form-check_license">
+                    <label for="prava">Номер прав:</label>
+                    <input type="text" name="license" class="prava">
+                    <button>Проверить</button>
+                </form>
+            </div>
+        </div>
 
-        }
-        $dateTimeStr=DateHelper::timeIntToStr($item['begin'],false).' - '. DateHelper::timeIntToStr($item['end'],false).' '. date('d.m.Y',$item['date']);
+        <div class="result-table">
+        <?php
+            $hour=null;
+            $notSlots=true;
+        ?>
+        <?foreach ( $calendar[$selected_wday] as $slotId=>$item) :?>
+        <?php
+            if (!is_int($slotId)) continue;
+            $currentHour = DateHelper::hourIntToStr($item['begin']);
+            //показывать только детские?
+            if ($onlyChildren AND $item['isChild']===false) {
+                continue;
+            }
+            //показывать клубные?
+            if (!$clubRaces AND $item['isClub']!==false)  {
+                continue;
+            }
+            $notSlots=false;
+            if ($currentHour!==$hour) {
+                $hour=$currentHour;
+                echo '<div class="result-table__time-row">' . $hour . ':00</div>';
 
-        $icon='';
-        if ($item['isChild']) {
-            $icon.='<img src="/booking/img/child.png" class="result-table__icon"> ';
-        }
-        if ($item['isClub']) {
-            $icon.='<img src="/booking/img/star.png" class="result-table__icon"> ';
-        }
-        echo '<div class="result-table__row">';
-        echo
-            '   <div class="result-table__info-block">
-                    <div class="result-table__time">'. DateHelper::timeIntToStr($item['begin'],false).' - '. DateHelper::timeIntToStr($item['end'],false).'</div>
-                    <div class="result-table__info">'.
-                        $icon .
-                        $item['typeName'] .
-                        ' Свободно: ' . $item['free'] . ' мест
+            }
+            $dateTimeStr=DateHelper::timeIntToStr($item['begin'],false).' - '. DateHelper::timeIntToStr($item['end'],false).' '. date('d.m.Y',$item['date']);
+
+            $icon='';
+            if ($item['isChild']) {
+                $icon.='<img src="/booking/img/child.png" class="result-table__icon"> ';
+            }
+            if ($item['isClub']) {
+                $icon.='<img src="/booking/img/star.png" class="result-table__icon"> ';
+            }
+            echo '<div class="result-table__row">';
+            echo
+                '   <div class="result-table__info-block">
+                        <div class="result-table__time">'. DateHelper::timeIntToStr($item['begin'],false).' - '. DateHelper::timeIntToStr($item['end'],false).'</div>
+                        <div class="result-table__info">'.
+                            $icon .
+                            $item['typeName'] .
+                            ' Свободно: ' . $item['free'] . ' мест
+                        </div>
+                        <div class="result-table__order" id="result-table__slot_id_'.$slotId.'">'. (($order AND $order->getQtyBySlotId($slotId)>0)?$order->getQtyBySlotId($slotId):'').'</div>
                     </div>
-                    <div class="result-table__order" id="result-table__slot_id_'.$slotId.'">'. (($order AND $order->getQtyBySlotId($slotId)>0)?$order->getQtyBySlotId($slotId):'').'</div>
-                </div>
-                <button 
-                    class="result-table__btn btn" 
-                    data-action="'.Url::to(['site/order-modal-ajax','slot_id'=>$slotId]).'"
-                >Забронировать</button>
-            </div>'
-        ;
-    ?>
-    <?endforeach;?>
-    <?php
-        if ($notSlots) {
-            echo 'Нет свободных заездов по заданным критериям';
-        }
-    ?>
+                    <button 
+                        class="result-table__btn btn" 
+                        data-action="'.Url::to(['site/order-modal-ajax','slot_id'=>$slotId]).'"
+                    >Забронировать</button>
+                </div>'
+            ;
+        ?>
+        <?endforeach;?>
+        <?php
+            if ($notSlots) {
+                echo 'Нет свободных заездов по заданным критериям';
+            }
+        ?>
+        </div>
+
     </div>
 
     <?=$this->render('_btnCheckoutTimer',['timer'=>Order::TIME_RESERVE,'time'=>$order?$order->date_begin_reserve:''])?>
+
 
 </section>
 
