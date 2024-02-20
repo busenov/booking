@@ -10,6 +10,7 @@ use booking\forms\manage\Order\OrderCreateForm;
 use booking\forms\manage\Order\OrderEditForm;
 use booking\forms\manage\Order\RacersForm;
 use booking\forms\manage\Order\SlotCreateForm;
+use booking\helpers\DateHelper;
 use booking\repositories\OrderRepository;
 use booking\repositories\SlotRepository;
 use booking\useCases\manage\OrderManageService;
@@ -109,6 +110,7 @@ class SiteController extends Controller
     {
         $this->layout = 'blank';
         $calendar=$this->slotRepository->calendarWeekly();
+
         $order=null;
         $customerOrder=new CustomerForm();
         $racersForm=null;
@@ -214,7 +216,13 @@ class SiteController extends Controller
         }
     }
 
-    public function actionChangeQtyToOrderAjax(int $item,int $qty): Response
+    /**
+     * @param int $item
+     * @param int $qty
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function actionChangeQtyToOrderAjax(int $item, int $qty): Response
     {
         $item = $this->findOrderItem($item);
 
@@ -270,6 +278,22 @@ class SiteController extends Controller
             Yii::$app->session->setFlash('error', 'Ошибка удаление заезда: '. $ex->getMessage());
         }
         return $this->redirect(['index','step'=>$step]);
+    }
+
+    /**
+     * Получаем календарь, где week - это дата в unixtime формате недели
+     * @param int $week
+     * @return Response
+     */
+    public function actionGetCalendarAjax(?int $week=null):Response
+    {
+        $calendar=$this->slotRepository->calendarWeekly($week);
+        return $this->asJson([
+            'status'=>'success',
+            'html'=>$this->renderPartial('_week_dates',['calendar'=>$calendar,'week'=>$week]),
+            'calendar'=>json_encode($calendar),
+            'month'=>DateHelper::getMonthRu(date('n',$week)-1).' '.date('Y',$week)
+        ]);
     }
 ###
     /**

@@ -26,6 +26,7 @@ $onlyChildren= ((array_key_exists('onlyChildren',$_COOKIE))AND($_COOKIE['onlyChi
 $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==='true'));
 $urlPre='';
 $urlNxt=Url::to(['index','step'=>2]);
+
 ?>
 <script type='text/javascript'>
     var $ykv_step=1;
@@ -41,12 +42,9 @@ $urlNxt=Url::to(['index','step'=>2]);
 <section class="body">
     <div class="header">
         <div class="header__wrapper">
-            <?
-//                dump($selected_day=time());
-//                dump(date('n',$selected_day)-1);exit;
-            ?>
-            <div class="month"><?=DateHelper::getMonthRu(date('n',$selected_day)-1).' '.date('Y',$selected_day)?></div>
+            <div class="month" id="step1_title-date"><?=DateHelper::getMonthRu(date('n',$selected_day)-1).' '.date('Y',$selected_day)?></div>
             <a class="head-link" href="<?= Url::to(['index','step'=>2])?>">Перейти к оформлению ></a>
+
         </div>
     </div>
     <div class="week">
@@ -59,38 +57,12 @@ $urlNxt=Url::to(['index','step'=>2]);
             <div class="week__day red">СБ</div>
             <div class="week__day red">ВС</div>
         </div>
-        <div class="week__dates">
-            <? foreach ($calendar as $wDay=> $day) :?>
-                <?php
-                    $colorLabel='';
-                    if (isset($day['qty'])) {
-                        if ($day['qty']==0) {
-                            $colorLabel='busy';
-                        } elseif ($day['qty']<=100) {
-                            $colorLabel='malo';
-                        } elseif($day['qty']<=200) {
-                            $colorLabel='malo';
-                        } elseif($day['qty']<=400) {
-                            $colorLabel='dostupno';
-                        }
-                    }
+        <div id="week__dates">
+            <?=$this->render('_week_dates',['calendar'=>$calendar,'week'=>time()])?>
 
-                ?>
-                <div class="week__date
-                <?=$day['isPast']?'past':''?>
-                <?=$day['isCurrent']?'current':''?>
-                <?=$day['isSelected']?'isActive':''?>
-                <?=$day['isNoActive']?'noActive':''?>
-                "
-                     data-wday="<?=$wDay?>"
-                     data-day="<?=$day['unixTime']?>"
-                >
-                    <div class="week__date-count"><?=$day['day']?></div>
-                    <div class="week__date-label
-                         <?=$colorLabel?>
-                        "><?=$day['qty']??''?></div>
-                </div>
-            <?endforeach;?>
+
+
+
         </div>
     </div>
     <div class="label-list">
@@ -185,7 +157,7 @@ $urlNxt=Url::to(['index','step'=>2]);
                     <div class="result-table__info">'.
                         $icon .
                         $item['typeName'] .
-                        ' Свободно: ' . $item['qty'] . ' мест
+                        ' Свободно: ' . $item['free'] . ' мест
                     </div>
                     <div class="result-table__order" id="result-table__slot_id_'.$slotId.'">'. (($order AND $order->getQtyBySlotId($slotId)>0)?$order->getQtyBySlotId($slotId):'').'</div>
                 </div>
@@ -213,7 +185,6 @@ $urlNxt=Url::to(['index','step'=>2]);
 </section>
 
 <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="" aria-hidden="true">
-
 </div>
 <!-- Modal -->
 

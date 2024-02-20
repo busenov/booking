@@ -105,7 +105,6 @@ class SlotRepository
     {
         $dateTime=$unixTime?:time();
         $slots=$this->findSlotsByWeek($dateTime);
-//        dump(count($slots));exit;
         $calendar=[];
         $reservedCars=OrderRepository::findSumReservedCar_st();
 
@@ -120,6 +119,7 @@ class SlotRepository
 
         }
         foreach ($slots as $slot) {
+            if (($slot->getBeginUT())<time()) continue;
 //            $day=date('j',$slot->date);
             $wDay=date('N',$slot->date);
 //            $year=date('Y',$slot->date);
@@ -184,11 +184,18 @@ class SlotRepository
      * @return Slot[]
      * @throws \Exception
      */
-    public function findSlotsByWeek(int $dateTime):array
+    public function findSlotsByWeek(int $dateTime,bool $findPastRaces=false):array
     {
-        return Slot::find()
-            ->andWhere([ '>=', 'date',DateHelper::beginWeekDayByUnixTime($dateTime)])
-            ->andWhere([ '<=', 'date',DateHelper::lastWeekDayByUnixTime($dateTime)])
+        $query=Slot::find();
+        $begin=DateHelper::beginWeekDayByUnixTime($dateTime);
+        if (!$findPastRaces) {
+            $beginDay=DateHelper::beginDay();
+            $begin = max($beginDay, $begin);
+        }
+        $end=DateHelper::lastWeekDayByUnixTime($begin);
+        return $query
+            ->andWhere([ '>=', 'date',$begin])
+            ->andWhere([ '<=', 'date',$end])
             ->andWhere([ 'status'=>Slot::STATUS_ACTIVE])
             ->orderBy('date,begin')
             ->all();

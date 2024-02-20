@@ -15,8 +15,9 @@
             clubRacesEl=document.getElementById('club-races'),
             racesTableEl=document.getElementsByClassName('result-table')[0],
             nomerPravEl=document.getElementsByClassName('nomer-prav')[0],
-            modalFormSlot_id=document.getElementById('modal-form-slot_id'),
             orderModal=document.getElementById('orderModal'),
+            step1_weekDatesEl = document.getElementById('week__dates'),
+            step1_titleDateEl = document.getElementById('step1_title-date'),
             //step2
             step2_incs=document.getElementsByClassName('btn-inc'),
             step2_btnTimer=document.getElementById('step2_btn_timer'),
@@ -46,9 +47,11 @@
             } else {
                 // selectedWDay = today;
             }
+
             console.log(selectedDay);
             if ($ykv_step===1) {
                 this.draw();
+                this.listenerStep1();
             } else if ($ykv_step===2) {
                 this.listenerStep2()
             } else if ($ykv_step===3) {
@@ -122,28 +125,37 @@
         // Выводим на экран дни недели
         Booking.prototype.draw  = function() {
             console.log('draw');
+        }
+        Booking.prototype.listenerStep1 = function () {
+            console.log('listenerStep1');
             let
                 that = this,
                 wDay = document.getElementsByClassName('week__date'),
-                orderBtn=document.getElementsByClassName('result-table__btn')
+                orderBtn=document.getElementsByClassName('result-table__btn'),
+                step1_btnChangeWeek = document.getElementsByClassName('btn-change-week')
             ;
-
+            //при подгружаем предыдущую неделю
+            if (step1_btnChangeWeek) {
+                for (let i = 0; i < step1_btnChangeWeek.length; i++) {
+                    step1_btnChangeWeek[i].addEventListener('click', function(){that.step1_changeWeek(this);});
+                }
+            }
             //изменение фильтра Только дети
             onlyChildrenEl.addEventListener('change',function (){that.changeOnlyChildren(this);})
             //изменение фильтра Показать клубные заезды
             clubRacesEl.addEventListener('change',function (){that.changeClubRaces(this);})
             //при клике на дате
             for (let i = 0; i < wDay.length; i++) {
-                wDay[i].addEventListener('click', function(){that.clickDay(this);});
+                wDay[i].addEventListener('click', function(){that.step1_clickDay(this);});
             }
             //при клике на кнопке заказать
             for (let i = 0; i < orderBtn.length; i++) {
                 orderBtn[i].addEventListener('click', function(){that.clickOrder(this);});
             }
+
         }
         // Выводим заезды
         Booking.prototype.drawRaces  = function(wDay) {
-            // console.log($ykv_calendar[wDay]);
             let
                 that = this,
                 slotsByDay,
@@ -193,7 +205,7 @@
                         html+='' +
                         '<div class="result-table__info-block">'+
                             '<div class="result-table__time">'+this.getTimeBySec(slotsByDay[slotId]['begin'])+' - '+this.getTimeBySec(slotsByDay[slotId]['end'])+'</div>'+
-                            '<div class="result-table__info">'+icon+slotsByDay[slotId]['typeName']+' Свободно: ' + slotsByDay[slotId]['qty'] + ' мест</div>'+
+                            '<div class="result-table__info">'+icon+slotsByDay[slotId]['typeName']+' Свободно: ' + slotsByDay[slotId]['free'] + ' мест</div>'+
                             '<div class="result-table__order" id="result-table__slot_id_'+slotId+'">'+ orderSlotQty+ '</div>'+
                         '</div>'+
                         '<button class="result-table__btn btn"'+buttonData+'>Забронировать</button>'
@@ -212,7 +224,7 @@
                 orderBtn[i].addEventListener('click', function(){that.clickOrder(this);});
             }
         }
-        Booking.prototype.clickDay = function(o) {
+        Booking.prototype.step1_clickDay = function(o) {
             let selected = document.getElementsByClassName("isActive"),
                 len = selected.length;
 
@@ -310,6 +322,27 @@
             });
 
         }
+        Booking.prototype.step1_changeWeek = function (o) {
+            // console.log('step1_changeWeek');
+            let that=this;
+            $.get({
+                url: o.dataset.action,
+                processData: false,
+                contentType: false,
+                success: function(data){
+                    if (data.status==='success') {
+                        step1_weekDatesEl.innerHTML=data.html;
+                        $ykv_calendar=JSON.parse(data.calendar);
+                        that.listenerStep1();
+                        //если сменился месяц
+                        step1_titleDateEl.innerHTML=data.month
+                    }
+                },
+                error:function (data){
+                    console.log(data)
+                }
+            });
+        }
         //step2=========================================================================================================
         Booking.prototype.listenerStep2 = function () {
             let that=this;
@@ -333,7 +366,6 @@
                 input =  o.parentNode.querySelector("input"),
                 oldValue=input.value
                 ;
-            console.log(o);
             btnInc(o);
 
             $.get({
