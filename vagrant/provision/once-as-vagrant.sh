@@ -30,3 +30,5 @@ echo 'alias app="cd /app"' | tee /home/vagrant/.bash_aliases
 
 info "Enabling colorized prompt for guest console"
 sed -i "s/#force_color_prompt=yes/force_color_prompt=yes/" /home/vagrant/.bashrc
+
+cd /app && mysql -uroot <<< "DROP DATABASE booking" && mysql -uroot <<< "CREATE DATABASE booking" && mysql -u root booking < sql/booking.sql
