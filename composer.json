@@ -26,8 +26,9 @@
         "kartik-v/yii2-widgets": "dev-master",
         "bower-asset/font-awesome": "dev-master",
         "kartik-v/yii2-editable": "dev-master",
-        "kartik-v/yii2-field-range":"*"
-    },
+        "kartik-v/yii2-field-range":"*",
+	  "ext-json": "*"
+	},
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
         "yiisoft/yii2-gii": "~2.2.0",

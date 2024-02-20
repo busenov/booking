@@ -30,8 +30,6 @@ $urlNxt=Url::to(['index','step'=>3]);
     var $ykv_step=2;
 </script>
 
-<a href="<?= $urlPre?>" style="display: none"><--Перейти к выбору заездов</a>
-<a href="<?= $urlNxt?>" style="display: none">Перейти к оплате--></a>
 <div class="body">
     <div class="header next-step">
         <div class="header__wrapper">
@@ -52,9 +50,9 @@ $urlNxt=Url::to(['index','step'=>3]);
         <?php $currentSlotId=$item->slot_id?>
     <div class="order-table">
         <div class="order-table__head">
-            <div class="order-table__date"><?=date('d.m.Y',$item->slot->date)?></div>
-            <div class="order-table__time"><?=DateHelper::timeIntToStr($item->slot->begin,false)?></div>
-            <div class="order-table__type"><?=Slot::getTypeName($item->slot->type)?> заезд</div>
+            <div class="order-table__date"><?=$item->slot->getDateStr()?></div>
+            <div class="order-table__time"><?=$item->slot->getTimeStr()?></div>
+            <div class="order-table__type"><?=$item->slot->getTypeNameStr()?></div>
             <div class="order-table__name"></div>
             <div class="order-table__col"></div>
             <div class="order-table__price">Цена</div>

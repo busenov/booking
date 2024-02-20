@@ -208,6 +208,18 @@ class Slot extends ActiveRecord
         }
         return $this->_total;
     }
+    public function getDateStr():string
+    {
+        return date('d.m.Y',$this->date);
+    }
+    public function getTimeStr():string
+    {
+        return DateHelper::timeIntToStr($this->begin,false);
+    }
+    public function getTypeNameStr():string
+    {
+        return self::getTypeName($this->type). ' заезд';
+    }
 #on
     public function onNew()
     {

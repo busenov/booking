@@ -41,14 +41,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'width' => '5%',
             ],
             [
-                'attribute' => 'slot_id',
-                'value' => function (Order $data) {
-                    return Html::a(Html::encode($data->slot->getName()), Url::to(['view', 'id' => $data->id]));
-                },
-                'format' => 'raw',
-                'width' => '20%',
-            ],
-            [
                 'attribute' => 'customer_id',
                 'value' => function (Order $data) {
                     return Html::a(Html::encode($data->customer?$data->customer->name:''), Url::to(['view', 'id' => $data->id]));

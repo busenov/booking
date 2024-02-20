@@ -38,8 +38,6 @@ $urlNxt=Url::to(['index','step'=>2]);
     // console.log($ykv_step);
 </script>
 
-<a href="<?= $urlNxt ?>" style="display: none">Перейти к оформлению--></a>
-
 <section class="body">
     <div class="header">
         <div class="header__wrapper">

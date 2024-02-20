@@ -31,6 +31,8 @@ use yii\helpers\ArrayHelper;
  * @property string|null $author_name
  * @property int|null $editor_id
  * @property string|null $editor_name
+ * @property array|null $additionalInfo         //дополнительная информация по заказу(Например, инф по гонщикам(имя, вес, рост и т.д.))
+ * @property array|null $additional_info_json
  *
  * @property OrderItem[] $items
  * @property User $customer
@@ -47,6 +49,8 @@ class Order extends ActiveRecord
     const GUID_LENGTH=16;
 
     const COOKIE_NAME_GUID='orderGuid';
+
+    public array $additionalInfo=[];
 
     public static function create(
                                 int     $status=self::STATUS_NEW,
@@ -153,6 +157,11 @@ class Order extends ActiveRecord
         $this->_total=$total;
         return $this->_total;
     }
+    public function getName():string
+    {
+        return 'Заказ №'.$this->id;
+    }
+
 #sets
     public function setCustomer(User $customer)
     {
@@ -319,6 +328,20 @@ class Order extends ActiveRecord
         return 3000;
     }
 
+    public function beforeSave($insert)
+    {
+        $this->additional_info_json=json_encode($this->additionalInfo);
+        return parent::beforeSave($insert);
+    }
+    public function afterFind()
+    {
+        if ($this->additional_info_json) {
+            $this->additionalInfo=json_decode($this->additional_info_json,true);
+        }
+
+        parent::afterFind();
+
+    }
 
 
 

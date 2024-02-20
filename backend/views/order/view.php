@@ -1,14 +1,17 @@
 <?php
 
+use booking\entities\Order\Order;
 use booking\entities\Slot\Slot;
+use booking\helpers\OrderHelper;
 use booking\helpers\SlotHelper;
+use booking\useCases\manage\OrderManageService;
 use booking\useCases\manage\SlotManageService;
 use yii\helpers\Html;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
-/** @var Slot $model */
+/** @var Order $model */
 
 $this->title = $model->getName();
 $this->params['breadcrumbs'][] = ['label' => 'Слоты', 'url' => ['index']];
@@ -20,10 +23,10 @@ YiiAsset::register($this);
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?php if (SlotManageService::guardCanEdit($model,true)) :?>
+        <?php if (OrderManageService::guardCanEdit($model,true)) :?>
         <?= Html::a('Правка', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?php endif;?>
-        <?php if (SlotManageService::guardCanRemove($model,true)) :?>
+        <?php if (OrderManageService::guardCanRemove($model,true)) :?>
         <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
@@ -32,7 +35,7 @@ YiiAsset::register($this);
             ],
         ]) ?>
         <?php endif;?>
-        <?php if (SlotManageService::guardCanRemoveHard($model,true)) :?>
+        <?php if (OrderManageService::guardCanRemoveHard($model,true)) :?>
         <?= Html::a('Удалить Жестко', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
@@ -47,18 +50,19 @@ YiiAsset::register($this);
         'model' => $model,
         'attributes' => [
             'id',
-            'date:datetime',
-            'begin',
-            'end',
-            'qty',
+//            'date:datetime',
+//            'begin',
+//            'end',
+//            'qty',
             'note',
             [
                 'attribute' => 'status',
                 'format' => 'raw',
-                'value' => function (Slot $data) {
-                    return SlotHelper::statusLabel($data->status) ;
+                'value' => function (Order $data) {
+                    return OrderHelper::statusLabel($data->status) ;
                 },
             ],
+            'additional_info_json',
             'created_at:datetime',
             'author_name',
             'updated_at:datetime',

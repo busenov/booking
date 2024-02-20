@@ -8,6 +8,7 @@ use booking\entities\Slot\Slot;
 use booking\forms\manage\Order\CustomerForm;
 use booking\forms\manage\Order\OrderCreateForm;
 use booking\forms\manage\Order\OrderEditForm;
+use booking\forms\manage\Order\RacersForm;
 use booking\forms\manage\Order\SlotCreateForm;
 use booking\repositories\OrderRepository;
 use booking\repositories\SlotRepository;
@@ -110,10 +111,11 @@ class SiteController extends Controller
         $calendar=$this->slotRepository->calendarWeekly();
         $order=null;
         $customerOrder=new CustomerForm();
+        $racersForm=null;
         if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)){
             $order=$this->findOrder($orderGuid);
+            $racersForm = new RacersForm($order);
         }
-//        dump($orderGuid);exit;
         if (empty($order)and $step!==1) {
             return $this->redirect(['index','step'=>1]);
         };
@@ -122,12 +124,25 @@ class SiteController extends Controller
                 $this->orderService->checkout($order,$customerOrder);
                 return $this->redirect(['index','step'=>3]);
             }
+        } elseif ($step==4) {
+            if ($this->request->isPost) {
+                if ($racersForm->load($this->request->post())) {
+                    try {
+                        $this->orderService->addAdditionalInfo($order,$racersForm);
+                        Yii::$app->session->setFlash('success', 'Данные успешно сохранены.');
+                    }catch (Exception $ex) {
+                        Yii::$app->session->setFlash('error', 'Ошибка при сохранение данных: '. $ex->getMessage());
+                    }
+
+                }
+            }
         }
 
         return $this->render('step'.$step,[
             'calendar'=>$calendar,
             'order'=>$order,
-            'customerOrder'=>$customerOrder
+            'customerOrder'=>$customerOrder,
+            'racersForm'=>$racersForm
         ]);
     }
     /**

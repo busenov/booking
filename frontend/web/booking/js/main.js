@@ -19,7 +19,11 @@
             orderModal=document.getElementById('orderModal'),
             //step2
             step2_incs=document.getElementsByClassName('btn-inc'),
-            step2_btnTimer=document.getElementById('step2_btn_timer')
+            step2_btnTimer=document.getElementById('step2_btn_timer'),
+            //step3
+            //step4
+            step4_btnCopyRacer=document.getElementsByClassName('pay-table__btn'),
+            step4_btnSave=document.getElementById('save-block__btn')
             ;
         function Booking() {
             if (this.getCookie('onlyChildren')==='true') {
@@ -49,6 +53,8 @@
                 this.listenerStep2()
             } else if ($ykv_step===3) {
 
+            } else if ($ykv_step===4) {
+                this.listenerStep4()
             }
         }
         //==============================================================================================================
@@ -365,6 +371,78 @@
             }
             totalEl.innerHTML = that.getNumberFormat(order.total);
         };
+        //step4=========================================================================================================
+        Booking.prototype.listenerStep4 = function () {
+            let that=this;
+            //При изменении кол-ва в позиции
+            if (step4_btnCopyRacer) {
+                for (let i = 0; i < step4_btnCopyRacer.length; i++) {
+                    step4_btnCopyRacer[i].addEventListener('click', function(){that.step4_copyRacers(this)});
+                }
+            }
+            //При на клике на Сохранить
+            if (step4_btnSave) {
+                // console.log('tut');
+                // console.log(document.getElementsByClassName('pay-table__form')[0]);
+                step4_btnSave.addEventListener('click', function(){document.getElementsByClassName('pay-table__form')[0].submit()});
+            }
+
+        }
+        //копируем гонщиков во все остальные заезды, если поля не заполнены
+        Booking.prototype.step4_copyRacers = function (o) {
+            console.log('step4_copyRacers');
+            let
+                that=this,
+                sources=[],
+                races=document.getElementsByClassName('pay-table__row');
+
+            if (races) {
+                //копируем исходные данные
+                for (let i = 0; i < races.length; i++) {
+                    if (races[i].dataset.slot_id===o.dataset.slot_id) {
+                        console.log(races[i].getElementsByClassName('racer_name')[0])
+                        let
+                            name=races[i].getElementsByClassName('racer_name')[0],
+                            weight=races[i].getElementsByClassName('racer_weight')[0],
+                            height=races[i].getElementsByClassName('racer_height')[0],
+                            birthday=races[i].getElementsByClassName('racer_birthday')[0];
+
+                        name = name ? name.value : '';
+                        weight = weight ? weight.value : '';
+                        height = height ? height.value : '';
+                        birthday = birthday ? birthday.value : '';
+
+                        if (name || weight || height || birthday) {
+                            sources.push({
+                                'name': name,
+                                'weight': weight,
+                                'height': height,
+                                'birthday': birthday
+                            });
+                        }
+                    }
+                }
+                for (let i = 0; i < races.length; i++) {
+                    if (races[i].dataset.slot_id!==o.dataset.slot_id) {
+                        let racer=sources.shift()
+                        if (racer===undefined) break;
+
+                        let
+                            name=races[i].getElementsByClassName('racer_name')[0],
+                            weight=races[i].getElementsByClassName('racer_weight')[0],
+                            height=races[i].getElementsByClassName('racer_height')[0],
+                            birthday=races[i].getElementsByClassName('racer_birthday')[0];
+
+                        name.value=racer.name;
+                        weight.value=racer.weight;
+                        height.value=racer.height;
+                        birthday.value=racer.birthday;
+                    }
+                }
+            }
+
+        }
+
         var booking = new Booking();
     }, false);
 

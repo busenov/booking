@@ -11,6 +11,7 @@ use booking\forms\manage\Order\CustomerForm;
 use booking\forms\manage\Order\OrderCreateForm;
 use booking\forms\manage\Order\OrderEditForm;
 use booking\forms\manage\Order\OrderItemForm;
+use booking\forms\manage\Order\RacersForm;
 use booking\forms\manage\Order\SlotCreateForm;
 use booking\forms\manage\Slot\SlotForm;
 use booking\helpers\DateHelper;
@@ -194,7 +195,7 @@ class OrderManageService
      */
     public function checkout(Order $order, CustomerForm $customerOrder)
     {
-        $this->guardCheckout($order);
+        $this->guardCanCheckout($order);
         if (!$customer=$this->userRepository->findByTelephone($customerOrder->telephone)) {
             $customer=User::createCustomer(
                 $customerOrder->name,
@@ -207,6 +208,39 @@ class OrderManageService
         $order->onCheckout();
         $this->repository->save($order);
 
+    }
+
+    /**
+     * Сохранение дополнительной информации по заезду(имен гонщиков, вес и т.д.)
+     * Предыдущая информация удаляется
+     * @param Order $order
+     * @param RacersForm $racersForm
+     * @return void
+     */
+    public function addAdditionalInfo(Order $order, RacersForm $racersForm)
+    {
+        $this->guardCanAddAdditionalInfo($order);
+        $order->additionalInfo=[];
+        foreach ($racersForm->items as $item) {
+            if (
+                $item->name OR
+                $item->weight OR
+                $item->height OR
+                $item->birthday
+            ) {
+                if (!array_key_exists($item->slot_id,$order->additionalInfo)) {
+                    $order->additionalInfo[$item->slot_id]=[];
+                }
+
+                $order->additionalInfo[$item->slot_id][]=[
+                    'name' => $item->name,
+                    'weight' => $item->weight,
+                    'height' => $item->height,
+                    'birthday' => $item->birthday,
+                ];
+            }
+        }
+        $this->repository->save($order);
     }
 ###guards
     public static function guardCanView($entityOrId, bool $return=false):bool
@@ -302,7 +336,11 @@ class OrderManageService
         }
         return true;
     }
-    public static function guardCheckout(Order $order, bool $return=false):bool
+    public static function guardCanCheckout(Order $order, bool $return=false):bool
+    {
+        return true;
+    }
+    private function guardCanAddAdditionalInfo(Order $order, bool $return=false):bool
     {
         return true;
     }
