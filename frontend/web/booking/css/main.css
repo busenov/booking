@@ -21,7 +21,7 @@
 .header__wrapper {
     width: 90%;
     height: 100%;
-    max-width: 840px;
+    max-width: 873px;
     position: relative;
     padding: 24px 0;
 }
@@ -65,7 +65,7 @@
 }
 .week {
     width: 90%;
-    max-width: 840px;
+    max-width: 873px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -120,8 +120,10 @@
     background: #eeeeee;
 }
 .week__date-count {
-    margin-bottom: 50px;
-    font-size: 18px;
+    margin-top: 15px;
+    margin-bottom: 0px;
+    font-size: 25px;
+    line-height: 29px;
     font-weight: 600;
 }
 .week__date.past .week__date-count {
@@ -191,7 +193,7 @@
 
 .label-list {
     width: 90%;
-    max-width: 840px;
+    max-width: 873px;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -226,7 +228,7 @@
 }
 .order-block {
     width: 90%;
-    max-width: 840px;
+    max-width: 873px;
     box-sizing: border-box;
     background: #F7F7F7;
     display: flex;
@@ -243,7 +245,7 @@
 }
 .form {
     width: auto;
-    max-width: 840px;
+    max-width: 873px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -308,7 +310,7 @@ input:checked + .slider:before {
 /*конец свич*/
 .forms-block {
     width: 96%;
-    max-width: 840px;
+    max-width: 873px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -373,7 +375,7 @@ input:checked + .slider:before {
 }
 .result-table {
     width: 96%;
-    max-width: 840px;
+    max-width: 873px;
     border: 1px solid #000000;
     background: #D9D9D9;
     margin-top: 19px;
@@ -464,7 +466,7 @@ input:checked + .slider:before {
 }
 .timer-block {
     width: 90%;
-    max-width: 840px;
+    max-width: 873px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -572,7 +574,7 @@ input:checked + .slider:before {
 /*Step 2*/
 .order-table {
     width: 90%;
-    max-width: 840px;
+    max-width: 873px;
     border: 1px solid #000000;
     margin-bottom: 10px;
 }
@@ -707,7 +709,7 @@ input {
 }
 .summ-block {
     width: 90%;
-    max-width: 840px;
+    max-width: 873px;
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
@@ -723,7 +725,7 @@ input {
 }
 .order-form__block {
     width: 90%;
-    max-width: 840px;
+    max-width: 873px;
     background: #F7F7F7;
     padding: 35px 0;
     display: flex;
@@ -773,7 +775,7 @@ input {
 /*Step 3*/
 .order-result__block {
     width: 90%;
-    max-width: 840px;
+    max-width: 873px;
     margin-bottom: 40px;
 }
 .order-result__text {
@@ -788,7 +790,7 @@ input {
 }
 .pay-table {
     width: 90%;
-    max-width: 840px;
+    max-width: 873px;
     border: 1px solid #000000;
     display: flex;
     flex-direction: column;
@@ -865,7 +867,7 @@ input {
 }
 .save-block {
     width: 90%;
-    max-width: 840px;
+    max-width: 873px;
     display: flex;
     justify-content: flex-end;
     align-self: center;
