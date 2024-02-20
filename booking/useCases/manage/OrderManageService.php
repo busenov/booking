@@ -108,6 +108,9 @@ class OrderManageService
         foreach ($form->items as $item) {
             $entity->changeItem($form->slot_id, $item->carType_id, intval($item->qty));
         }
+        if (!$entity->isReserved()) {
+            $entity->onReserved();
+        }
         $this->repository->save($entity);
         return $entity;
     }

@@ -326,6 +326,28 @@ class DateHelper
         return null;
     }
     /**
+     * Конвертируем строку вида ММ:СЕК из кол-во секунд от начала дня
+     * @param int|null $intTime
+     * @return string|null
+     */
+    public static function minuteIntToStr(?int $intTime):?string
+    {
+        if ($intTime) {
+
+            $minute=$intTime/60;
+            if ($minute>=1) {
+                $minute=intval($minute);
+                $intTime=$intTime - $minute*60;
+            }
+
+            $second=$intTime;
+
+            return sprintf("%1$02d:%2$02d",$minute,$second);
+
+        }
+        return null;
+    }
+    /**
      * Конвертируем строку вида ЧЧ из кол-во секунд от начала дня
      * @param int|null $intTime
      * @return string|null

@@ -15,7 +15,7 @@ use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "car_types".
+ * This is the model class for table "licenses".
  *
  * @property int $id
  * @property int|null $number

@@ -18,9 +18,10 @@
             orderModal=document.getElementById('orderModal'),
             step1_weekDatesEl = document.getElementById('week__dates'),
             step1_titleDateEl = document.getElementById('step1_title-date'),
+            step1_btnTimerEl=document.getElementById('btn_timer'),
             //step2
             step2_incs=document.getElementsByClassName('btn-inc'),
-            step2_btnTimer=document.getElementById('step2_btn_timer'),
+            step2_btnTimer=document.getElementById('btn_timer'),
             //step3
             //step4
             step4_btnCopyRacer=document.getElementsByClassName('pay-table__btn'),
@@ -152,6 +153,7 @@
             for (let i = 0; i < orderBtn.length; i++) {
                 orderBtn[i].addEventListener('click', function(){that.clickOrder(this);});
             }
+            step1_btnTimerEl.addEventListener('click',function(){document.location=this.dataset.action})
 
         }
         // Выводим заезды

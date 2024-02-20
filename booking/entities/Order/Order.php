@@ -33,6 +33,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $editor_name
  * @property array|null $additionalInfo         //дополнительная информация по заказу(Например, инф по гонщикам(имя, вес, рост и т.д.))
  * @property array|null $additional_info_json
+ * @property int|null $date_begin_reserve       //Дата начала резервирования
  *
  * @property OrderItem[] $items
  * @property User $customer
@@ -49,6 +50,7 @@ class Order extends ActiveRecord
     const GUID_LENGTH=16;
 
     const COOKIE_NAME_GUID='orderGuid';
+    const TIME_RESERVE=600;                 //Время бронирования
 
     public array $additionalInfo=[];
 
@@ -88,6 +90,7 @@ class Order extends ActiveRecord
     public function onReserved()
     {
         $this->status=self::STATUS_RESERVED;
+        $this->date_begin_reserve=time();
     }
     public function onCheckout()
     {
@@ -109,6 +112,10 @@ class Order extends ActiveRecord
     public function isNew():bool
     {
         return $this->status===self::STATUS_NEW;
+    }
+    public function isReserved():bool
+    {
+        return $this->status===self::STATUS_RESERVED;
     }
     public function isAwaitingPayment():bool
     {
@@ -161,7 +168,18 @@ class Order extends ActiveRecord
     {
         return 'Заказ №'.$this->id;
     }
-
+    public function getLeftTimeReserve():?int
+    {
+        if (($this->date_begin_reserve) and ($this->isReserved())) {
+            $passedTime=time()-$this->date_begin_reserve;
+            if ($passedTime>self::TIME_RESERVE) {
+                return null;
+            } else {
+                return self::TIME_RESERVE-$passedTime;
+            }
+        }
+        return null;
+    }
 #sets
     public function setCustomer(User $customer)
     {
@@ -342,6 +360,7 @@ class Order extends ActiveRecord
         parent::afterFind();
 
     }
+
 
 
 

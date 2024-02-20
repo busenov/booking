@@ -176,12 +176,8 @@ $urlNxt=Url::to(['index','step'=>2]);
     ?>
     </div>
 
-    <div class="timer-block">
-        <div class="timer">
-            <span class="timer-title">Оформить в течении</span>
-            <div class="timer-time">10:00</div>
-        </div>
-    </div>
+    <?=$this->render('_btnCheckoutTimer',['timer'=>Order::TIME_RESERVE,'time'=>$order->date_begin_reserve])?>
+
 </section>
 
 <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="" aria-hidden="true">
