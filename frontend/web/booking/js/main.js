@@ -480,6 +480,8 @@
         var booking = new Booking();
     }, false);
 
+    $('#customerform-telephone').inputmask({"mask": "+7 (999) 999-99-99"});
+
 })(jQuery);
 
 //количество в таблице

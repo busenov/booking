@@ -159,33 +159,36 @@
     background: #FF0707;
 }
 
-.week::before {
-    content: '';
+.prev-week-btn {
     display: block;
     width: 25px;
     height: 33px;
     background: url(../img/prev.png) no-repeat;
     background-position: center;
+    background-color: transparent;
     background-size: 100% 100%;
     position: absolute;
     left: -50px;
     top: 50%;
     transform: translateY(-50%);
+    border: 0;
 }
-
-.week::after {
-    content: '';
+.next-week-btn {
     display: block;
     width: 25px;
     height: 33px;
     background: url(../img/next.png) no-repeat;
     background-position: center;
+    background-color: transparent;
     background-size: 100% 100%;
     position: absolute;
     right: -50px;
     top: 50%;
     transform: translateY(-50%);
+    border: 0;
 }
+
+
 .label-list {
     width: 90%;
     max-width: 840px;
@@ -463,6 +466,7 @@ input:checked + .slider:before {
     justify-content: center;
     align-items: center;
     border-radius: 5px;
+    cursor: pointer;
 }
 .timer-title {
     font-size: 16px;

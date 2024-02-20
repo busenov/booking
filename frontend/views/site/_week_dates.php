@@ -10,7 +10,7 @@ $urlWeekNxt=Url::to(['get-calendar-ajax','week'=>$week+(1*60*60*24*7)]);
 $urlWeekPre=Url::to(['get-calendar-ajax','week'=>$week+(-1*60*60*24*7)]);
 ?>
 
-<button class="btn-change-week" data-action="<?=$urlWeekPre?>"><-- предыдущая неделя</button>
+<button class="btn-change-week prev-week-btn" data-action="<?=$urlWeekPre?>"></button>
 <div class="week__dates">
 <? foreach ($calendar as $wDay=> $day) :?>
     <?php
@@ -44,4 +44,4 @@ $urlWeekPre=Url::to(['get-calendar-ajax','week'=>$week+(-1*60*60*24*7)]);
     </div>
 <?endforeach;?>
 </div>
-<button class="btn-change-week" data-action="<?=$urlWeekNxt?>"> следующая неделя --></button>
+<button class="btn-change-week next-week-btn" data-action="<?=$urlWeekNxt?>"></button>

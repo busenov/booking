@@ -12,6 +12,7 @@ class BookingAsset extends AssetBundle
         'booking/css/main.css',
     ];
     public $js = [
+        'booking/js/jquery.inputmask.min.js',
         'booking/js/main.js',
     ];
     public $depends = [

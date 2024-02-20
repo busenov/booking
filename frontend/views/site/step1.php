@@ -176,7 +176,7 @@ $urlNxt=Url::to(['index','step'=>2]);
     ?>
     </div>
 
-    <?=$this->render('_btnCheckoutTimer',['timer'=>Order::TIME_RESERVE,'time'=>$order->date_begin_reserve])?>
+    <?=$this->render('_btnCheckoutTimer',['timer'=>Order::TIME_RESERVE,'time'=>$order?$order->date_begin_reserve:''])?>
 
 </section>
 
