@@ -6,11 +6,13 @@ use booking\entities\Order\Order;
 use booking\entities\Order\OrderItem;
 use booking\entities\Slot\Slot;
 use booking\forms\manage\Order\CustomerForm;
+use booking\forms\manage\Order\LicenseForm;
 use booking\forms\manage\Order\OrderCreateForm;
 use booking\forms\manage\Order\OrderEditForm;
 use booking\forms\manage\Order\RacersForm;
 use booking\forms\manage\Order\SlotCreateForm;
 use booking\helpers\DateHelper;
+use booking\repositories\LicenseRepository;
 use booking\repositories\OrderRepository;
 use booking\repositories\SlotRepository;
 use booking\useCases\manage\OrderManageService;
@@ -72,12 +74,14 @@ class SiteController extends Controller
     private SlotRepository $slotRepository;
     private OrderManageService $orderService;
     private OrderRepository $orderRepository;
+    private LicenseRepository $licenseRepository;
 
     public function __construct(                    $id, $module,
                                                     SlotManageService   $slotService,
                                                     SlotRepository      $slotRepository,
                                                     OrderManageService  $orderService,
                                                     OrderRepository     $orderRepository,
+                                                    LicenseRepository   $licenseRepository,
         $config = [])
     {
         parent::__construct($id, $module, $config);
@@ -85,6 +89,7 @@ class SiteController extends Controller
         $this->slotRepository = $slotRepository;
         $this->orderService = $orderService;
         $this->orderRepository = $orderRepository;
+        $this->licenseRepository = $licenseRepository;
     }
     /**
      * {@inheritdoc}
@@ -114,14 +119,17 @@ class SiteController extends Controller
         $order=null;
         $customerOrder=new CustomerForm();
         $racersForm=null;
+        $licenseForm=null;
         if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)){
             $order=$this->findOrder($orderGuid);
             $racersForm = new RacersForm($order);
         }
         if (empty($order)and $step!==1) {
             return $this->redirect(['index','step'=>1]);
-        };
-        if ($step==2) {
+        }
+        if ($step==1) {
+            $licenseForm=new LicenseForm(($order and $order->customer)?$order->customer->license:null);
+        } elseif ($step==2) {
             if ($this->request->isPost && $customerOrder->load($this->request->post())) {
                 $this->orderService->checkout($order,$customerOrder);
                 return $this->redirect(['index','step'=>3]);
@@ -144,7 +152,8 @@ class SiteController extends Controller
             'calendar'=>$calendar,
             'order'=>$order,
             'customerOrder'=>$customerOrder,
-            'racersForm'=>$racersForm
+            'racersForm'=>$racersForm,
+            'licenseForm'=>$licenseForm
         ]);
     }
     /**
@@ -294,6 +303,27 @@ class SiteController extends Controller
             'calendar'=>json_encode($calendar),
             'month'=>DateHelper::getMonthRu(date('n',$week)-1).' '.date('Y',$week)
         ]);
+    }
+    public function actionCheckLicense():Response
+    {
+        try {
+            if (!(
+                $orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID) AND
+                $order=$this->findOrder($orderGuid->value)
+            )){
+                throw new NotFoundHttpException('The requested page does not exist.');
+            }
+            $form=new LicenseForm();
+            if ($this->request->isPost && $form->load($this->request->post())) {
+                if ($this->orderService->checkLicense($form,$order)) {
+                    return  $this->asJson(['status'=>'success']);
+                }
+            }
+
+        } catch (Exception $ex) {
+            return  $this->asJson(['status'=>'error', 'msg'=>$ex->getMessage()]);
+        }
+        return  $this->asJson(['status'=>'error', 'msg'=>'С таким номером лицензия не найдена']);
     }
 ###
     /**

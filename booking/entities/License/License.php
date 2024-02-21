@@ -19,9 +19,9 @@ use yii\helpers\ArrayHelper;
  *
  * @property int $id
  * @property int|null $number
+ * @property int|null $date
  * @property int|null $user_id
  * @property int|null $status
- * @property int|null $date
  * @property string|null $note
  *
  * @property int|null $created_at
@@ -104,7 +104,12 @@ class License extends ActiveRecord
 #gets
     public function getUser(): ActiveQuery
     {
-        return $this->hasOne(User::class, ['id' => 'customer_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    public function getName():string
+    {
+        return ('№'.$this->number . ($this->date?(' от ' . date('d.m.Y', $this->date)):''));
     }
     /**
      * {@inheritdoc}

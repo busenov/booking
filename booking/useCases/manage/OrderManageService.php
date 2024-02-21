@@ -8,6 +8,7 @@ use booking\entities\Schedule\Schedule;
 use booking\entities\Slot\Slot;
 use booking\entities\User\User;
 use booking\forms\manage\Order\CustomerForm;
+use booking\forms\manage\Order\LicenseForm;
 use booking\forms\manage\Order\OrderCreateForm;
 use booking\forms\manage\Order\OrderEditForm;
 use booking\forms\manage\Order\OrderItemForm;
@@ -16,6 +17,7 @@ use booking\forms\manage\Order\SlotCreateForm;
 use booking\forms\manage\Slot\SlotForm;
 use booking\helpers\DateHelper;
 use booking\repositories\CarTypeRepository;
+use booking\repositories\LicenseRepository;
 use booking\repositories\OrderRepository;
 use booking\repositories\ScheduleRepository;
 use booking\repositories\SlotRepository;
@@ -26,14 +28,17 @@ class OrderManageService
 {
     private OrderRepository $repository;
     private UserRepository $userRepository;
+    private LicenseRepository $licenseRepository;
 
     public function __construct(
         OrderRepository $repository,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        LicenseRepository   $licenseRepository,
     )
     {
         $this->repository = $repository;
         $this->userRepository = $userRepository;
+        $this->licenseRepository = $licenseRepository;
     }
 
     public function create(OrderCreateForm $form): Order
@@ -245,6 +250,18 @@ class OrderManageService
         }
         $this->repository->save($order);
     }
+    public function checkLicense(LicenseForm $form,?Order $order=null):bool
+    {
+        $this->guardCanCheckLicense();
+        if ($license=$this->licenseRepository->findByNumber($form->number)) {
+            if ($order) {
+                $order->customer_id=$license->user_id;
+                $this->repository->save($order);
+            }
+            return true;
+        }
+        return false;
+    }
 ###guards
     public static function guardCanView($entityOrId, bool $return=false):bool
     {
@@ -344,6 +361,10 @@ class OrderManageService
         return true;
     }
     private function guardCanAddAdditionalInfo(Order $order, bool $return=false):bool
+    {
+        return true;
+    }
+    private function guardCanCheckLicense(bool $return=false)
     {
         return true;
     }

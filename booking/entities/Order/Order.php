@@ -249,6 +249,7 @@ class Order extends ActiveRecord
     {
         $result=$this->toArray();
         $result['leftTime']=$this->getLeftTimeReserve();
+        $result['license_number']=(($this->customer) and ($this->customer->license))?$this->customer->license->number:'';
 
         $items=[];
         foreach ($this->items as $item) {

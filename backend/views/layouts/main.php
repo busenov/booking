@@ -41,16 +41,15 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Войти', 'url' => ['/site/login']];
     } else {
         $menuItems = [
-            ['label' => 'Календарь', 'url' => ['/site/calendar']],
             ['label' => 'Заезды', 'url' => ['/slot/index']],
             ['label' => 'Заказы', 'url' => ['/order/index']],
-
         ];
 
         if (Yii::$app->user->can('manager')) {
             $manageItems=[];
             $manageItems[]=['label' => 'Машины(карты)', 'url' => ['/car/index']];
             $manageItems[]=['label' => 'Расписание', 'url' => ['/schedule/index']];
+            $manageItems[]=['label' => 'Водительские удостоверения', 'url' => ['/license/index']];
             $menuItems[] = ['label' => 'Справочники', 'items'=>$manageItems];
         }
         if (Yii::$app->user->can('admin')) {

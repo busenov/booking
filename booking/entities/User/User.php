@@ -4,9 +4,11 @@ namespace booking\entities\User;
 
 use booking\entities\behaviors\FillingServiceFieldsBehavior;
 use booking\entities\behaviors\LoggingBehavior;
+use booking\entities\License\License;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
@@ -38,6 +40,9 @@ use yii\web\IdentityInterface;
  * @property string $author_name
  * @property integer $editor_id
  * @property string $editor_name
+ *
+ * @property License $license
+ * @property License[] $licenses
  *
  *
  */
@@ -110,9 +115,11 @@ class User extends ActiveRecord implements IdentityInterface
         $user = new User();
         $user->name = $name;
         $user->telephone =$telephone;
-        $user->email =$email;
+        $user->email = $email??Yii::$app->security->generateRandomString();
         $user->surname =$surname;
-        $user->type=self::TYPE_USER;
+        $user->type=self::TYPE_CUSTOMER;
+        $user->auth_key = Yii::$app->security->generateRandomString();
+        $user->setPassword(Yii::$app->security->generateRandomString());
         return $user;
     }
 
@@ -231,6 +238,14 @@ class User extends ActiveRecord implements IdentityInterface
     public static function getPasswordMinimum():int
     {
         return self::PWD_MIN_LENGTH;
+    }
+    public function getLicenses(): ActiveQuery
+    {
+        return $this->hasMany(License::class, ['user_id' => 'id']);
+    }
+    public function getLicense(): ?License
+    {
+        return $this->licenses?$this->licenses[0]:null;
     }
 
     /**

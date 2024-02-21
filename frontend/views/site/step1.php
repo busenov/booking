@@ -1,6 +1,7 @@
 <?php
 
 use booking\entities\Order\Order;
+use booking\forms\manage\Order\LicenseForm;
 use booking\forms\manage\Order\OrderCreateForm;
 use booking\forms\manage\Order\SlotCreateForm;
 use booking\helpers\DateHelper;
@@ -14,6 +15,7 @@ use yii\web\YiiAsset;
 /** @var yii\web\View $this */
 /** @var array $calendar */
 /** @var Order $order */
+/** @var LicenseForm $licenseForm */
 
 YiiAsset::register($this);
 BookingAsset::register($this);
@@ -112,11 +114,20 @@ $urlNxt=Url::to(['index','step'=>2]);
                 </label>
             </div>
             <div class="nomer-prav <?=$clubRaces?'':'hidden'?>">
-                <form class="form" action="<?=Url::to(['license/check'])?>" id="form-check_license">
+                <?php $form = ActiveForm::begin([
+                    'class'=>"form",
+                    'method'=>"post",
+                    'id'=> 'form-check_license',
+                    'action'=>Url::to(['check-license'])
+                ]); ?>
                     <label for="prava">Номер прав:</label>
-                    <input type="text" name="license" class="prava">
+                <?= $form->field($licenseForm, 'number',)->input([
+                    'class'=>'prava',
+                    'template'=>'{input}',
+                    'id'=>'license_number222'
+                ])->label(false) ?>
                     <button>Проверить</button>
-                </form>
+                <?php ActiveForm::end(); ?>
             </div>
         </div>
 
@@ -194,7 +205,7 @@ $urlNxt=Url::to(['index','step'=>2]);
 <pre>
     <?if ($order) :?>
     <?dump($order->statusName($order->status));?>
-    <?dump($order->date_begin_reserve);?>
+    <?dump($order->customer);?>
     <?dump($order->date_begin_reserve?date('d/m/y H:i',$order->date_begin_reserve):'');?>
 <!--    --><?//dump($order->items);?>
 <!--    --><?//dump($order->toJs());?>

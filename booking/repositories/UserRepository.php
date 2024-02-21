@@ -29,7 +29,15 @@ class UserRepository
     {
         return $this->getBy(['email' => $email]);
     }
+    public function getByTelephone(string $telephone, bool $onlyRacer=false):User
+    {
+        if ($onlyRacer) {
+            return $this->getBy(['telephone' => $telephone,'type'=>User::TYPE_CUSTOMER]);
+        } else {
+            return $this->getBy(['telephone' => $telephone]);
+        }
 
+    }
     public function getByPasswordResetToken($token): User
     {
         return $this->getBy(['password_reset_token' => $token]);
@@ -76,9 +84,13 @@ class UserRepository
     {
         return $this->findOneBy(['status'=>User::STATUS_ACTIVE,'email' => $value]);
     }
-    public function findByTelephone($value)
+    public function findByTelephone($telephone, bool $onlyRacer=false): ?User
     {
-        return $this->findOneBy(['telephone' => $value]);
+        if ($onlyRacer) {
+            return $this->findOneBy(['telephone' => $telephone,'type'=>User::TYPE_CUSTOMER]);
+        } else {
+            return $this->findOneBy(['telephone' => $telephone]);
+        }
     }
     public function findActive():array
     {

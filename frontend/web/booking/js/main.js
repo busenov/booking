@@ -21,6 +21,8 @@
             step1_weekDatesEl = document.getElementById('week__dates'),
             step1_titleDateEl = document.getElementById('step1_title-date'),
             step1_btnTimerEl=document.getElementById('btn_timer'),
+            step1_formCheckLicenseEl=document.getElementById('form-check_license'),
+            step1_licenseNumberEl=document.getElementById('licenseform-number'),
             //step2
             step2_incs=document.getElementsByClassName('btn-inc'),
             step2_btnTimer=document.getElementById('btn_timer'),
@@ -188,6 +190,11 @@
             }
             step1_btnTimerEl.addEventListener('click',function(){document.location=this.dataset.action})
 
+            //проверяем права
+            if (step1_formCheckLicenseEl) {
+                $(step1_formCheckLicenseEl).on('beforeSubmit', function () {return false;}).on('submit', function(e){that.checkLicense(this);e.preventDefault();});
+            }
+
         }
         // Выводим заезды
         Booking.prototype.drawRaces  = function(wDay) {
@@ -288,17 +295,20 @@
             console.log('changeClubRaces');
             clubRaces=o.checked;
 
-            console.log(o.checked);
-            console.log(clubRaces);
-            //проверяем права
             if (o.checked) {
+                if (($ykv_order) && ($ykv_order['license_number'])) {
+                    step1_licenseNumberEl.value=$ykv_order['license_number'];
+                    this.setCookie('clubRaces',clubRaces);
+                    this.drawRaces(selectedWDay);
+                } else {
+                    o.checked=false;
+                }
                 nomerPravEl.classList.remove('hidden');
             } else {
                 nomerPravEl.classList.add('hidden');
+                this.setCookie('clubRaces',clubRaces);
+                this.drawRaces(selectedWDay);
             }
-
-            this.setCookie('clubRaces',clubRaces);
-            this.drawRaces(selectedWDay);
         }
         Booking.prototype.clickOrder = function(o) {
             console.log('clickOrder');
@@ -384,6 +394,34 @@
                     console.log(data)
                 }
             });
+        }
+        Booking.prototype.checkLicense = function (o) {
+            console.log('checkLicense');
+            let
+                formData=new FormData(o),
+                that=this
+            ;
+
+            $.ajax({
+                url: o.getAttribute('action'),
+                method: o.getAttribute('method'),
+                processData: false,
+                contentType: false,
+                data: formData,
+                success: function(data){
+                    if (data.status==='success') {
+                        clubRacesEl.checked=true;
+                        that.setCookie('clubRaces',clubRaces);
+                        that.drawRaces(selectedWDay);
+                    } else {
+                        clubRacesEl.checked=false;
+                    }
+                },
+                error:function (data){
+                    console.log(data)
+                }
+            });
+            return false;
         }
         //step2=========================================================================================================
         Booking.prototype.listenerStep2 = function () {

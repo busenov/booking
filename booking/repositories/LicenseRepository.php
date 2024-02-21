@@ -53,7 +53,10 @@ class LicenseRepository
     {
         return License::find()->where(['status'=>License::STATUS_ACTIVE])->all();
     }
-
+    public function findByNumber(int $number):?License
+    {
+        return License::findOne(['number'=>$number]);
+    }
 ###
 
     private static function getBy(array $condition): License
@@ -63,6 +66,7 @@ class LicenseRepository
         }
         return $entity;
     }
+
 
 
 
