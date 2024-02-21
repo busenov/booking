@@ -353,10 +353,22 @@ input:checked + .slider:before {
 .nomer-prav.hidden {
     visibility: hidden;
 }
+#form-check_license {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+#form-check_license .field-licenseform-number {
+    margin-bottom: 0 !important;
+    margin-right: 24px;
+}
 .nomer-prav label {
     font-size: 14px;
     color: #000000;
     margin-right: 24px;
+}
+#form-check_license .field-licenseform-number .form-control {
+    height: 30px;
 }
 .nomer-prav .prava {
     width: 136px;
@@ -370,7 +382,7 @@ input:checked + .slider:before {
     justify-content: center;
     align-items: center;
     width: 70px;
-    height: 23px;
+    height: 30px;
     border: 0px;
     background: #000000;
     color: #ffffff;
@@ -431,6 +443,29 @@ input:checked + .slider:before {
     border-radius: 0px 5px 5px 0px;
     position: relative;
 }
+.result-table__info-icon {
+    display: none;
+}
+.result-table__info-icon.open {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.result-table__info-icon img {
+    width: auto;
+    height: auto;
+    margin-right: 10px;
+}
+.result-table__info-icon span {
+    font-size: 8px;
+    line-height: 10px;
+    text-align: center;
+}
+
 .result-table__info.purple {
     background: #EFF0FF;
 }
@@ -439,6 +474,26 @@ input:checked + .slider:before {
 }
 .result-table__info.gray {
     background: #AAAAAA;
+}
+.result-table__order {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    line-height: 11px;
+    font-weight: 700;
+    margin-right: 5px;
+}
+.result-table__order::after {
+    content: '';
+    display: block;
+    background: url(../img/basket.png) no-repeat;
+    background-size: 100% 100%;
+    background-position: center;
+    width: 18px;
+    height: 18px;
 }
 .result-table__btn {
     width: 178px;
@@ -505,29 +560,29 @@ input:checked + .slider:before {
     font-size: 14px;
     font-weight: 600;
 }
-#exampleModal .modal-header {
+.modal-header {
     background: #D60000;
     justify-content: flex-start;
 }
-#exampleModal .modal-header .modal-date {
+.modal-header .modal-date {
     color: #ffffff;
     font-size: 15px;
     font-weight: 700;
     margin-right: 8px;
 }
-#exampleModal .modal-header .modal-time {
+.modal-header .modal-time {
     color: #ffffff;
     font-size: 15px;
     font-weight: 700;
     margin-right: 8px;
 }
-#exampleModal .modal-header .modal-name {
+.modal-header .modal-name {
     color: #ffffff;
     font-size: 15px;
     font-weight: 700;
 }
-#exampleModal .modal-body {
-    padding: 60px 25px 12px 37px;
+.modal-body {
+    padding: 30px 25px 12px 37px;
     box-sizing: border-box;
 }
 .modal-form__row {

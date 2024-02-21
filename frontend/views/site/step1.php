@@ -167,12 +167,25 @@ $urlNxt=Url::to(['index','step'=>2]);
             echo
                 '   <div class="result-table__info-block">
                         <div class="result-table__time">'. DateHelper::timeIntToStr($item['begin'],false).' - '. DateHelper::timeIntToStr($item['end'],false).'</div>
-                        <div class="result-table__info">'.
+                        <div class="result-table__info">
+                            <div class="result-table__info-icon">
+                                <img src="/booking/img/grownup-icon.png">
+                                <span>Взрослый<br> заезд</span>
+                            </div>
+                            <div class="result-table__info-icon">
+                                <img src="/booking/img/child-big.png">
+                                <span>Детский<br> заезд</span>
+                            </div>
+                            <div class="result-table__info-icon open">
+                                <img src="/booking/img/star.png">
+                                <span>Клубный<br> заезд</span>
+                            </div>
+                        '.
                             $icon .
                             $item['typeName'] .
                             ' Свободно: ' . $item['free'] . ' мест
                         </div>
-                        <div class="result-table__order" id="result-table__slot_id_'.$slotId.'">'. (($order AND $order->getQtyBySlotId($slotId)>0)?$order->getQtyBySlotId($slotId):'').'</div>
+                        <div class="result-table__order" id="result-table__slot_id_'.$slotId.'">'. (($order AND $order->getQtyBySlotId($slotId)>0)?$order->getQtyBySlotId($slotId):'0').'</div>
                     </div>
                     <button 
                         class="result-table__btn btn" 
