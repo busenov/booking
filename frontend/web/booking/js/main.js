@@ -3,11 +3,13 @@
     "use strict";
     document.addEventListener('DOMContentLoaded', function(){
         let
-            //step1
+            //main
             today = new Date(),
             monthTag =["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],
             selectedDay,
             selectedWDay,
+            timerTimeEl=document.getElementById('timer-time'),
+            //step1
             onlyChildren=false,
             clubRaces=false,
             raceDayEl=document.getElementById('race-day'),
@@ -49,12 +51,13 @@
                 // selectedWDay = today;
             }
 
-            console.log(selectedDay);
             if ($ykv_step===1) {
                 this.draw();
                 this.listenerStep1();
+                this.timerOn();
             } else if ($ykv_step===2) {
-                this.listenerStep2()
+                this.listenerStep2();
+                this.timerOn();
             } else if ($ykv_step===3) {
 
             } else if ($ykv_step===4) {
@@ -105,6 +108,13 @@
             hour = Math.floor(secBeginningDay/(60*60));
             return ('00'+hour).slice(-2);
         }
+        //получаем время из кол-ва секунд в формате ММ:СС
+        Booking.prototype.getTimeMinSecBySec = function (sec) {
+            let minute,second;
+            minute = Math.floor(sec/(60));
+            second = Math.floor(sec-(minute*60));
+            return ('00'+minute).slice(-2) + ':' + ('00'+second).slice(-2);
+        }
         //возращаем дату в формате ДД МЕСЯЦА ГГГГ
         Booking.prototype.getDateStr = function (timeUnix) {
             let date=new Date(timeUnix*1000);
@@ -121,6 +131,29 @@
             return Intl.NumberFormat('ru-RU', { maximumSignificantDigits: 2 }).format(
                 number,
             );
+        }
+        //main==========================================================================================================
+        Booking.prototype.timerOn  = function(newTime) {
+            if (timerTimeEl) {
+                let time,timerId,that=this;
+                if (newTime) {
+                    time = newTime
+                } else {
+                    time=timerTimeEl.dataset.time;
+                }
+                if (time>0) {
+                    timerId=setInterval(function () {
+                        if (time-- > 0) {
+                            timerTimeEl.innerHTML = that.getTimeMinSecBySec(time);
+                        } else {
+                            timerTimeEl.innerHTML = ''
+                            clearInterval(timerId);
+                            location.reload();
+                        }
+
+                    }, 1000);
+                }
+            }
         }
         //step1=========================================================================================================
         // Выводим на экран дни недели
@@ -292,16 +325,19 @@
         }
         Booking.prototype.addToOrder = function(o) {
             console.log('addToOrder');
-            let formData=new FormData(o);
-            console.log(formData );
+            let
+                formData=new FormData(o),
+                that=this
+            ;
+
 
             $.ajax({
-                url: o.getAttribute('action'),         /* Куда пойдет запрос */
-                method: o.getAttribute('method'),             /* Метод передачи (post или get) */
+                url: o.getAttribute('action'),
+                method: o.getAttribute('method'),
                 processData: false,
                 contentType: false,
                 data: formData,
-                success: function(data){   /* функция которая будет выполнена после успешного запроса.  */
+                success: function(data){
                     console.log(data)
                     if (data.status==='success') {
                         for (let slotId in data.order.items) {
@@ -312,10 +348,14 @@
                             }
                         }
                         $(orderModal).modal('hide');
-                        console.log($ykv_toIssue);
                         if ($ykv_toIssue) {
                             location.href=$ykv_urlNxt
                         }
+                        //запускаем таймер
+                        if (data.order.leftTime) {
+                            that.timerOn(data.order.leftTime)
+                        }
+
                     }
                 },
                 error:function (data){
@@ -529,8 +569,4 @@ function btnInc(o) {
             }
         }
     }
-}
-
-function changeOrderOnStep2() {
-
 }

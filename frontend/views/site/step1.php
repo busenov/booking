@@ -180,7 +180,9 @@ $urlNxt=Url::to(['index','step'=>2]);
 
     </div>
 
-    <?=$this->render('_btnCheckoutTimer',['timer'=>Order::TIME_RESERVE,'time'=>$order?$order->date_begin_reserve:''])?>
+    <?=$this->render('_btnCheckoutTimer',[
+        'order'=>$order])
+    ?>
 
 
 </section>
@@ -190,9 +192,13 @@ $urlNxt=Url::to(['index','step'=>2]);
 <!-- Modal -->
 
 <pre>
-<!--    --><?//dump($order);?>
+    <?if ($order) :?>
+    <?dump($order->statusName($order->status));?>
+    <?dump($order->date_begin_reserve);?>
+    <?dump($order->date_begin_reserve?date('d/m/y H:i',$order->date_begin_reserve):'');?>
 <!--    --><?//dump($order->items);?>
 <!--    --><?//dump($order->toJs());?>
+    <?endif;?>
 </pre>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>

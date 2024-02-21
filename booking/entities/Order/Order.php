@@ -42,7 +42,7 @@ use yii\helpers\ArrayHelper;
 class Order extends ActiveRecord
 {
     const STATUS_NEW=10;                    //Новый
-    const STATUS_RESERVED=15;               //Статус в работе, добавлены заезды
+    const STATUS_RESERVATION_PROCESS=15;   //В процессе добавление заказов(должен длится не более TIME_RESERVE секунд, от начала добавления первого заказа
     const STATUS_CHECKOUT=20;               //Оформление. Ожидает оплаты
     const STATUS_PAID=30;                   //Оплачен
     const STATUS_COMPLETED=40;              //Завершен
@@ -89,7 +89,7 @@ class Order extends ActiveRecord
     }
     public function onReserved()
     {
-        $this->status=self::STATUS_RESERVED;
+        $this->status=self::STATUS_RESERVATION_PROCESS;
         $this->date_begin_reserve=time();
     }
     public function onCheckout()
@@ -113,9 +113,9 @@ class Order extends ActiveRecord
     {
         return $this->status===self::STATUS_NEW;
     }
-    public function isReserved():bool
+    public function isReservationProcess():bool
     {
-        return $this->status===self::STATUS_RESERVED;
+        return $this->status===self::STATUS_RESERVATION_PROCESS;
     }
     public function isAwaitingPayment():bool
     {
@@ -170,7 +170,7 @@ class Order extends ActiveRecord
     }
     public function getLeftTimeReserve():?int
     {
-        if (($this->date_begin_reserve) and ($this->isReserved())) {
+        if (($this->date_begin_reserve) and ($this->isReservationProcess())) {
             $passedTime=time()-$this->date_begin_reserve;
             if ($passedTime>self::TIME_RESERVE) {
                 return null;
@@ -248,6 +248,7 @@ class Order extends ActiveRecord
     public function toJs():array
     {
         $result=$this->toArray();
+        $result['leftTime']=$this->getLeftTimeReserve();
 
         $items=[];
         foreach ($this->items as $item) {
@@ -271,6 +272,30 @@ class Order extends ActiveRecord
         return $result;
     }
 
+    /**
+     * Проверка статуса заказа.
+     * Если статус "процесс резервирования"(Order::STATUS_RESERVATION_PROCESS) длится более Order::TIME_RESERVE секунд
+     * тогда меняем статус на Order::NEW, отменяем все брони по этому заказу
+     * @return void
+     */
+    public function checkStatusReservationProcess():void
+    {
+        if ($this->isReservationProcess()) {
+            if ($this->date_begin_reserve) {
+                if ((time() - $this->date_begin_reserve) <= self::TIME_RESERVE) {
+                    return;
+                }
+            }
+            $this->revokeItems();
+            $this->date_begin_reserve=null;
+            $this->onNew();
+            $this->save();
+        }
+    }
+    public function revokeItems():void
+    {
+        $this->items=[];
+    }
     /**
      * {@inheritdoc}
      */
@@ -328,7 +353,7 @@ class Order extends ActiveRecord
     {
         return [
             self::STATUS_NEW => 'Новый',
-            self::STATUS_RESERVED => 'Заполняется',
+            self::STATUS_RESERVATION_PROCESS => 'Заполняется',
             self::STATUS_CHECKOUT => 'Ожидает оплаты',
             self::STATUS_PAID => 'Оплачен',
             self::STATUS_COMPLETED => 'Завершен',
@@ -356,7 +381,9 @@ class Order extends ActiveRecord
         if ($this->additional_info_json) {
             $this->additionalInfo=json_decode($this->additional_info_json,true);
         }
-
+        //Если статус "процесс резервирования"(Order::STATUS_RESERVATION_PROCESS) длится более Order::TIME_RESERVE секунд
+        //тогда меняем статуся на Order::NEW, отменяем все брони по этому заказу
+        $this->checkStatusReservationProcess();
         parent::afterFind();
 
     }

@@ -112,7 +112,9 @@ $urlNxt=Url::to(['index','step'=>3]);
         </div>
         <?php ActiveForm::end(); ?>
     </div>
-    <?=$this->render('_btnCheckoutTimer',['timer'=>Order::TIME_RESERVE,'time'=>$order->getLeftTimeReserve()])?>
+    <?=$this->render('_btnCheckoutTimer',[
+        'order'=>$order])
+    ?>
 
     <? else:?>
         <div class="order-form__title">Не выбран ни один заезд. Для выбора перейдите <a href="<?=$urlPre?>">сюда</a></div>
