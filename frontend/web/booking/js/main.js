@@ -216,11 +216,24 @@
                         if ($ykv_order && $ykv_order['items'][slotId] && ($ykv_order['items'][slotId]['qty'])) {
                             orderSlotQty=$ykv_order['items'][slotId]['qty'];
                         }
+                        icon='<div class="result-table__info-icon open">\n' +
+                            '<img src="/booking/img/grownup-icon.png">\n' +
+                            '<span>Взрослый<br> заезд</span>\n' +
+                            '</div>'
+
                         if (slotsByDay[slotId]['isChild']) {
                             icon+='<img src="/booking/img/child.png" class="result-table__icon"> ';
+                            icon='<div class="result-table__info-icon open " >\n' +
+                                '<img src="/booking/img/child-big.png">\n' +
+                                '<span>Детский<br> заезд</span>\n' +
+                                '</div>'
                         }
                         if (slotsByDay[slotId]['isClub']) {
                             icon+='<img src="/booking/img/star.png" class="result-table__icon"> ';
+                            icon='<div class="result-table__info-icon open">\n' +
+                                '<img src="/booking/img/star.png">\n' +
+                                '<span>Клубный<br> заезд</span>\n' +
+                                '</div>'
                         }
                         //показывать только детские?
                         if (onlyChildren) {
@@ -247,7 +260,7 @@
                         html+='' +
                         '<div class="result-table__info-block">'+
                             '<div class="result-table__time">'+this.getTimeBySec(slotsByDay[slotId]['begin'])+' - '+this.getTimeBySec(slotsByDay[slotId]['end'])+'</div>'+
-                            '<div class="result-table__info">'+icon+slotsByDay[slotId]['typeName']+' Свободно: ' + slotsByDay[slotId]['free'] + ' мест</div>'+
+                            '<div class="result-table__info">'+icon+' Свободно: ' + slotsByDay[slotId]['free'] + ' мест</div>'+
                             '<div class="result-table__order" id="result-table__slot_id_'+slotId+'">'+ orderSlotQty+ '</div>'+
                         '</div>'+
                         '<button class="result-table__btn btn"'+buttonData+'>Забронировать</button>'
