@@ -100,6 +100,31 @@ class UserController extends Controller
         $this->service->assignRole($user->id, $role);
         $this->stdout('Done!' . PHP_EOL);
     }
+    /**
+     * Смена пароля пользователя (Change password by user)
+     * @return void
+     */
+    public function actionChangePassword():void
+    {
+        $email = $this->prompt('Email:', [
+            'required' => true,
+        ]);
+        $password = $this->prompt('Password:', [
+            'required' => true,
+            'validator' => function ($input, &$error) {
+                if (strlen($input) < User::getPasswordMinimum()) {
+                    $error = 'The password must be exactly '.User::getPasswordMinimum().' chars!';
+                    return false;
+                }
+                return true;
+            },
+        ]);
+        $user = $this->findModel($email);
+
+        $this->service->changePassword($user->id,$password);
+
+        $this->stdout('User success change password!' . PHP_EOL);
+    }
 ###
     private function findModel($email): User
     {

@@ -56,6 +56,7 @@ class PasswordResetService
                     'resetLink' => $resetLink,
                 ]
             )
+            ->setFrom(Yii::$app->params['adminEmail'])
             ->setTo($user->email)
             ->setSubject('Password reset for ' . Yii::$app->name)
             ->send();

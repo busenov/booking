@@ -92,6 +92,13 @@ class UserManageService
 
     }
 
+    public function changePassword($id, $newPassword)
+    {
+        $user = $this->repository->get($id);
+        $user->password=$newPassword;
+        $this->repository->save($user);;
+    }
+
 
     /**
      * Устанавливаем роль для пользователя

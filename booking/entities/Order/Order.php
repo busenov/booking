@@ -205,18 +205,20 @@ class Order extends ActiveRecord
     }
     public function changeItem(int $slotId, int $carTypeId, int $qty=0): void
     {
-        $items = $this->items;
-        $notInOrder = true;
-        foreach ($items as $item) {
-            if ($item->isIdSlotIdEqualTo($slotId,$carTypeId)) {
-                $item->qty = $qty;
-                $notInOrder = false;
+        if ($qty>0) {
+            $items = $this->items;
+            $notInOrder = true;
+            foreach ($items as $item) {
+                if ($item->isIdSlotIdEqualTo($slotId,$carTypeId)) {
+                    $item->qty = $qty;
+                    $notInOrder = false;
+                }
             }
-        }
-        if ($notInOrder)
-            $items[] = OrderItem::create($slotId,$carTypeId,$qty);
+            if ($notInOrder)
+                $items[] = OrderItem::create($slotId,$carTypeId,$qty);
 
-        $this->items = $items;
+            $this->items = $items;
+        }
     }
     public function editItem($item_id,int $qty=0): void
     {
