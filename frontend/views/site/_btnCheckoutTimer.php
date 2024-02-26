@@ -16,7 +16,7 @@ $url= Url::to(['index','step'=>2]);
         <div
                 class="timer-time"
                 id="timer-time"
-                data-time="<?=$order->getLeftTimeReserve()?>"
+                data-time="<?=$order?$order->getLeftTimeReserve():''?>"
         ><?= $order?DateHelper::minuteIntToStr($order->getLeftTimeReserve()):''?></div>
     </div>
 </div>

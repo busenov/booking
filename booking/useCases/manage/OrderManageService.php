@@ -22,7 +22,6 @@ use booking\repositories\OrderRepository;
 use booking\repositories\ScheduleRepository;
 use booking\repositories\SlotRepository;
 use booking\repositories\UserRepository;
-use http\Exception\RuntimeException;
 
 class OrderManageService
 {
@@ -33,7 +32,7 @@ class OrderManageService
     public function __construct(
         OrderRepository $repository,
         UserRepository $userRepository,
-        LicenseRepository   $licenseRepository,
+        LicenseRepository   $licenseRepository
     )
     {
         $this->repository = $repository;

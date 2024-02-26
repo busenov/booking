@@ -156,33 +156,38 @@ $urlNxt=Url::to(['index','step'=>2]);
             }
             $dateTimeStr=DateHelper::timeIntToStr($item['begin'],false).' - '. DateHelper::timeIntToStr($item['end'],false).' '. date('d.m.Y',$item['date']);
 
-            $icon='';
+            $icon='
+                    <div class="result-table__info-icon open">
+                        <img src="/booking/img/grownup-icon.png">
+                        <span>Взрослый<br> заезд</span>
+                    </div>
+            ';
             if ($item['isChild']) {
-                $icon.='<img src="/booking/img/child.png" class="result-table__icon"> ';
+                $icon='
+                        <div class="result-table__info-icon open " >
+                            <img src="/booking/img/child-big.png">
+                            <span>Детский<br> заезд</span>
+                        </div>
+            ';
             }
             if ($item['isClub']) {
-                $icon.='<img src="/booking/img/star.png" class="result-table__icon"> ';
+                $icon='
+                        <div class="result-table__info-icon open">
+                            <img src="/booking/img/star.png">
+                            <span>Клубный<br> заезд</span>
+                        </div>
+            ';
             }
             echo '<div class="result-table__row">';
             echo
                 '   <div class="result-table__info-block">
                         <div class="result-table__time">'. DateHelper::timeIntToStr($item['begin'],false).' - '. DateHelper::timeIntToStr($item['end'],false).'</div>
                         <div class="result-table__info">
-                            <div class="result-table__info-icon">
-                                <img src="/booking/img/grownup-icon.png">
-                                <span>Взрослый<br> заезд</span>
-                            </div>
-                            <div class="result-table__info-icon">
-                                <img src="/booking/img/child-big.png">
-                                <span>Детский<br> заезд</span>
-                            </div>
-                            <div class="result-table__info-icon open">
-                                <img src="/booking/img/star.png">
-                                <span>Клубный<br> заезд</span>
-                            </div>
+
+
+
                         '.
                             $icon .
-                            $item['typeName'] .
                             ' Свободно: ' . $item['free'] . ' мест
                         </div>
                         <div class="result-table__order" id="result-table__slot_id_'.$slotId.'">'. (($order AND $order->getQtyBySlotId($slotId)>0)?$order->getQtyBySlotId($slotId):'0').'</div>

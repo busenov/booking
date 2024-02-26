@@ -22,7 +22,7 @@ class SignupService
         UserRepository $users,
         MailerInterface $mailer,
         TransactionManager $transaction,
-        RoleManager $roles,
+        RoleManager $roles
     )
     {
         $this->mailer = $mailer;
