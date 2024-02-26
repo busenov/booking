@@ -83,7 +83,7 @@ class UserController extends Controller
             'name' => 'Новый пользователь',
             'email'=>$email,
             'password'=>$password,
-            'role' => Rbac::ROLE_USER
+            'roles' => Rbac::ROLE_USER
         ]);
         $user=$this->service->create($form);
 

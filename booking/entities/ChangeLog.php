@@ -37,14 +37,14 @@ class ChangeLog extends \yii\db\ActiveRecord
     const ACTION_DELETE=3;
 
     public static function create(
-        string|null $model_class,
-        int|null $model_id,
-        string|null $attribute,
-        string|null $value_old,
-        string|null $value_new,
-        int|null $date_time,
-        string|null $model_json,
-        int|null $action
+        ?string $model_class,
+        ?int $model_id,
+        ?string $attribute,
+        ?string $value_old,
+        ?string $value_new,
+        ?int $date_time,
+        ?string $model_json,
+        ?int $action
 
     ):self
     {
