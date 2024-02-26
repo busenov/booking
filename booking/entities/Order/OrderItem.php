@@ -62,7 +62,7 @@ class OrderItem extends ActiveRecord
     }
     public function isIdSlotIdEqualTo(int $slotId,int $cartTypeId):bool
     {
-        return (($this->carType_id === $cartTypeId) and ($this->slot_id===$slotId));
+        return (($this->carType_id == $cartTypeId) and ($this->slot_id==$slotId));
     }
 
 #gets

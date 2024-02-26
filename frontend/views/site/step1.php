@@ -190,7 +190,7 @@ $urlNxt=Url::to(['index','step'=>2]);
                             $icon .
                             ' Свободно: ' . $item['free'] . ' мест
                         </div>
-                        <div class="result-table__order" id="result-table__slot_id_'.$slotId.'">'. (($order AND $order->getQtyBySlotId($slotId)>0)?$order->getQtyBySlotId($slotId):'0').'</div>
+                        <div class="result-table__order" id="result-table__slot_id_'.$slotId.'">'. (($order AND $order->getQtyBySlotId($slotId)>0)?$order->getQtyBySlotId($slotId):'').'</div>
                     </div>
                     <button 
                         class="result-table__btn btn" 
@@ -225,8 +225,8 @@ $urlNxt=Url::to(['index','step'=>2]);
     <?dump($order->statusName($order->status));?>
     <?dump($order->customer);?>
     <?dump($order->date_begin_reserve?date('d/m/y H:i',$order->date_begin_reserve):'');?>
-<!--    --><?//dump($order->items);?>
-<!--    --><?//dump($order->toJs());?>
+    <?dump($order->items);?>
+    <?dump($order->getQtyBySlotId(7634));?>
     <?endif;?>
 </pre>
 

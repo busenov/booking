@@ -264,7 +264,7 @@ class Slot extends ActiveRecord
     }
     public function isIdEqualTo(int $slotId):bool
     {
-        return $this->id===$slotId;
+        return $this->id==$slotId;
     }
 #hass
     public function hasReserved():bool
