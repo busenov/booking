@@ -143,7 +143,7 @@ class CarType extends ActiveRecord
     }
     public function getPrices(): ActiveQuery
     {
-        return $this->hasMany(Price::class, ['car_type_id' => 'id'])->orderBy('weekday');
+        return $this->hasMany(Price::class, ['car_type_id' => 'id'])->orderBy('weekday,date_from');
     }
 
     /**
@@ -207,6 +207,42 @@ class CarType extends ActiveRecord
     public static function statusName($status): string
     {
         return ArrayHelper::getValue(self::getStatusList(), $status);
+    }
+
+    /**
+     * Находим цену по слоту
+     * Сначала ищем по дню неделю с даты от
+     * Если не найходим ищем по дню неделю без времени
+     * Иначе ищем первую попавшую запись
+     * @param Slot $slot
+     * @return float
+     */
+    public function getPriceBySlot(Slot $slot):float
+    {
+        $currentPrice=null;
+        foreach ($this->prices as $price) {
+            if ($price->weekday) {
+                if ($price->weekday == date('N',$slot->date)) {
+                    if ($price->date_from) {
+                        if (($price->date_from<=$slot->begin)) {
+                            $currentPrice=$price->cost;
+                        }
+                    } else {
+                        $currentPrice=$price->cost;
+                    }
+                }
+            } else {
+                if ($price->date_from) {
+                    if (($price->date_from<=$slot->begin)) {
+                        $currentPrice=$price->cost;
+                    }
+                } else {
+                    $currentPrice=$price->cost;
+                }
+            }
+
+        }
+        return $currentPrice??Price::DEFAULT_COST;
     }
 
 

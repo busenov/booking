@@ -38,6 +38,7 @@ class Price extends ActiveRecord
     const STATUS_ACTIVE=10;              //Активный
     const STATUS_INACTIVE=5;             //Не активный
     const STATUS_DELETED=100;            //Удален
+    const DEFAULT_COST = 1000;
 
     public static function create(
                                 float   $cost,

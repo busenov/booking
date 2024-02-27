@@ -44,7 +44,7 @@ use yii\helpers\Url;
                     )->textInput([
                         'data-min'=>0,
                         'data-max'=>14
-                    ])->label($item->_carType->name)?>
+                    ])->label($item->_carType->name . '(Цена: '.$item->_carType->getPriceBySlot($slot).' руб/машина)' )?>
                     <?php
 
                     ?>

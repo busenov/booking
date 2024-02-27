@@ -80,7 +80,7 @@ class CarTypeManageService
         $entity = $this->repository->get($entityOrId);
         $this->guardCanEditPrice($entity);
         $prices=$entity->prices;
-        $prices[]=Price::create(0);
+        $prices[]=Price::create(Price::DEFAULT_COST);
         $entity->prices=$prices;
         $this->repository->save($entity);
     }

@@ -80,6 +80,7 @@ class OrderItem extends ActiveRecord
     }
     public function getPrice():float
     {
+        return $this->carType->getPriceBySlot($this->slot);
         return 1000;
     }
     public function getTotal():?float
