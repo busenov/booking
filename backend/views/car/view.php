@@ -24,6 +24,9 @@ YiiAsset::register($this);
         <?php if (CarTypeManageService::guardCanEdit($model,true)) :?>
         <?= Html::a('Правка', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?php endif;?>
+        <?php if (CarTypeManageService::guardCanEditPrice($model,true)) :?>
+        <?= Html::a('Редактировать цены', ['update-prices', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?php endif;?>
         <?php if (CarTypeManageService::guardCanRemove($model,true)) :?>
         <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',

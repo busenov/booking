@@ -337,6 +337,7 @@ class Slot extends ActiveRecord
             'note' => 'Примечание',
             'is_child' => 'Детский',
             'countOrders' => 'Броней',
+            'type' => 'Тип',
 
             'created_at' => 'Создано',
             'updated_at' => 'Отредактировано',

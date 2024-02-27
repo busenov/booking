@@ -8,24 +8,21 @@ use booking\entities\Order\Order;
 use booking\entities\Slot\Slot;
 use booking\repositories\OrderRepository;
 use booking\repositories\SlotRepository;
-use lhs\Yii2SaveRelationsBehavior\SaveRelationsBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 /**
- * This is the model class for table "car_types".
+ * This is the model class for table "car_prices".
  *
  * @property int $id
- * @property string|null $name
- * @property string|null $description
- * @property string|null $note
+ * @property int $car_type_id
+ * @property int $weekday
+ * @property int|null $date_from
  * @property int|null $status
- * @property int $qty
- * @property double $pwr
- * @property int $type
- *
+ * @property double $cost
+ * @property string $note
  *
  * @property int|null $created_at
  * @property int|null $updated_at
@@ -34,51 +31,43 @@ use yii\helpers\ArrayHelper;
  * @property int|null $editor_id
  * @property string|null $editor_name
  *
- * @property Price[] $prices
+ * @property CarType $carType
  */
-class CarType extends ActiveRecord
+class Price extends ActiveRecord
 {
     const STATUS_ACTIVE=10;              //Активный
     const STATUS_INACTIVE=5;             //Не активный
     const STATUS_DELETED=100;            //Удален
 
     public static function create(
-                                string  $name,
-                                string  $description,
+                                float   $cost,
+                                ?int  $weekday=null,
+                                ?int  $date_from=null,
                                 int     $status=self::STATUS_ACTIVE,
-                                int     $qty = 1,
-                                ?float  $pwr=null,
-                                ?string $note=null,
-                                ?int    $type=Slot::TYPE_ADULT
+                                ?string $note=null
                             ):self
     {
         return new self([
-            'name'=>$name,
-            'description'=>$description,
+            'cost'=>$cost,
+            'weekday'=>$weekday,
+            'date_from'=>$date_from,
             'status'=>$status,
-            'qty'=>$qty,
-            'pwr'=>$pwr,
             'note'=>$note,
-            'type'=>$type
         ]);
     }
     public function edit(
-        string  $name,
-        string  $description,
+        float   $cost,
+        string  $weekday,
+        string  $date_from,
         int     $status=self::STATUS_ACTIVE,
-        int     $qty = 1,
-        ?float  $pwr=null,
-        ?string $note=null,
-        ?int    $type=Slot::TYPE_ADULT
+        ?string $note=null
     ):void
     {
-        $this->name=$name;
-        $this->description=$description;
+        $this->cost=$cost;
+        $this->weekday=$weekday;
+        $this->date_from=$date_from;
         $this->status=$status;
-        $this->qty=$qty;
-        $this->pwr=$pwr;
         $this->note=$note;
-        $this->type=$type;
 
     }
 #on
@@ -94,19 +83,6 @@ class CarType extends ActiveRecord
     {
         $this->status=self::STATUS_DELETED;
     }
-
-    public function onAdult()
-    {
-        $this->type=Slot::TYPE_ADULT;
-    }
-    public function onChild()
-    {
-        $this->type=Slot::TYPE_CHILD;
-    }
-    public function onClub()
-    {
-        $this->type=Slot::TYPE_CLUB;
-    }
 #is
     public function isActive():bool
     {
@@ -120,30 +96,14 @@ class CarType extends ActiveRecord
     {
         return $this->status===self::STATUS_DELETED;
     }
-    public function isAdult():bool
-    {
-        return $this->status===Slot::TYPE_ADULT;
-    }
-    public function isChild():bool
-    {
-        return $this->status===Slot::TYPE_CHILD;
-    }
-    public function isClub():bool
-    {
-        return $this->status===Slot::TYPE_CLUB;
-    }
     public function isIdEqualTo($id):bool
     {
         return $this->id == $id;
     }
 #gets
-    public function getFreeBySlot(int $slotId=null)
+    public function getCarType(): ActiveQuery
     {
-        return $this->qty - OrderRepository::findSumReservedCar_st($slotId,$this->id);
-    }
-    public function getPrices(): ActiveQuery
-    {
-        return $this->hasMany(Price::class, ['car_type_id' => 'id'])->orderBy('weekday');
+        return $this->hasOne(CarType::class, ['id' => 'car_type_id']);
     }
 
     /**
@@ -151,7 +111,7 @@ class CarType extends ActiveRecord
      */
     public static function tableName()
     {
-        return '{{car_types}}';
+        return '{{car_prices}}';
     }
     public function behaviors()
     {
@@ -160,11 +120,7 @@ class CarType extends ActiveRecord
             FillingServiceFieldsBehavior::class,
             [
                 'class' => LoggingBehavior::class,
-            ],
-            [
-                'class' => SaveRelationsBehavior::class,
-                'relations' => ['prices']
-            ],
+            ]
         ];
     }
 
@@ -179,13 +135,12 @@ class CarType extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Название',
-            'description' => 'Описание',
+            'car_type_id' => 'Машина(карт)',
+            'weekday' => 'День недели',
+            'date_from' => 'С какого времени',
             'status' => 'Статус',
-            'qty' => 'Количество',
-            'pwr' => 'Мощность',
+            'cost' => 'Цена',
             'note' => 'Примечание',
-            'type' => 'Тип',
 
             'created_at' => 'Создано',
             'updated_at' => 'Отредактировано',
@@ -208,6 +163,21 @@ class CarType extends ActiveRecord
     {
         return ArrayHelper::getValue(self::getStatusList(), $status);
     }
-
+    public static function getWeekdayList(): array
+    {
+        return [
+            1 => 'Понедельник',
+            2 => 'Вторник',
+            3 => 'Среда',
+            4 => 'Четверг',
+            5 => 'Пятница',
+            6 => 'Суббота',
+            7 => 'Воскресенье',
+        ];
+    }
+    public static function weekdayName($weekday): string
+    {
+        return ArrayHelper::getValue(self::getWeekdayList(), $weekday);
+    }
 
 }

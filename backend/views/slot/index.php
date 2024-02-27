@@ -175,47 +175,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'class' => 'kartik\grid\EditableColumn',
-                'attribute' => 'is_child',
-                'value' => function (Slot $data) {
-                    return Slot::getIsChildLabel($data->is_child);
-                },
-                'format' => 'raw',
-                'width' => '10%',
-                'readonly' => function(Slot $model, $key, $index, $widget) {
-                    return ($model->readOnly());
-                },
-                'editableOptions' =>  function ($model, $key, $index) {
-                    return [
-                        'header'=>'Детский?',
-                        'size'=>'md',
-                        'inputType' => Editable::INPUT_HIDDEN,
-                        'beforeInput' => function ($form, $widget) use ($model, $index) {
-                            $model=new SlotForm($model);
-                            echo $form->field($model, "is_child")->widget(SwitchInput::class, [
-                                'options'=>[
-                                    'placeholder'=>'',
-                                    'class'=>'',
-                                    'id'=> $model->formName().'-is_child-'.$index
-                                ],
-                                'pluginOptions' => [
-                                    'onText'=>'Детский',
-                                    'offText'=>'Взрослый'
-                                ]
-                            ])->label(false);
-                        },
-                    ];
-                },
-                'filterType' => GridViewInterface::FILTER_SELECT2,
-                'filter' => [false=>'Взрослый',true=>'Детский'],
-                'filterWidgetOptions' => [
-                    'hideSearch' => true,
-                    'pluginOptions' => ['allowClear' => true],
-                ],
-                'filterInputOptions' => ['placeholder' => '', 'multiple' => false],
-
-            ],
-            [
-                'class' => 'kartik\grid\EditableColumn',
                 'attribute' => 'type',
                 'value' => function (Slot $data) {
                     return Slot::getTypeName($data->type);

@@ -11,6 +11,7 @@ use artel\useCases\manage\TeamManageService;
 use backend\forms\CarTypeSearch;
 use booking\entities\Car\CarType;
 use booking\forms\manage\Car\CarTypeForm;
+use booking\forms\manage\Car\PricesForm;
 use booking\repositories\CarTypeRepository;
 use booking\useCases\manage\CarTypeManageService;
 use Yii;
@@ -66,6 +67,8 @@ class CarController extends Controller
                     'actions' => [
                         'delete' => ['POST'],
                         'delete-hard' => ['POST'],
+                        'delete-price' => ['POST'],
+                        'add-empty-price' => ['POST'],
                     ],
                 ],
             ]
@@ -146,6 +149,43 @@ class CarController extends Controller
         return $this->render('update', [
             'model' => $form,
         ]);
+    }
+    /**
+     * Редактируем цены
+     * @param int $id ID
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdatePrices($id)
+    {
+        $entity = $this->findModel($id);
+        $form= new PricesForm($entity);
+
+        if ($this->request->isPost && $form->load($this->request->post())) {
+            try {
+                $this->service->editPrices($entity,$form);
+                Yii::$app->session->setFlash('success', 'Успешно отредактирована цена машины: '.$entity->name);
+            } catch (\Exception $ex) {
+                Yii::$app->session->setFlash('error', 'Ошибка при редактировании цена машины: '.$entity->name . ' '. $ex->getMessage());
+            }
+            return $this->redirect(['update-prices', 'id' => $entity->id]);
+        }
+
+        return $this->render('updatePrices', [
+            'model' => $form,
+        ]);
+    }
+    public function actionAddEmptyPrice($id)
+    {
+        $entity = $this->findModel($id);
+        $this->service->addEmptyPrice($entity);
+        return $this->redirect(['update-prices', 'id' => $entity->id]);
+    }
+    public function actionDeletePrice($id,$price_id)
+    {
+        $entity = $this->findModel($id);
+        $this->service->deletePrice($entity,$price_id);
+        return $this->redirect(['update-prices', 'id' => $entity->id]);
     }
 
     /**

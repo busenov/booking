@@ -225,7 +225,7 @@ $urlNxt=Url::to(['index','step'=>2]);
     <?dump($order->statusName($order->status));?>
     <?dump($order->customer);?>
     <?dump($order->date_begin_reserve?date('d/m/y H:i',$order->date_begin_reserve):'');?>
-    <?dump($order->items);?>
+    <?dump($calendar);?>
     <?dump($order->getQtyBySlotId(7634));?>
     <?endif;?>
 </pre>

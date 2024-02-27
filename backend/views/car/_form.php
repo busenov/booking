@@ -1,8 +1,11 @@
 <?php
 
 use booking\entities\Car\CarType;
+use booking\entities\Car\Price;
 use booking\entities\Slot\Slot;
 use booking\forms\manage\Car\CarTypeForm;
+use booking\forms\manage\Car\PriceForm;
+use kartik\datecontrol\DateControl;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 

@@ -4,9 +4,13 @@ namespace booking\forms\manage\Car;
 
 use booking\entities\Car\CarType;
 use booking\entities\Slot\Slot;
+use booking\forms\CompositeForm;
 use yii\base\Model;
 
-class CarTypeForm extends Model
+/**
+ * @property PriceForm[] $prices
+ */
+class CarTypeForm extends CompositeForm
 {
     public ?string $name=null;
     public ?string $description=null;
@@ -16,24 +20,31 @@ class CarTypeForm extends Model
     public ?float $pwr=null;
     public ?int $type=null;
     public ?CarType $_carType;
-    public function __construct(CarType $license=null, $config = [])
+    public function __construct(CarType $carType=null, $config = [])
     {
         parent::__construct($config);
-        if ($license) {
-            $this->name=$license->name;
-            $this->description=$license->description;
-            $this->note=$license->note;
-            $this->status=$license->status;
-            $this->qty=$license->qty;
-            $this->pwr=$license->pwr;
-            $this->type=$license->type;
+        $prices=[];
+        if ($carType) {
+            $this->name=$carType->name;
+            $this->description=$carType->description;
+            $this->note=$carType->note;
+            $this->status=$carType->status;
+            $this->qty=$carType->qty;
+            $this->pwr=$carType->pwr;
+            $this->type=$carType->type;
 
-            $this->_carType = $license;
+            foreach ($carType->prices as $price) {
+                $prices[]=new PriceForm($price);
+            }
+            $this->_carType = $carType;
         } else {
             $this->status=CarType::STATUS_ACTIVE;
             $this->type=Slot::TYPE_ADULT;
         }
-
+        if (empty($prices)) {
+            $prices[]=new PriceForm();
+        }
+        $this->prices=$prices;
     }
 
     /**
@@ -57,4 +68,8 @@ class CarTypeForm extends Model
         return CarType::getAttributeLabels();
     }
 
+    protected function internalForms(): array
+    {
+        return ['prices'];
+    }
 }
