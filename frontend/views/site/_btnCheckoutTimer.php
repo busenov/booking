@@ -14,7 +14,7 @@ $url= Url::to(['index','step'=>2]);
     <div class="timer">
         <span class="timer-title">Оформить в течении</span>
         <div
-                class="timer-time"
+                class="timer-time <?=($order->isReservationProcess()?'':'hidden') ?>"
                 id="timer-time"
                 data-time="<?=$order?$order->getLeftTimeReserve():''?>"
         ><?= $order?DateHelper::minuteIntToStr($order->getLeftTimeReserve()):''?></div>

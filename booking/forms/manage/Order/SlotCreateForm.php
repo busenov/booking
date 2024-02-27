@@ -28,11 +28,13 @@ class SlotCreateForm extends CompositeForm
         $carTypeIdsUse=[];
         $items=[];
         if ($order) {
+
             $this->_order=$order;
             $this->order_id=$order->id;
             //добавляем существующие позиции
             foreach ($order->items as $item) {
-                if ($slot_id!==$item->slot_id) continue;
+                if ($slot_id!=$item->slot_id) continue;
+
                 $items[] = new OrderItemForm($item);
                 $carTypeIdsUse[]=$item->carType_id;
             }
