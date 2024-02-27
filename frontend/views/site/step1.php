@@ -221,13 +221,13 @@ $urlNxt=Url::to(['index','step'=>2]);
 <!-- Modal -->
 
 <pre>
-    <?if ($order) :?>
-    <?dump($order->statusName($order->status));?>
-    <?dump($order->customer);?>
-    <?dump($order->date_begin_reserve?date('d/m/y H:i',$order->date_begin_reserve):'');?>
-    <?dump($calendar);?>
-    <?dump($order->getQtyBySlotId(7634));?>
-    <?endif;?>
+<!--    --><?//if ($order) :?>
+<!--    --><?//dump($order->statusName($order->status));?>
+<!--    --><?//dump($order->customer);?>
+<!--    --><?//dump($order->date_begin_reserve?date('d/m/y H:i',$order->date_begin_reserve):'');?>
+<!--    --><?//dump($calendar);?>
+<!--    --><?//dump($order->getQtyBySlotId(7634));?>
+<!--    --><?//endif;?>
 </pre>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>

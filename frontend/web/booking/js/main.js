@@ -198,6 +198,7 @@
         }
         // Выводим заезды
         Booking.prototype.drawRaces  = function(wDay) {
+            console.log('drawRaces')
             let
                 that = this,
                 slotsByDay,
@@ -205,7 +206,6 @@
                 currentTime=null,
                 hour=null
             ;
-
             if (slotsByDay=$ykv_calendar[wDay]) {
                 for(let slotId in slotsByDay) {
 
@@ -305,10 +305,10 @@
             this.drawRaces(selectedWDay);
         }
         Booking.prototype.changeClubRaces = function(o) {
-            console.log('changeClubRaces');
+            console.log('changeClubRaces1');
             clubRaces=o.checked;
-
             if (o.checked) {
+                console.log($ykv_order['license_number']);
                 if (($ykv_order) && ($ykv_order['license_number'])) {
                     step1_licenseNumberEl.value=$ykv_order['license_number'];
                     this.setCookie('clubRaces',clubRaces);

@@ -45,10 +45,8 @@ class OrderManageService
         $this->guardCanCreate();
         $entity = Order::create(
             (int)$form->status,
-            (int)$form->isChild,
             $form->note,
         );
-
         #customer
         if (!($customer=$this->userRepository->findByTelephone($form->customer->telephone))) {
             $customer=User::createCustomer(
@@ -71,7 +69,13 @@ class OrderManageService
 
         return $entity;
     }
-
+    public function createEmpty(): Order
+    {
+        $this->guardCanCreate();
+        $entity = Order::create();
+        $this->repository->save($entity);
+        return $entity;
+    }
     public function edit($entityOrId, OrderEditForm $form):void
     {
         $entity=$this->repository->get($entityOrId);

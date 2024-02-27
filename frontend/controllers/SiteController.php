@@ -307,11 +307,16 @@ class SiteController extends Controller
     public function actionCheckLicense():Response
     {
         try {
-            if (!(
-                $orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID) AND
-                $order=$this->findOrder($orderGuid->value)
-            )){
-                throw new NotFoundHttpException('The requested page does not exist.');
+            if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)) {
+                $order=$this->findOrder($orderGuid->value);
+            } else {
+                $order=$this->orderService->createEmpty();
+                $cookies=Yii::$app->response->cookies;
+                $cookies->add(new Cookie([
+                    'name' => Order::COOKIE_NAME_GUID,
+                    'value' => $order->guid,
+                    'expire'=> time() + 60*60*24
+                ]));
             }
             $form=new LicenseForm();
             if ($this->request->isPost && $form->load($this->request->post())) {
