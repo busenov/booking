@@ -221,6 +221,7 @@ $urlNxt=Url::to(['index','step'=>2]);
 <!-- Modal -->
 
 <pre>
+    <?dump($order);?>
 <!--    --><?//if ($order) :?>
 <!--    --><?//dump($order->statusName($order->status));?>
 <!--    --><?//dump($order->customer);?>

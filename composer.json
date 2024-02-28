@@ -27,7 +27,8 @@
         "bower-asset/font-awesome": "dev-master",
         "kartik-v/yii2-editable": "dev-master",
         "kartik-v/yii2-field-range":"*",
-	  "ext-json": "*"
+	    "ext-json": "*",
+        "amocrm/amocrm-api-library":"*"
 	},
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

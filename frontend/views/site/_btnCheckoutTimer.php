@@ -10,11 +10,11 @@ use yii\helpers\Url;
 $url= Url::to(['index','step'=>2]);
 ?>
 
-<div class="timer-block" id="btn_timer" data-action="<?=$url?>">
+<div class="timer-block <?=(($order && $order->isReservationProcess())?'':'hidden') ?>" id="btn_timer" data-action="<?=$url?>">
     <div class="timer">
         <span class="timer-title">Оформить в течении</span>
         <div
-                class="timer-time <?=($order->isReservationProcess()?'':'hidden') ?>"
+                class="timer-time"
                 id="timer-time"
                 data-time="<?=$order?$order->getLeftTimeReserve():''?>"
         ><?= $order?DateHelper::minuteIntToStr($order->getLeftTimeReserve()):''?></div>

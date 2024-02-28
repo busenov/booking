@@ -945,3 +945,7 @@ input {
     color: #ffffff;
     font-size: 16px;
 }
+
+.timer-block.hidden {
+    visibility: hidden;
+}

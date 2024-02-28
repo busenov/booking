@@ -136,6 +136,7 @@
         }
         //main==========================================================================================================
         Booking.prototype.timerOn  = function(newTime) {
+
             if (timerTimeEl) {
                 let time,timerId,that=this;
                 if (newTime) {
