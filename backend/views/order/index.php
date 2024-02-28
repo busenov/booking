@@ -8,6 +8,7 @@ use booking\entities\Order\Order;
 use booking\entities\Slot\Slot;
 use booking\helpers\CarHelper;
 use booking\helpers\DateHelper;
+use booking\helpers\OrderHelper;
 use booking\helpers\SlotHelper;
 use booking\useCases\manage\CarTypeManageService;
 use booking\useCases\manage\OrderManageService;
@@ -38,7 +39,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             [
                 'attribute' => 'id',
-                'width' => '5%',
+                'value' => function (Order $data) {
+                    return Html::a(Html::encode($data->getName()), Url::to(['view', 'id' => $data->id]));
+                },
+                'format' => 'raw',
+
             ],
             [
                 'attribute' => 'customer_id',
@@ -56,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'status',
                 'width' => '10%',
                 'value' => function (Order $data) {
-                    return \booking\helpers\OrderHelper::statusLabel($data->status);
+                    return OrderHelper::statusLabel($data->status);
                 },
                 'format' => 'raw',
                 'filterType' => GridViewInterface::FILTER_SELECT2,

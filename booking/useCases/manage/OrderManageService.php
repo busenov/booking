@@ -2,6 +2,7 @@
 
 namespace booking\useCases\manage;
 
+use booking\entities\AmoCRM\Credential;
 use booking\entities\Order\Order;
 use booking\entities\Order\OrderItem;
 use booking\entities\Schedule\Schedule;
@@ -15,29 +16,38 @@ use booking\forms\manage\Order\OrderItemForm;
 use booking\forms\manage\Order\RacersForm;
 use booking\forms\manage\Order\SlotCreateForm;
 use booking\forms\manage\Slot\SlotForm;
+use booking\helpers\AppHelper;
 use booking\helpers\DateHelper;
 use booking\repositories\CarTypeRepository;
+use booking\repositories\CredentialRepository;
 use booking\repositories\LicenseRepository;
 use booking\repositories\OrderRepository;
 use booking\repositories\ScheduleRepository;
 use booking\repositories\SlotRepository;
 use booking\repositories\UserRepository;
+use booking\useCases\AmoCRM\AmoCRMService;
 
 class OrderManageService
 {
     private OrderRepository $repository;
     private UserRepository $userRepository;
     private LicenseRepository $licenseRepository;
+    private AmoCRMService $amoCRMService;
+    private CredentialRepository $credentialRepository;
 
     public function __construct(
         OrderRepository $repository,
         UserRepository $userRepository,
-        LicenseRepository   $licenseRepository
+        LicenseRepository   $licenseRepository,
+        AmoCRMService $amoCRMService,
+        CredentialRepository $credentialRepository
     )
     {
         $this->repository = $repository;
         $this->userRepository = $userRepository;
         $this->licenseRepository = $licenseRepository;
+        $this->amoCRMService = $amoCRMService;
+        $this->credentialRepository = $credentialRepository;
     }
 
     public function create(OrderCreateForm $form): Order
@@ -218,6 +228,13 @@ class OrderManageService
         $order->setCustomer($customer);
         $order->onCheckout();
         $this->repository->save($order);
+        //отправляем в АмоЦРМ
+        if ($credential=$this->credentialRepository->find(Credential::MAIN_ID)) {
+            $this->amoCRMService->setCredential($credential);
+//            $leadForm=new LeadPipeline3471679(
+//            )
+//            $this->amoCRMService->addLead($order);
+        }
 
     }
 
@@ -265,6 +282,43 @@ class OrderManageService
         }
         return false;
     }
+
+    /**
+     * Удаляем заказы со статусом NEW, которые редактировались больше чем $seconds. По умолчанию 3 дня
+     * @return void
+     */
+    public function clearOrders(?int $seconds=60*60*24*3):int
+    {
+        $orders=Order::find()
+            ->where(['status'=>Order::STATUS_NEW])
+            ->andWhere(['<=','updated_at',(time()-$seconds)])
+            ->all();
+        $count=0;
+        foreach ($orders as $order) {
+            $this->removeHard($order);
+            $count++;
+        }
+        return $count;
+    }
+
+    /**
+     * Проверяем заказы, на время бронирования и оплаты, если время закончилось тогда убираем бронь и статус ставим NEW
+     * @return int
+     */
+    public function checkOrders():int
+    {
+        $orders=Order::find()
+            ->where(['status'=>[Order::STATUS_CHECKOUT,Order::STATUS_RESERVATION_PROCESS]])
+            ->all();
+        $count=0;
+        /** @var Order $order */
+        foreach ($orders as $order) {
+            $order->checkStatusReservationProcess();
+            $order->checkStatusCheckout();
+            $count++;
+        }
+        return $count;
+    }
 ###guards
     public static function guardCanView($entityOrId, bool $return=false):bool
     {
@@ -288,7 +342,8 @@ class OrderManageService
      */
     public static function guardCanEdit($entityOrId, bool $return=false):bool
     {
-        return \Yii::$app->user->can('admin');
+//        return \Yii::$app->user->can('admin');
+        return false;
     }
 
     /**
@@ -309,7 +364,11 @@ class OrderManageService
      */
     public static function guardCanRemoveHard($entityOrId, bool $return=false):bool
     {
-        return \Yii::$app->user->can('admin');
+        if (!AppHelper::isConsole()) {
+            return \Yii::$app->user->can('admin');
+        }
+        return true;
+
     }
     public static function guardCanClear(bool $return=false):bool
     {

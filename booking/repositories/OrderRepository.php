@@ -66,7 +66,14 @@ class OrderRepository
     {
         return static::find_st($entityOrId);
     }
-
+    public static function findAllBy_st(array $condition):array
+    {
+        return Order::find()->andWhere($condition)->all();
+    }
+    public function findAllBy(array $condition):array
+    {
+        return static::findAllBy_st($condition);
+    }
     /**
      * Кол-во зарезервированных машин. Если переданы slotId и carTypeId, тогда возвращаем число, иначе массив вида
      * [
@@ -130,13 +137,13 @@ class OrderRepository
     {
         return static::findSumReservedCar_st($slotId,$cartId);
     }
-###other
-
-
     public function findAll():array
     {
         return $this->findAllBy([]);
     }
+###other
+
+
 ###
 
     private static function getBy(array $condition): Order
@@ -147,13 +154,6 @@ class OrderRepository
         return $entity;
     }
 
-
-
-
-    private function findAllBy(array $condition):array
-    {
-        return Order::find()->andWhere($condition)->all();
-    }
 
     private function findOneBy(array $condition):?Order
     {

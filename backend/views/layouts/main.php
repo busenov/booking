@@ -55,6 +55,7 @@ AppAsset::register($this);
         if (Yii::$app->user->can('admin')) {
             $manageItems=[];
             $manageItems[]=['label' => 'Пользователи', 'url' => ['/user/index']];
+            $manageItems[]=['label' => 'Доступ к AmoCRM', 'url' => ['/amocrm/credential/index']];
             $menuItems[] = ['label' => 'Управление', 'items'=>$manageItems];
         }
     }

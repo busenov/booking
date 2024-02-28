@@ -28,8 +28,9 @@
         "kartik-v/yii2-editable": "dev-master",
         "kartik-v/yii2-field-range":"*",
 	    "ext-json": "*",
-        "amocrm/amocrm-api-library":"*"
-	},
+        "amocrm/amocrm-api-library":"*",
+        "ext-curl": "*"
+    },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
         "yiisoft/yii2-gii": "~2.2.0",

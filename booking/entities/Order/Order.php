@@ -117,7 +117,7 @@ class Order extends ActiveRecord
     {
         return $this->status===self::STATUS_RESERVATION_PROCESS;
     }
-    public function isAwaitingPayment():bool
+    public function isCheckout():bool
     {
         return $this->status===self::STATUS_CHECKOUT;
     }
@@ -284,6 +284,26 @@ class Order extends ActiveRecord
     public function checkStatusReservationProcess():void
     {
         if ($this->isReservationProcess()) {
+            if ($this->date_begin_reserve) {
+                if ((time() - $this->date_begin_reserve) <= self::TIME_RESERVE) {
+                    return;
+                }
+            }
+            $this->revokeItems();
+            $this->date_begin_reserve=null;
+            $this->onNew();
+            $this->save();
+        }
+    }
+    /**
+     * Проверка статуса заказа.
+     * Если статус "процесс резервирования"(Order::STATUS_CHECKOUT) длится более Order::TIME_RESERVE секунд
+     * тогда меняем статус на Order::NEW, отменяем все брони по этому заказу
+     * @return void
+     */
+    public function checkStatusCheckout():void
+    {
+        if ($this->isCheckout()) {
             if ($this->date_begin_reserve) {
                 if ((time() - $this->date_begin_reserve) <= self::TIME_RESERVE) {
                     return;

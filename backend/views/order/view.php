@@ -14,7 +14,7 @@ use yii\widgets\DetailView;
 /** @var Order $model */
 
 $this->title = $model->getName();
-$this->params['breadcrumbs'][] = ['label' => 'Слоты', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Заказы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 YiiAsset::register($this);
 ?>
@@ -62,7 +62,14 @@ YiiAsset::register($this);
                     return OrderHelper::statusLabel($data->status) ;
                 },
             ],
-            'additional_info_json',
+            [
+                'label'=>'Оплатить до:',
+                'format' => 'raw',
+                'value' => function (Order $data) {
+                    return $data->date_begin_reserve?date('d.m.y H:i',$data->date_begin_reserve):'';
+                },
+            ],
+//            'additional_info_json',
             'created_at:datetime',
             'author_name',
             'updated_at:datetime',
@@ -70,5 +77,37 @@ YiiAsset::register($this);
         ],
     ]) ?>
 
-
+    <?if ($model->items):?>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Время заезда</th>
+            <th scope="col">Машина</th>
+            <th scope="col">Кол-во</th>
+            <th scope="col">Цена</th>
+            <th scope="col">Стоимость</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?foreach ($model->items as $item) :?>
+        <tr>
+            <td><?=$item->slot->getName()?></td>
+            <td><?=$item->carType->name?></td>
+            <td><?=$item->qty?></td>
+            <td><?=$item->price?></td>
+            <td><?=$item->total?></td>
+        </tr>
+        <?endforeach;?>
+        <tr class="table-success">
+            <td><b>ИТОГО:</b></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><b><?=$model->total?></b></td>
+        </tr>
+        <tbody>
+    </table>
+    <?else:?>
+        Нет заездов
+    <?endif;?>
 </div>
