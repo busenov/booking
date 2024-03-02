@@ -97,14 +97,14 @@ class SlotSearch extends Slot
     {
         $currentDay=DateHelper::beginDay();
         $period=[
-            $currentDay=>'Текущий день('.AppHelper::datetimeFormat($currentDay,false).')'
+            $currentDay=>'Текущий день ('.AppHelper::datetimeFormat($currentDay,false).')'
         ];
         for ($i=1;$i<self::PERIOD_MAX_DAY;$i++){
             $day=$currentDay+($i*(60*60*24));
             if ($i==1) {
-                $name='Завтра('.AppHelper::datetimeFormat($day,false).')';
+                $name='Завтра ('.AppHelper::datetimeFormat($day,false).')';
             } elseif ($i==2) {
-                $name='Послезавтра('.AppHelper::datetimeFormat($day,false).')';
+                $name='Послезавтра ('.AppHelper::datetimeFormat($day,false).')';
             } else {
                 $name=AppHelper::datetimeFormat($day,false);
             }

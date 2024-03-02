@@ -55,11 +55,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
     ])->label(false) ?>
 
-
+    <br>
     <div class="form-group">
         <?= Html::resetButton('Сброс', ['class' => 'btn btn-outline-secondary']) ?>
     </div>
-
+    <br>
     <?php ActiveForm::end(); ?>
     <div class="slot-day">
         <div class="row">
