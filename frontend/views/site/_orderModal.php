@@ -18,8 +18,7 @@ use yii\helpers\Url;
 <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
-            <!--                <div class="modal-date">23.01.2024</div>-->
-            <!--                <div class="modal-time">12:25</div>-->
+                            <div class="modal-date"><?=$slot->getName()?></div>
             <div class="modal-name" id="modal-title" ></div>
         </div>
         <div class="modal-body">
