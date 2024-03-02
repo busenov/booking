@@ -1,4 +1,5 @@
 <?php
+use kartik\datecontrol\Module;
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -17,6 +18,22 @@ return [
         'frontend\bootstrap\SetUp',
     ],
     'homeUrl' => '/',
+    'modules'=>[
+        'datecontrol' =>  [
+            'class' => '\kartik\datecontrol\Module',
+
+            'displaySettings' => [
+                Module::FORMAT_DATE => 'dd.MM.yyyy',
+                Module::FORMAT_TIME => 'php:H:i:s',
+                Module::FORMAT_DATETIME => 'php:d-m-Y H:i:s',
+            ],
+            'saveSettings' => [
+                Module::FORMAT_DATE => 'php:U',
+                Module::FORMAT_TIME => 'php:U',
+                Module::FORMAT_DATETIME => 'php:U',
+            ],
+        ]
+    ],
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [

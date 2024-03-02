@@ -9,6 +9,7 @@
 use booking\entities\Order\Order;
 use booking\forms\manage\Order\RacersForm;
 use frontend\assets\BookingAsset;
+use kartik\datecontrol\DateControl;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Url;
 use yii\web\YiiAsset;
@@ -72,7 +73,19 @@ $urlNxt='';
             <?=$form->field($item,'[' . $i . ']name')->textInput(['placeholder'=>'Имя(ник)','class'=>'racer_name'])->label(false)?>
             <?=$form->field($item,'[' . $i . ']weight')->textInput(['placeholder'=>'Вес','class'=>'racer_weight'])->label(false)?>
             <?=$form->field($item,'[' . $i . ']height')->textInput(['placeholder'=>'Рост','class'=>'racer_height'])->label(false)?>
-            <?=$form->field($item,'[' . $i . ']birthday')->textInput(['placeholder'=>'День рождения','class'=>'racer_birthday'])->label(false)?>
+
+            <?=$form->field($item, '[' . $i . ']birthday')->widget(DateControl::class, [
+                'type'=>DateControl::FORMAT_DATE,
+                'ajaxConversion'=>false,
+                'widgetOptions' => [
+                    'pluginOptions' => [
+                        'autoclose' => true,
+
+                    ]
+                ]
+            ])->label(false);
+            ?>
+
             <?=$form->field($item,'[' . $i . ']slot_id')->hiddenInput([])->label(false)?>
         </div>
         <?endforeach;?>
