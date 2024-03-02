@@ -91,8 +91,10 @@ class OrderRepository
     {
         $statuses=[
             Order::STATUS_NEW,
+            Order::STATUS_RESERVATION_PROCESS,
             Order::STATUS_CHECKOUT,
             Order::STATUS_PAID,
+            Order::STATUS_SENT_AMOCRM,
             Order::STATUS_COMPLETED,
         ];
         $query = new Query;
@@ -115,6 +117,7 @@ class OrderRepository
             $query->andWhere(['carType_id'=>$carTypeId]);
         }
         $result = $query->groupBy($groupColumn)->all();
+//        dump($result);exit;
         $result2=[];
         foreach ($result as $item) {
             if (empty($result2[$item['slot_id']])) {
