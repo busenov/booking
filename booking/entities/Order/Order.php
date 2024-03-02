@@ -45,6 +45,7 @@ class Order extends ActiveRecord
     const STATUS_RESERVATION_PROCESS=15;   //В процессе добавление заказов(должен длится не более TIME_RESERVE секунд, от начала добавления первого заказа
     const STATUS_CHECKOUT=20;               //Оформление. Ожидает оплаты
     const STATUS_PAID=30;                   //Оплачен
+    const STATUS_SENT_AMOCRM=35;            //Отправлен в AmoCRM
     const STATUS_COMPLETED=40;              //Завершен
     const STATUS_DELETED=100;               //Удален
     const GUID_LENGTH=16;
@@ -100,6 +101,10 @@ class Order extends ActiveRecord
     {
         $this->status=self::STATUS_PAID;
     }
+    public function onSentAmoCRM()
+    {
+        $this->status=self::STATUS_SENT_AMOCRM;
+    }
     public function onCompleted()
     {
         $this->status=self::STATUS_COMPLETED;
@@ -124,6 +129,10 @@ class Order extends ActiveRecord
     public function isPaid():bool
     {
         return $this->status===self::STATUS_PAID;
+    }
+    public function isSentAmoCRM():bool
+    {
+        return $this->status===self::STATUS_SENT_AMOCRM;
     }
     public function isCompleted():bool
     {
@@ -183,7 +192,7 @@ class Order extends ActiveRecord
 #sets
     public function setCustomer(User $customer)
     {
-        $this->customer=$customer;
+        $this->customer_id=$customer->id;
     }
 #hass
 
@@ -336,7 +345,7 @@ class Order extends ActiveRecord
             ],
             [
                 'class' => SaveRelationsBehavior::class,
-                'relations' => ['items'],
+                'relations' => ['items','customer'],
             ],
         ];
     }

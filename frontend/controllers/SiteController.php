@@ -131,7 +131,9 @@ class SiteController extends Controller
             $licenseForm=new LicenseForm(($order and $order->customer)?$order->customer->license:null);
         } elseif ($step==2) {
             if ($this->request->isPost && $customerOrder->load($this->request->post())) {
+//                dump($customerOrder);
                 $this->orderService->checkout($order,$customerOrder);
+//                exit;
                 return $this->redirect(['index','step'=>3]);
             }
         } elseif ($step==4) {

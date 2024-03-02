@@ -4,8 +4,11 @@ namespace backend\controllers\amocrm;
 
 use backend\forms\AmoCRM\CredentialSearch;
 use booking\entities\AmoCRM\Credential;
+use booking\entities\Order\Order;
 use booking\forms\AmoCRM\CredentialForm;
+use booking\forms\AmoCRM\hipsorurzu\LeadPipeline7665106;
 use booking\repositories\CredentialRepository;
+use booking\useCases\AmoCRM\AmoCRMService;
 use booking\useCases\manage\AmoCRM\CredentialManageService;
 use Yii;
 use yii\filters\AccessControl;
@@ -153,7 +156,16 @@ class CredentialController extends Controller
         return $this->redirect(['index']);
     }
 
+    public function actionTest()
+    {
+        $amocrm=new AmoCRMService();
+        $credential=Credential::findOne(Credential::MAIN_ID);
+        $amocrm->setCredential($credential);
 
+        $order=Order::findOne(99);
+        $amocrm->addLead(new LeadPipeline7665106($order));
+        return 'tut';
+    }
     /**
      * Finds the Companies model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

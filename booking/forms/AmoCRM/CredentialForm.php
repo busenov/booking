@@ -40,7 +40,7 @@ class CredentialForm extends Credential
                     'client_secret',
                     'redirect_uri',
                 ], 'string'],
-            [['expires','user_id','client_id'],'integer'],
+            [['expires'],'integer'],
             [['domain','client_id','client_secret','redirect_uri'], 'required'],
         ];
     }

@@ -25,9 +25,9 @@ use yii\web\IdentityInterface;
  * @property string $auth_key
  * @property integer $status
  * @property string $password write-only password
- * @property integer $name
- * @property integer $surname
- * @property integer $patronymic
+ * @property string $name
+ * @property string $surname
+ * @property string $patronymic
  * @property string $telephone
  * @property integer $gender
  * @property string $shortName

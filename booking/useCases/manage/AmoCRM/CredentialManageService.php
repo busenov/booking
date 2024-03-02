@@ -16,13 +16,13 @@ class CredentialManageService
 
     public function __construct(
         CredentialRepository   $credentialRepository,
-        TransactionManager $transaction,
-        AmoCRMService $amoCRMService
+        TransactionManager $transaction
+//        AmoCRMService $amoCRMService
     )
     {
         $this->repository = $credentialRepository;
         $this->transaction = $transaction;
-        $this->amoCRMService = $amoCRMService;
+//        $this->amoCRMService = $amoCRMService;
     }
 
     public function create(CredentialForm $form): Credential

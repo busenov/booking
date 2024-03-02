@@ -5,6 +5,7 @@ namespace booking\forms\AmoCRM\hipsorurzu;
 
 use AmoCRM\Collections\ContactsCollection;
 use AmoCRM\Collections\CustomFieldsValuesCollection;
+use AmoCRM\Collections\NotesCollection;
 use AmoCRM\Collections\TagsCollection;
 use AmoCRM\Models\ContactModel;
 use AmoCRM\Models\CustomFieldsValues\MultitextCustomFieldValuesModel;
@@ -16,8 +17,12 @@ use AmoCRM\Models\CustomFieldsValues\ValueCollections\TextCustomFieldValueCollec
 use AmoCRM\Models\CustomFieldsValues\ValueModels\MultitextCustomFieldValueModel;
 use AmoCRM\Models\CustomFieldsValues\ValueModels\SelectCustomFieldValueModel;
 use AmoCRM\Models\CustomFieldsValues\ValueModels\TextCustomFieldValueModel;
+use AmoCRM\Models\Factories\NoteFactory;
 use AmoCRM\Models\LeadModel;
+use AmoCRM\Models\NoteModel;
+use AmoCRM\Models\NoteType\CommonNote;
 use AmoCRM\Models\TagModel;
+use booking\entities\Order\Order;
 use booking\forms\AmoCRM\LeadForms;
 use function Symfony\Component\Translation\t;
 
@@ -32,63 +37,61 @@ class LeadPipeline7665106 extends LeadForms
     public ?string $contact_telephone;          //Телефон контакта
     public ?string $contact_email;              //Email контакта
     public ?float $budget;                      //Бюджет
-    public ?string $comments;                    //Комментарий к сделке(сообщение формы)
-    public ?string $utm_source;                 //utm_source
-    public ?string $utm_medium;                 //utm_medium
-    public ?string $utm_campaign;               //utm_campaign
-    public ?string $utm_content;                //utm_content
-    public ?string $utm_term;                   //utm_term
-    public ?string $tags;                 //теги
+    public ?string $comments=null;                    //Комментарий к сделке(сообщение формы)
+    public ?string $utm_source=null;                 //utm_source
+    public ?string $utm_medium=null;                 //utm_medium
+    public ?string $utm_campaign=null;               //utm_campaign
+    public ?string $utm_content=null;                //utm_content
+    public ?string $utm_term=null;                   //utm_term
+    public ?string $tags=null;                 //теги
     public int $dateTimeSlot;                       //дата и время заезда
     public int $typeSlot;                       //Тип заезда(детский, взрослый, клубный)
+    public ?Order $_order;
 
 
     public array $customFieldsAmoCRM = [        //соответсвтие название и коду по амоцрм
-        'utm_source'=>[273553,122825],
-        'utm_medium'=>[273555,122827],
-        'utm_campaign'=>[273557,122829],
-        'utm_term'=>[273559,122833],
-        'utm_content'=>[273561,122831],
-        'utm_referrer'=>273563,
-        'UTM'=>705095,
-        'comments'=>701479,                       //примечание
-        'sourceId'=>697153                      //источник сделки
+//        'utm_source'=>[273553,122825],
+//        'utm_medium'=>[273555,122827],
+//        'utm_campaign'=>[273557,122829],
+//        'utm_term'=>[273559,122833],
+//        'utm_content'=>[273561,122831],
+//        'utm_referrer'=>273563,
+//        'UTM'=>705095,
+//        'comments'=>701479,                         //примечание
+//        'sourceId'=>697153,                         //источник сделки
+        'totalCount'=>791383,                       //Общее кол-во
+        'typeSlot'=>791275,                         //Тип заезда
+        'dateSlot'=>791221,                         //Дата заезда
+        'timeSlot'=>791219,                         //Время заезда
+        'urlOrder'=>792431,                         //Ссылка на заказчика
+        'isPaid'=>795671,                           //Оплачено?
+
+        'SODI_RT8_count'=>791433,                   //SODI_RT8
+        'SPORT_9_count'=>791437,                    //SPORT_9
+
     ];
 
 
     public $leadCustomFieldsValues;
 
-    public function __construct(
-        string $title,
-        ?string $contact_name=null,
-        ?string $contact_secondName=null,
-        ?string $contact_lastName=null,
-        ?string $contact_telephone=null,
-        ?string $contact_email=null,
-        ?float $budget=null,
-        ?string $comments=null,
-        ?string $utm_source=null,
-        ?string $utm_medium=null,
-        ?string $utm_campaign=null,
-        ?string $utm_content=null,
-        ?string $utm_term=null,
-        ?string $tags=null
-    )
+    public function __construct(Order $order)
     {
-        $this->title=$title;
-        $this->contact_name=$contact_name;
-        $this->contact_secondName=$contact_secondName;
-        $this->contact_lastName=$contact_lastName;
-        $this->contact_telephone=$contact_telephone;
-        $this->contact_email=$contact_email;
-        $this->budget=$budget;
-        $this->comments=$comments;
-        $this->utm_source=$utm_source;
-        $this->utm_medium=$utm_medium;
-        $this->utm_campaign=$utm_campaign;
-        $this->utm_content=$utm_content;
-        $this->utm_term=$utm_term;
-        $this->tags=$tags;
+        $this->_order=$order;
+
+        $this->title=$order->getName();
+        $this->contact_name=$order->customer->name;
+        $this->contact_secondName=$order->customer->surname;
+        $this->contact_lastName=$order->customer->name;
+        $this->contact_telephone=$order->customer->telephone;
+        $this->contact_email=$order->customer->email;
+        $this->budget=$order->total;
+//        $this->comments=$comments;
+//        $this->utm_source=$utm_source;
+//        $this->utm_medium=$utm_medium;
+//        $this->utm_campaign=$utm_campaign;
+//        $this->utm_content=$utm_content;
+//        $this->utm_term=$utm_term;
+//        $this->tags=$tags;
     }
 
     public function getLead(): LeadModel
@@ -144,6 +147,7 @@ class LeadPipeline7665106 extends LeadForms
         $contact->setCustomFieldsValues($customFields);
         return $contact;
     }
+
 ###
     private function fillData():void
     {
@@ -157,7 +161,8 @@ class LeadPipeline7665106 extends LeadForms
         if ($this->budget)
             $this->lead->setPrice($this->budget);
         //устанавливаем тег
-        $this->lead->setTags((new TagsCollection())->add((new TagModel())->setName($this->tags)));
+        if ($this->tags)
+            $this->lead->setTags((new TagsCollection())->add((new TagModel())->setName($this->tags)));
         //customFields
         $this->leadCustomFieldsValues = new CustomFieldsValuesCollection();
         //Примечание
@@ -177,10 +182,11 @@ class LeadPipeline7665106 extends LeadForms
             $this->addCustomFieldsText($this->customFieldsAmoCRM['utm_term'],$this->utm_term);
 
         $this->lead->setCustomFieldsValues($this->leadCustomFieldsValues);
+
     }
 
     /**
-     * Некоторые товарищи используют некольк полея для одного значения
+     * Некоторые товарищи используют неколько полей для одного значения
      * @param $customFieldId
      * @param string $value
      */
@@ -213,5 +219,28 @@ class LeadPipeline7665106 extends LeadForms
         $selectCustomFieldValueModel->setFieldId($customFieldId);
         $selectCustomFieldValueModel->setValues((new SelectCustomFieldValueCollection())->add((new SelectCustomFieldValueModel())->setEnumId($value)));
         $this->leadCustomFieldsValues->add($selectCustomFieldValueModel);
+    }
+
+    public function getNotes():NotesCollection
+    {
+        $notes=new NotesCollection();
+        $note=new CommonNote();
+        $note->setEntityId($this->lead->getId());
+        $text='';
+        if ($this->_order->items) {
+            $slotId=null;
+            foreach ($this->_order->items as $item) {
+                if ($item->slot_id!=$slotId) {
+                    $text.='Заезд: '. $item->slot->getName().PHP_EOL;
+                    $slotId=$item->slot_id;
+                }
+                $text.='Машина: '.$item->carType->name.' Кол-во: '. $item->qty . '. Цена: '.$item->price . '. Итого: '. $item->total . PHP_EOL;
+            }
+        }
+        if ($text) {
+            $note->setText($text);
+        }
+        $notes->add($note);
+        return $notes;
     }
 }

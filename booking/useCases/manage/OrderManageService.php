@@ -8,6 +8,7 @@ use booking\entities\Order\OrderItem;
 use booking\entities\Schedule\Schedule;
 use booking\entities\Slot\Slot;
 use booking\entities\User\User;
+use booking\forms\AmoCRM\hipsorurzu\LeadPipeline7665106;
 use booking\forms\manage\Order\CustomerForm;
 use booking\forms\manage\Order\LicenseForm;
 use booking\forms\manage\Order\OrderCreateForm;
@@ -25,6 +26,7 @@ use booking\repositories\OrderRepository;
 use booking\repositories\ScheduleRepository;
 use booking\repositories\SlotRepository;
 use booking\repositories\UserRepository;
+use booking\services\TransactionManager;
 use booking\useCases\AmoCRM\AmoCRMService;
 
 class OrderManageService
@@ -34,13 +36,15 @@ class OrderManageService
     private LicenseRepository $licenseRepository;
     private AmoCRMService $amoCRMService;
     private CredentialRepository $credentialRepository;
+    private TransactionManager $transaction;
 
     public function __construct(
         OrderRepository $repository,
         UserRepository $userRepository,
         LicenseRepository   $licenseRepository,
         AmoCRMService $amoCRMService,
-        CredentialRepository $credentialRepository
+        CredentialRepository $credentialRepository,
+        TransactionManager $transaction
     )
     {
         $this->repository = $repository;
@@ -48,6 +52,7 @@ class OrderManageService
         $this->licenseRepository = $licenseRepository;
         $this->amoCRMService = $amoCRMService;
         $this->credentialRepository = $credentialRepository;
+        $this->transaction = $transaction;
     }
 
     public function create(OrderCreateForm $form): Order
@@ -64,18 +69,22 @@ class OrderManageService
                 $form->customer->telephone,
             );
         }
-        $entity->setCustomer($customer);
-        #items
-        if ($form->items) {
-            foreach ($form->items as $item) {
-                if ($item->qty) {
-                    $entity->changeItem($item->carType_id,intval($item->qty));
+
+        $this->transaction->wrap(function () use ($entity, $customer,$form) {
+
+            $this->userRepository->save($customer);
+
+            $entity->setCustomer($customer);
+            #items
+            if ($form->items) {
+                foreach ($form->items as $item) {
+                    if ($item->qty) {
+                        $entity->changeItem($item->carType_id, intval($item->qty));
+                    }
                 }
             }
-        }
-
-
-        $this->repository->save($entity);
+            $this->repository->save($entity);
+        });
 
         return $entity;
     }
@@ -101,16 +110,19 @@ class OrderManageService
                 $form->customer->telephone,
             );
         }
-        $entity->setCustomer($customer);
-        #items
-        foreach ($form->items as $item) {
-            if ($item->_orderItem) {
-                $entity->editItem($item->_orderItem->id,$item->qty);
-            } else {
-                $entity->changeItem($item->carType_id,$item->qty);
+        $this->transaction->wrap(function () use ($entity, $customer,$form) {
+            $this->userRepository->save($customer);
+            $entity->setCustomer($customer);
+            #items
+            foreach ($form->items as $item) {
+                if ($item->_orderItem) {
+                    $entity->editItem($item->_orderItem->id,$item->qty);
+                } else {
+                    $entity->changeItem($item->carType_id,$item->qty);
+                }
             }
-        }
-        $this->repository->save($entity);
+            $this->repository->save($entity);
+        });
     }
 
     /**
@@ -227,13 +239,16 @@ class OrderManageService
         }
         $order->setCustomer($customer);
         $order->onCheckout();
+
         $this->repository->save($order);
+//        dump($order);
+//        exit;
         //отправляем в АмоЦРМ
         if ($credential=$this->credentialRepository->find(Credential::MAIN_ID)) {
             $this->amoCRMService->setCredential($credential);
-//            $leadForm=new LeadPipeline3471679(
-//            )
-//            $this->amoCRMService->addLead($order);
+            $this->amoCRMService->addLead(new LeadPipeline7665106($order));
+            $order->onSentAmoCRM();
+            $this->repository->save($order);
         }
 
     }

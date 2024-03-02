@@ -5,6 +5,7 @@ use AmoCRM\Client\AmoCRMApiClient;
 use booking\entities\AmoCRM\Credential;
 use booking\entities\Order\Order;
 use booking\forms\AmoCRM\LeadFormsInterface;
+use Exception;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 
@@ -74,6 +75,7 @@ class AmoCRMService
 
         if ($code < 200 || $code > 204) {
             $response=json_decode($out, true);
+            dump($response);exit;
 //            die(isset($errors[$code]) ? $errors[$code].'. '.$response['hint'].'. '.$response['detail']. PHP_EOL : 'Undefined error');
             throw new Exception(isset($errors[$code]) ? $errors[$code].'. '.$response['hint'].'. '.$response['detail']. PHP_EOL : 'Undefined error');
         }
@@ -270,6 +272,8 @@ class AmoCRMService
         $contact=$this->apiClient->contacts()->addOne($lead->getContact());
         $lead->setContactId($contact->getId());
         $this->apiClient->leads()->addOne($lead->getLead());
+
+        $this->apiClient->notes('leads')->add($lead->getNotes());
 //        $this->simpleRefreshToken();
     }
 

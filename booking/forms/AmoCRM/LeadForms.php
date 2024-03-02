@@ -21,4 +21,7 @@ class LeadForms implements LeadFormsInterface
         $this->contactId=$contactId;
     }
 
+    public function getNotes()
+    {
+    }
 }

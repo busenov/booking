@@ -20,10 +20,10 @@ YiiAsset::register($this);
 
     <p>
         <?php if (CredentialManageService::guardCanEdit($model,true)) :?>
-        <?= Html::a('Правка', ['update', 'widget_id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Правка', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?php endif;?>
         <?php if (CredentialManageService::guardCanRemove($model,true)) :?>
-        <?= Html::a('Удалить', ['delete', 'widget_id' => $model->id], [
+        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Вы действительно хотите удалить?',
