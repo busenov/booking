@@ -88,7 +88,7 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                '' => 'slot/index',
+//                '' => 'slot/index',
                 '<_a:login|logout|signup>' => 'auth/auth/<_a>',
 #                '' => 'site/index',
 //                '<action:index|signup|request-password-reset|reset-password|access-denied|php-info|login>' => 'site/<action>',
