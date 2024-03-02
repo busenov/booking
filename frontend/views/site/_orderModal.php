@@ -52,7 +52,7 @@ use yii\helpers\Url;
             <?endif;?>
             <div class="modal-form__row">
                 <?= Html::submitButton('Добавить в заказ', ['class' => 'add-in-zakaz','onClick'=>'$ykv_toIssue=false']) ?>
-                <?= Html::submitButton('Добавить и оформить', ['class' => 'add-issue','onClick'=>'$ykv_toIssue=true']) ?>
+                <?= Html::submitButton('Добавить и перейти к оформлению', ['class' => 'add-issue','onClick'=>'$ykv_toIssue=true']) ?>
             </div>
             <?php ActiveForm::end(); ?>
         </div>
