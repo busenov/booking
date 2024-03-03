@@ -908,9 +908,23 @@ input {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 5px;
+    margin-bottom: 15px;
     box-sizing: border-box;
     padding: 0 5px;
+}
+.pay-table__row>div {
+    position: relative;
+}
+.input-group>span.input-group-text {
+    display: none;
+}
+.pay-table__row .invalid-feedback {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    display: block;
+    font-size: 12px;
+    line-height: 100%;
 }
 .pay-table__row label {
     font-size: 12px;
