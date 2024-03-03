@@ -547,7 +547,6 @@ input:checked + .slider:before {
     font-size: 16px;
     line-height: 24px;
     font-weight: 600;
-    margin-right: 13px;
     color: #ffffff;
 }
 .timer-time {
@@ -558,9 +557,9 @@ input:checked + .slider:before {
     justify-content: center;
     align-items: center;
     background: #ffffff;
-    color: #000000;
-    font-size: 14px;
-    font-weight: 600;
+    color: #D60000;
+    font-size: 16px;
+    font-weight: 400;
 }
 .modal-header {
     background: #D60000;
@@ -634,6 +633,17 @@ input:checked + .slider:before {
 }
 
 /*Step 2*/
+.head-timer {
+    width: 90%;
+    max-width: 873px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    color: #D60000;
+    font-size: 16px;
+    font-weight: 400;
+}
+
 .order-table {
     width: 90%;
     max-width: 873px;
