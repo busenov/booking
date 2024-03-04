@@ -197,16 +197,16 @@ class Order extends ActiveRecord
 #hass
 
     /**
-     * @param OrderItem|int $item
+     * @param OrderItem|int $itemOrItemId
      * @return bool
      */
     public function hasItem($itemOrItemId):bool
     {
-        if (is_a($itemOrItemId,self::class)) {
-            $itemOrItemId=$itemOrItemId->id;
+        if (is_a($itemOrItemId,OrderItem::class)) {
+            $itemOrItemId = $itemOrItemId->id;
         }
         foreach ($this->items as $item) {
-            if ($item->isIdEqualTo($itemOrItemId->id)) {
+            if ($item->isIdEqualTo($itemOrItemId)) {
                 return true;
             }
         }
@@ -398,9 +398,14 @@ class Order extends ActiveRecord
         return ArrayHelper::getValue(self::getStatusList(), $status);
     }
 
-    public function totalBySlot(int $slot_id)
+    public function totalBySlot(int $slot_id):float
     {
-        return 3000;
+        foreach ($this->items as $item) {
+            if ($item->slot->isIdEqualTo($slot_id)) {
+                return $item->slot->total;
+            }
+        }
+        return 0;
     }
 
     public function beforeSave($insert)

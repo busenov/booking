@@ -593,7 +593,11 @@ function btnInc(o) {
 
     let
         input =  o.parentNode.querySelector("input"),
-        min,max;
+        min,max,
+        modalFormCars = document.getElementsByClassName("modal-form_car"),
+        modalTotalPrice=document.getElementById('modal-total-price');
+    ;
+
     if (input.dataset.min) {
         min=input.dataset.min;
     }
@@ -620,5 +624,17 @@ function btnInc(o) {
                 }
             }
         }
+    }
+    if (modalFormCars) {
+        let total=0;
+        for (let i = 0; i < modalFormCars.length; i++) {
+            total += modalFormCars[i].value * modalFormCars[i].dataset.price
+        }
+        if (modalTotalPrice) {
+            modalTotalPrice.innerHTML = Intl.NumberFormat('ru-RU', { maximumSignificantDigits: 2 }).format(
+                ''+total,
+            );
+        }
+
     }
 }

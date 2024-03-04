@@ -58,7 +58,7 @@ class OrderItem extends ActiveRecord
 #iss
     public function isIdEqualTo(int $id):bool
     {
-        return ($this->id === $id) ;
+        return $this->id == $id ;
     }
     public function isIdSlotIdEqualTo(int $slotId,int $cartTypeId):bool
     {

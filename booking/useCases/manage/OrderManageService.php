@@ -159,6 +159,7 @@ class OrderManageService
             $this->repository->save($item->order);
             return $item->order;
         }
+        dump($this->guardCanChangeItem($itemOrItemId,$qty,true));exit;
         return null;
 
 
@@ -417,7 +418,7 @@ class OrderManageService
      */
     public static function guardCanChangeItem(OrderItem $item, int $newQty, bool $return=false):bool
     {
-        if (!$item->order->isNew()) {
+        if (!$item->order->isNew() and !$item->order->isReservationProcess()) {
             if ($return) {
                 return false;
             }
