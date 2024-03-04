@@ -12,7 +12,7 @@ class CredentialManageService
 {
     private CredentialRepository $repository;
     private TransactionManager $transaction;
-    private AmoCRMService $amoCRMService;
+    private ?AmoCRMService $amoCRMService;
 
     public function __construct(
         CredentialRepository   $credentialRepository,
@@ -33,7 +33,7 @@ class CredentialManageService
         );
         $this->repository->save($entity);
 
-        $this->amoCRMService->setCredential();
+        $this->amoCRMService->setCredential($entity);
         return $entity;
     }
 
