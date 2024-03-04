@@ -210,7 +210,8 @@ class AmoCRMService
         ];
 
         if ($code==401) {
-            return $this->simpleAuthorization();
+//            return $this->simpleAuthorization();
+            return $this->longAuthorization();
         }
 
         if ($code < 200 || $code > 204) {
