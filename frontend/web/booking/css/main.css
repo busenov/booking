@@ -327,24 +327,24 @@ input:checked + .slider:before {
 .for-childs {
     display: flex;
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: center;
     width: 48%;
 }
 .child-img {
-    margin-right: 30px;
+    margin-right: 10px;
 }
 .form-text {
     font-size: 14px;
     line-height: 16px;
     font-weight: 600;
     color: #000000;
-    margin-right: 45px;
+    margin-right: 10px;
     display: block;
 }
 .clubs-enter {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    justify-content: flex-end;
+    align-items: center;
     width: 45%;
 }
 .nomer-prav {
