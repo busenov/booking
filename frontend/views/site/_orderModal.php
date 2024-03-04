@@ -58,7 +58,7 @@ use yii\helpers\Url;
                 </div>
                 <div class="col-md-6 d-flex justify-content-end">
 
-                <span id="modal-total-price"><?=number_format($order->totalBySlot($slot->id),0,'',' ')?></span>
+                <span id="modal-total-price"><?=$order?(number_format($order->totalBySlot($slot->id),0,'',' ')):0?></span>
                 <b>&nbsp;руб</b>
                 </div>
             </div>

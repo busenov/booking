@@ -975,3 +975,6 @@ input {
 .timer-block.hidden {
     visibility: hidden;
 }
+.head-timer.hidden {
+    visibility: hidden;
+}

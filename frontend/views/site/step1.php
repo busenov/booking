@@ -85,7 +85,7 @@ $urlNxt=Url::to(['index','step'=>2]);
             Забронировано
         </div>
     </div>
-    <div class="head-timer">
+    <div class="head-timer <?=(($order && $order->isReservationProcess())?'':'hidden') ?>" id="timer-time-block">
         Время действия брони
         <div
                 class="timer-time"

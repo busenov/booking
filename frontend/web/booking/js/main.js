@@ -9,6 +9,7 @@
             selectedDay,
             selectedWDay,
             timerTimeEl=document.getElementById('timer-time'),
+            timerTimeBlockEl=document.getElementById('timer-time-block'),
             //step1
             onlyChildren=false,
             clubRaces=false,
@@ -56,7 +57,9 @@
             if ($ykv_step===1) {
                 this.draw();
                 this.listenerStep1();
-                this.timerOn();
+                if ($ykv_order) {
+                    this.timerOn();
+                }
             } else if ($ykv_step===2) {
                 this.listenerStep2();
                 this.timerOn();
@@ -136,7 +139,6 @@
         }
         //main==========================================================================================================
         Booking.prototype.timerOn  = function(newTime) {
-
             if (timerTimeEl) {
                 let time,timerId,that=this;
                 if (newTime) {
@@ -156,6 +158,9 @@
 
                     }, 1000);
                 }
+            }
+            if (timerTimeBlockEl) {
+                timerTimeBlockEl.classList.remove('hidden');
             }
         }
         //step1=========================================================================================================
