@@ -65,7 +65,21 @@ class Credential extends ActiveRecord
     }
 ###gets
 
-
+    public function attributeLabels():array
+    {
+        return static::getAttributeLabels();
+    }
+    public static function getAttributeLabels():array
+    {
+        return [
+            'token' => 'Access token(заполнять при авторизации)',
+            'domain' => 'Домен вида: xxx.amocrm.ru(заполнять при авторизации)',
+            'client_id' => 'ID интеграции(заполнять при авторизации)',
+            'client_secret' => 'Секретный ключ(заполнять при авторизации)',
+            'redirect_uri' => 'Редирект(заполнять при авторизации, должен совпадать как в AmoCRM)',
+            'refresh_token' => 'Возвращается от АмоЦРМ(не редактируется)',
+        ];
+    }
     #################################################################
     public static function tableName(): string
     {

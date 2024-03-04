@@ -41,7 +41,6 @@ YiiAsset::register($this);
             'token',
             'refresh_token',
             'expires:datetime',
-            'widget_client_id',
             'client_secret',
             'redirect_uri',
         ],

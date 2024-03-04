@@ -72,7 +72,6 @@ class AmoCRMService
             502 => 'Bad gateway',
             503 => 'Service unavailable',
         ];
-
         if ($code < 200 || $code > 204) {
             $response=json_decode($out, true);
             dump($response);exit;
@@ -139,7 +138,6 @@ class AmoCRMService
             502 => 'Bad gateway',
             503 => 'Service unavailable',
         ];
-
         try
         {
             /** Если код ответа не успешный - возвращаем сообщение об ошибке  */
@@ -210,8 +208,8 @@ class AmoCRMService
         ];
 
         if ($code==401) {
-//            return $this->simpleAuthorization();
-            return $this->longAuthorization();
+            return $this->simpleAuthorization();
+//            return $this->longAuthorization();
         }
 
         if ($code < 200 || $code > 204) {
@@ -277,7 +275,6 @@ class AmoCRMService
 //            dump('tit');
             $this->simpleRefreshToken();
         }
-
         $this->apiClient = new AmoCRMApiClient($credential->client_id, $credential->client_secret, $credential->domain);
         if ($accessToken = $this->getToken()) {
 //            dump($accessToken);
@@ -335,12 +332,5 @@ class AmoCRMService
         $this->apiClient->notes('leads')->add($lead->getNotes());
 //        $this->simpleRefreshToken();
     }
-
-    public function addOrder(Order $order)
-    {
-        $this->log(__FUNCTION__);
-
-    }
-
 
 }

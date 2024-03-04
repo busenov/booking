@@ -15,17 +15,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'domain')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'token')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'refresh_token')->textarea(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'expires')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'client_id')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'redirect_uri')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'client_secret')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'redirect_uri')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'client_id')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'token')->textarea(['maxlength' => true, 'rows'=>10]) ?>
 
     <br>
 

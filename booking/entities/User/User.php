@@ -115,7 +115,7 @@ class User extends ActiveRecord implements IdentityInterface
         $user = new User();
         $user->name = $name;
         $user->telephone =$telephone;
-        $user->email = $email??Yii::$app->security->generateRandomString();
+        $user->email = (!empty($customerOrder->email))?$customerOrder->email:Yii::$app->security->generateRandomString();
         $user->surname =$surname;
         $user->type=self::TYPE_CUSTOMER;
         $user->auth_key = Yii::$app->security->generateRandomString();

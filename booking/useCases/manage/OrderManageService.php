@@ -28,6 +28,7 @@ use booking\repositories\SlotRepository;
 use booking\repositories\UserRepository;
 use booking\services\TransactionManager;
 use booking\useCases\AmoCRM\AmoCRMService;
+use Yii;
 
 class OrderManageService
 {
@@ -238,15 +239,20 @@ class OrderManageService
                 $customerOrder->surname,
             );
         }
-        $order->setCustomer($customer);
-        $order->onCheckout();
+        $this->transaction->wrap(function () use ($order, $customer) {
+            $this->userRepository->save($customer);
+            $order->setCustomer($customer);
+            $order->onCheckout();
 
-        $this->repository->save($order);
+            $this->repository->save($order);
+        });
+
 //        dump($order);
 //        exit;
         //отправляем в АмоЦРМ
         if ($credential=$this->credentialRepository->find(Credential::MAIN_ID)) {
             $this->amoCRMService->setCredential($credential);
+
             $this->amoCRMService->addLead(new LeadPipeline7665106($order));
             $order->onSentAmoCRM();
             $this->repository->save($order);
