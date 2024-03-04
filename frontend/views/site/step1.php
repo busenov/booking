@@ -85,7 +85,14 @@ $urlNxt=Url::to(['index','step'=>2]);
             Забронировано
         </div>
     </div>
-
+    <div class="head-timer">
+        Время действия брони
+        <div
+                class="timer-time"
+                id="timer-time"
+                data-time="<?=$order?$order->getLeftTimeReserve():''?>"
+        ><?= $order?DateHelper::minuteIntToStr($order->getLeftTimeReserve()):''?></div>
+    </div>
     <div class="order-block">
         <div class="step-title">Заезды <span id="race-day"><?=date('j',$selected_day).' '.DateHelper::getMonthRu(date('n',$selected_day)-1).' '.date('Y',$selected_day)?></span>г.</div>
         <div class="forms-block">
