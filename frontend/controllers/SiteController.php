@@ -117,7 +117,7 @@ class SiteController extends Controller
         $calendar=$this->slotRepository->calendarWeekly();
 
         $order=null;
-        $customerOrder=new CustomerForm();
+
         $racersForm=null;
         $licenseForm=null;
         if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)){
@@ -127,6 +127,12 @@ class SiteController extends Controller
         if (empty($order)and $step!==1) {
             return $this->redirect(['index','step'=>1]);
         }
+        if ($order) {
+            $customerOrder=new CustomerForm($order->customer);
+        } else {
+            $customerOrder=new CustomerForm();
+        }
+
         if ($step==1) {
             $licenseForm=new LicenseForm(($order and $order->customer)?$order->customer->license:null);
         } elseif ($step==2) {
