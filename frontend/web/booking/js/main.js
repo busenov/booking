@@ -377,6 +377,7 @@
                             }
                         }
                         $(orderModal).modal('hide');
+                        step1_btnTimerEl.classList.remove('hidden');
                         if ($ykv_toIssue) {
                             location.href=$ykv_urlNxt
                         }
