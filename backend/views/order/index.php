@@ -59,7 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'attribute' => 'status',
-                'width' => '10%',
+                'width' => '20%',
                 'value' => function (Order $data) {
                     return OrderHelper::statusLabel($data->status);
                 },

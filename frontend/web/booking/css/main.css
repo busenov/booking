@@ -32,6 +32,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-bottom: 20px
 }
 .month::after {
     content: '';
@@ -90,6 +91,9 @@
 }
 .week__day.black {
     color: #000000;
+}
+.week__day.blue {
+    color: #2991FC;
 }
 .week__dates {
     display: flex;
@@ -978,3 +982,4 @@ input {
 .head-timer.hidden {
     visibility: hidden;
 }
+

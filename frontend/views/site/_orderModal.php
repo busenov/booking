@@ -62,7 +62,7 @@ use yii\helpers\Url;
                 <b>&nbsp;руб</b>
                 </div>
             </div>
-
+            <br>
             <div class="modal-form__row">
                 <?= Html::submitButton('Добавить в заказ', ['class' => 'add-in-zakaz','onClick'=>'$ykv_toIssue=false']) ?>
                 <?= Html::submitButton('Добавить и перейти к оформлению', ['class' => 'add-issue','onClick'=>'$ykv_toIssue=true']) ?>

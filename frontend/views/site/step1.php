@@ -56,8 +56,8 @@ $urlNxt=Url::to(['index','step'=>2]);
             <div class="week__day">СР</div>
             <div class="week__day">ЧТ</div>
             <div class="week__day">ПТ</div>
-            <div class="week__day black">СБ</div>
-            <div class="week__day black">ВС</div>
+            <div class="week__day blue">СБ</div>
+            <div class="week__day blue">ВС</div>
         </div>
         <div id="week__dates">
             <?=$this->render('_week_dates',['calendar'=>$calendar,'week'=>time()])?>

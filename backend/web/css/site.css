@@ -88,3 +88,7 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+/*фильтр картик*/
+.select2-container--krajee-bs5 .select2-selection--single .select2-selection__rendered {
+    padding-right: 10px;
+}

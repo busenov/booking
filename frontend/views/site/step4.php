@@ -81,8 +81,13 @@ $urlNxt='';
                     'pluginOptions' => [
                         'autoclose' => true,
 
+                    ],
+                    'options'=>[
+                        'placeholder'=>'Дата рождения',
+                        'class'=>'racer_birthday'
                     ]
-                ]
+                ],
+
             ])->label(false);
             ?>
 
