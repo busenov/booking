@@ -38,6 +38,14 @@ $urlNxt=Url::to(['index','step'=>3]);
             <a class="head-link" href="<?= $urlNxt?>">Перейти к оплате ></a>
         </div>
     </div>
+    <div class="head-timer">
+        Время действия брони
+        <div
+                class="timer-time"
+                id="timer-time"
+                data-time="<?=$order?$order->getLeftTimeReserve():''?>"
+        ><?= $order?DateHelper::minuteIntToStr($order->getLeftTimeReserve()):''?></div>
+    </div>
     <? if ($order->items):?>
     <?php
         $currentSlotId=null;
@@ -49,14 +57,7 @@ $urlNxt=Url::to(['index','step'=>3]);
         <? endif;?>
         <?php $currentSlotId=$item->slot_id?>
 
-    <div class="head-timer">
-        Время действия брони
-        <div
-                class="timer-time"
-                id="timer-time"
-                data-time="<?=$order?$order->getLeftTimeReserve():''?>"
-        ><?= $order?DateHelper::minuteIntToStr($order->getLeftTimeReserve()):''?></div>
-    </div>
+
     <div class="order-table">
         <div class="order-table__head">
             <div class="order-table__date"><?=$item->slot->getDateStr()?></div>

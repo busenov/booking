@@ -322,15 +322,16 @@ class AmoCRMService
      * @throws \AmoCRM\Exceptions\AmoCRMMissedTokenException
      * @throws \AmoCRM\Exceptions\AmoCRMoAuthApiException
      */
-    public function addLead(LeadFormsInterface $lead)
+    public function addLead(LeadFormsInterface $lead):int
     {
         $this->log(__FUNCTION__);
         $contact=$this->apiClient->contacts()->addOne($lead->getContact());
         $lead->setContactId($contact->getId());
-        $this->apiClient->leads()->addOne($lead->getLead());
+        $result=$this->apiClient->leads()->addOne($lead->getLead());
 
         $this->apiClient->notes('leads')->add($lead->getNotes());
-//        $this->simpleRefreshToken();
+
+        return $result->getId();
     }
 
 }

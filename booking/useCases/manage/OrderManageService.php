@@ -2,6 +2,8 @@
 
 namespace booking\useCases\manage;
 
+use AmoCRM\Exceptions\AmoCRMApiErrorResponseException;
+use AmoCRM\OAuth2\Client\Provider\AmoCRMException;
 use booking\entities\AmoCRM\Credential;
 use booking\entities\Order\Order;
 use booking\entities\Order\OrderItem;
@@ -260,13 +262,61 @@ class OrderManageService
 //        dump($order);
 //        exit;
         //отправляем в АмоЦРМ
-//        if ($credential=$this->credentialRepository->find(Credential::MAIN_ID)) {
-//            $this->amoCRMService->setCredential($credential);
-//
-//            $this->amoCRMService->addLead(new LeadPipeline7665106($order));
-//            $order->onSentAmoCRM();
-//            $this->repository->save($order);
-//        }
+        if ($credential=$this->credentialRepository->find(Credential::MAIN_ID)) {
+            $this->amoCRMService->setCredential($credential);
+
+
+            if ($order->items) {
+                $racers=[];
+                foreach ($order->items as $item) {
+                    if (!array_key_exists($item->slot_id, $racers)) {
+                        $racers[$item->slot_id]=[
+                            'cars'=>[],
+                            'qty'=>0,
+                            'total'=>0,
+                            'slot'=>$item->slot
+                        ];
+                    }
+                    if (!array_key_exists($item->carType_id, $racers[$item->slot_id]['cars'])) {
+                        $racers[$item->slot_id]['cars'][$item->carType_id]['qty']=0;
+                        $racers[$item->slot_id]['cars'][$item->carType_id]['carType']=$item->carType;
+                    }
+                    $racers[$item->slot_id]['cars'][$item->carType_id]['qty']+=$item->qty;
+                    $racers[$item->slot_id]['qty']+=$item->qty;
+                    $racers[$item->slot_id]['total']+=$item->total;
+                }
+
+                foreach ($racers as $racer) {
+                    try {
+                        $amocrm_leadId=$this->amoCRMService->addLead(
+                            new LeadPipeline7665106([
+                                'title'=>$order->getName().', заезд: '. $racer['slot']->getName(),
+                                'contact_name' => $order->customer->name,
+                                'contact_secondName' => $order->customer->surname,
+                                'contact_lastName' => $order->customer->name,
+                                'contact_telephone' => $order->customer->telephone,
+                                'contact_email' => $order->customer->email,
+                                'budget' => $racer['total'],
+                                'notes' => ['Заказ на '. count($racers) . ' заезда'],
+                                'dateTimeSlot'=>$racer['slot']->getBeginUT(),
+                                'typeSlot'=>$racer['slot']->type,
+                                'qty'=>$racer['qty'],
+                                'cars'=>$racer['cars']
+                            ])
+                        );
+                        $order->setAmoCRMLeadId($amocrm_leadId,$racer['slot']->id);
+                        $this->repository->save($order);
+                    } catch (AmoCRMApiErrorResponseException  $exception) {
+                        dump($exception->getMessage());
+                        dump($exception->getLastRequestInfo());
+                        dump($exception->getTraceAsString());
+                        dump($exception->getDescription());
+                    }
+                }
+            }
+            $order->onSentAmoCRM();
+            $this->repository->save($order);
+        }
 
     }
 

@@ -31,7 +31,8 @@ class CarTypeManageService
             (int)$form->qty,
             (double)$form->pwr,
             $form->note,
-            $form->type
+            $form->type,
+            $form->amocrm_field_id
         );
 
         $this->repository->save($entity);
@@ -50,7 +51,8 @@ class CarTypeManageService
             (int)$form->qty,
             (double)$form->pwr,
             $form->note,
-            $form->type
+            $form->type,
+            $form->amocrm_field_id
         );
         $this->repository->save($entity);
     }

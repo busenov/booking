@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
  * @property int $qty
  * @property double $pwr
  * @property int $type
+ * @property int $amocrm_field_id
  *
  *
  * @property int|null $created_at
@@ -49,7 +50,9 @@ class CarType extends ActiveRecord
                                 int     $qty = 1,
                                 ?float  $pwr=null,
                                 ?string $note=null,
-                                ?int    $type=Slot::TYPE_ADULT
+                                ?int    $type=Slot::TYPE_ADULT,
+                                ?int    $amocrm_field_id=null
+
                             ):self
     {
         return new self([
@@ -59,7 +62,8 @@ class CarType extends ActiveRecord
             'qty'=>$qty,
             'pwr'=>$pwr,
             'note'=>$note,
-            'type'=>$type
+            'type'=>$type,
+            'amocrm_field_id'=>$amocrm_field_id
         ]);
     }
     public function edit(
@@ -69,7 +73,8 @@ class CarType extends ActiveRecord
         int     $qty = 1,
         ?float  $pwr=null,
         ?string $note=null,
-        ?int    $type=Slot::TYPE_ADULT
+        ?int    $type=Slot::TYPE_ADULT,
+        ?int    $amocrm_field_id=null
     ):void
     {
         $this->name=$name;
@@ -79,6 +84,7 @@ class CarType extends ActiveRecord
         $this->pwr=$pwr;
         $this->note=$note;
         $this->type=$type;
+        $this->amocrm_field_id=$amocrm_field_id;
 
     }
 #on
@@ -186,6 +192,7 @@ class CarType extends ActiveRecord
             'pwr' => 'Мощность',
             'note' => 'Примечание',
             'type' => 'Тип',
+            'amocrm_field_id' => 'Соответствия поля в АмоЦРМ',
 
             'created_at' => 'Создано',
             'updated_at' => 'Отредактировано',

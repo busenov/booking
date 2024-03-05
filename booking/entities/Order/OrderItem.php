@@ -20,6 +20,7 @@ use yii\helpers\ArrayHelper;
  * @property int $carType_id
  * @property int $qty
  * @property float $price
+ * @property int|null $amocrm_lead_id           //соответствие позции и заказа в амоцрм
  *
  * @property int|null $created_at
  * @property int|null $updated_at
@@ -27,7 +28,7 @@ use yii\helpers\ArrayHelper;
  * @property string|null $author_name
  * @property int|null $editor_id
  * @property string|null $editor_name
- *
+  *
  * @property CarType $carType
  * @property Order $order
  * @property Slot $slot
@@ -60,9 +61,13 @@ class OrderItem extends ActiveRecord
     {
         return $this->id == $id ;
     }
-    public function isIdSlotIdEqualTo(int $slotId,int $cartTypeId):bool
+    public function isIdSlotIdCarTypeIdEqualTo(int $slotId, int $cartTypeId):bool
     {
         return (($this->carType_id == $cartTypeId) and ($this->slot_id==$slotId));
+    }
+    public function isIdSlotIdEqualTo(int $slotId):bool
+    {
+        return ($this->slot_id==$slotId);
     }
 
 #gets

@@ -18,6 +18,7 @@ class CarTypeForm extends Model
     public ?int $qty=null;
     public ?float $pwr=null;
     public ?int $type=null;
+    public ?int $amocrm_field_id=null;
     public ?CarType $_carType;
     public function __construct(CarType $carType=null, $config = [])
     {
@@ -31,6 +32,7 @@ class CarTypeForm extends Model
             $this->qty=$carType->qty;
             $this->pwr=$carType->pwr;
             $this->type=$carType->type;
+            $this->amocrm_field_id=$carType->amocrm_field_id;
 
             $this->_carType = $carType;
         } else {
@@ -47,6 +49,7 @@ class CarTypeForm extends Model
     {
         return [
             [['qty',], 'integer', 'min'=>1],
+            [['amocrm_field_id',], 'integer'],
             [['pwr',], 'double','min'=>0.1],
             [['name', 'note'], 'string', 'max' => 255],
             [['description'], 'string', 'max' => 1024],

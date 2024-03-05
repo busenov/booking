@@ -29,6 +29,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'type')->dropDownList(Slot::getTypeList(), ['prompt' => '']) ?>
 
     <?= $form->field($model, 'pwr')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'amocrm_field_id')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'note')->textInput(['maxlength' => true]) ?>
 

@@ -56,6 +56,7 @@ YiiAsset::register($this);
             'qty',
             'pwr',
             'note',
+            'amocrm_field_id',
             [
                 'attribute' => 'status',
                 'format' => 'raw',

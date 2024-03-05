@@ -575,7 +575,6 @@
                     let racer = sources[ii];
                     let slots=[o.dataset.slot_id]
                     for (let i = 0; i < races.length; i++) {
-                        // if (races[i].dataset.slot_id!==o.dataset.slot_id) {
                         if (!slots.includes(races[i].dataset.slot_id) && !raceCompleted.includes(i)) {
                             let
                                 name = races[i].getElementsByClassName('racer_name')[0],

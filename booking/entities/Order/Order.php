@@ -194,6 +194,17 @@ class Order extends ActiveRecord
     {
         $this->customer_id=$customer->id;
     }
+
+    public function setAmoCRMLeadId(int $amocrm_leadId, $slotId)
+    {
+        $items=$this->items;
+        foreach ($items as $key=>$item) {
+            if ($item->isIdSlotIdEqualTo($slotId)) {
+                $items[$key]->amocrm_lead_id=$amocrm_leadId;
+            }
+        }
+        $this->items=$items;
+    }
 #hass
 
     /**
@@ -218,7 +229,7 @@ class Order extends ActiveRecord
             $items = $this->items;
             $notInOrder = true;
             foreach ($items as $item) {
-                if ($item->isIdSlotIdEqualTo($slotId,$carTypeId)) {
+                if ($item->isIdSlotIdCarTypeIdEqualTo($slotId,$carTypeId)) {
                     $item->qty = $qty;
                     $notInOrder = false;
                 }
@@ -388,6 +399,7 @@ class Order extends ActiveRecord
             self::STATUS_NEW => 'Новый',
             self::STATUS_RESERVATION_PROCESS => 'Заполняется',
             self::STATUS_CHECKOUT => 'Ожидает оплаты',
+            self::STATUS_SENT_AMOCRM => 'Отправлен в АмоЦРМ',
             self::STATUS_PAID => 'Оплачен',
             self::STATUS_COMPLETED => 'Завершен',
             self::STATUS_DELETED => 'Удален',
