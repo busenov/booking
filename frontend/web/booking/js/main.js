@@ -373,7 +373,6 @@
                 contentType: false,
                 data: formData,
                 success: function(data){
-                    console.log(data)
                     if (data.status==='success') {
                         for (let slotId in data.order.items) {
                             console.log(slotId);

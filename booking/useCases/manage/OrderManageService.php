@@ -441,7 +441,7 @@ class OrderManageService
             throw new \DomainException('Ошибка! Заказ на этапе обработки. Запрет редактирования.');
         }
 
-        $free=$item->slot->getFree($item->carType_id);
+        $free=$item->slot->getFree();
         if (($newQty) > ($free + $item->qty) ) {
             if ($return) {
                 return false;
