@@ -8,9 +8,8 @@ use booking\forms\CompositeForm;
 use yii\base\Model;
 
 /**
- * @property PriceForm[] $prices
  */
-class CarTypeForm extends CompositeForm
+class CarTypeForm extends Model
 {
     public ?string $name=null;
     public ?string $description=null;
@@ -33,18 +32,12 @@ class CarTypeForm extends CompositeForm
             $this->pwr=$carType->pwr;
             $this->type=$carType->type;
 
-            foreach ($carType->prices as $price) {
-                $prices[]=new PriceForm($price);
-            }
             $this->_carType = $carType;
         } else {
             $this->status=CarType::STATUS_ACTIVE;
             $this->type=Slot::TYPE_ADULT;
         }
-        if (empty($prices)) {
-            $prices[]=new PriceForm();
-        }
-        $this->prices=$prices;
+
     }
 
     /**
@@ -68,8 +61,4 @@ class CarTypeForm extends CompositeForm
         return CarType::getAttributeLabels();
     }
 
-    protected function internalForms(): array
-    {
-        return ['prices'];
-    }
 }

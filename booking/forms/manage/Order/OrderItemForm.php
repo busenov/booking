@@ -14,7 +14,8 @@ class OrderItemForm extends Model
     public ?int $carType_id=null;
     public ?string $qty=null;
     public ?CarType $_carType=null;
-    public ?OrderItem $_orderItem;
+    public ?OrderItem $_orderItem=null;
+    public int $max;
     public function __construct(OrderItem $orderItem=null, $config = [])
     {
         parent::__construct($config);
@@ -27,6 +28,11 @@ class OrderItemForm extends Model
             $this->_orderItem = $orderItem;
         }
 
+        if ($this->_orderItem) {
+            $this->max=$this->_orderItem->slot->getFree($this->_carType->id)+max($this->_orderItem->qty,$this->_carType->qty);
+        } else {
+            $this->max=$this->_carType->qty;
+        }
     }
 
     /**
@@ -37,7 +43,7 @@ class OrderItemForm extends Model
         return [
             [['qty','cartTypeId','slotId'], 'integer'],
             [['slotId'], 'exist', 'skipOnError' => true, 'targetClass' => Slot::class, 'targetAttribute' => ['slot_id' => 'id']],
-            ['qty', 'integer', 'min' => 0],
+            ['qty', 'integer', 'min' => 0,'max'=>$this->max],
 //            [['cartTypeId','qty'],'required']
         ];
     }
@@ -47,4 +53,8 @@ class OrderItemForm extends Model
         return OrderItem::getAttributeLabels();
     }
 
+    public function getMax():int
+    {
+        return $this->max;
+    }
 }

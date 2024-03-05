@@ -27,7 +27,11 @@ use yii\helpers\Url;
                 'class'=>"modal-form",
                 'method'=>"post",
                 'id'=> 'modal-form',
-                'action'=>Url::to(['site/add-to-order-ajax','slot_id'=>$slot->id])
+                'action'=>Url::to(['site/add-to-order-ajax','slot_id'=>$slot->id]),
+                'options'=>[
+                    'data-max_slot'=>$slot->getFree()+$order->getQtyBySlotId($slot->id)
+                ]
+
             ]); ?>
             <?= $form->field($orderForm, 'slot_id')->hiddenInput(['id'=>'modal-form-slot_id'])->label(false) ?>
             <?if ($orderForm->items):?>
@@ -43,9 +47,11 @@ use yii\helpers\Url;
                         ]
                     )->textInput([
                         'data-min'=>0,
-                        'data-max'=>14,
+                        'data-max'=>$item->getMax(),
                         'class'=>'modal-form_car form-control',
-                        'data-price'=>$item->_carType->getPriceBySlot($slot)
+                        'data-price'=>$item->_carType->getPriceBySlot($slot),
+                        'data-old_value'=>$item->qty,
+                        'oninput'=>"btnInc(this)"
                     ])->label($item->_carType->name . '(Цена: '.$item->_carType->getPriceBySlot($slot).' руб/машина)' )?>
                     <?php
 
@@ -74,21 +80,6 @@ use yii\helpers\Url;
 
 <?php
 $js = <<<JS
-    let 
-        modalFormCars=document.getElementsByClassName('modal-form_car');
-        modalTotalPrice=document.getElementById('modal-total-price');
-        console.log('tut');
-    for (let i = 0; i < modalFormCars.length; i++) {
-        
-        modalFormCars[i].addEventListener('change', function () {change();});
-    }
-    function change(){
-        let total=0;
-        for (let i = 0; i < modalFormCars.length; i++) {
-            total += modalFormCars[i].value * modalFormCars[i].dataset.price 
-        }
-        modalTotalPrice.innerHTML = ''+total;
-    }
 
 JS;
 $this->registerJs($js);

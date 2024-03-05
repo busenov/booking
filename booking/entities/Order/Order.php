@@ -277,6 +277,7 @@ class Order extends ActiveRecord
             $items[$item->slot_id][$item->carType_id]['total']=$item->total;
             $items[$item->slot_id]['qty']+=$item->qty;
             $items[$item->slot_id]['total']=$item->slot->total;
+            $items[$item->slot_id]['free']=$item->slot->getFree();
 
         }
         $result['items']=$items;

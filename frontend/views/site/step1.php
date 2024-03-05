@@ -195,7 +195,7 @@ $hasItems= $order && !empty($order->items);
 
                         '.
                             $icon .
-                            ' Свободно: ' . $item['free'] . ' мест
+                            ' Свободно мест: &nbsp;<span id="result-table__free_slot_id_'.$slotId.'">' . $item['free'] . '</span>
                         </div>
                         <div class="result-table__order" id="result-table__slot_id_'.$slotId.'">'. (($order AND $order->getQtyBySlotId($slotId)>0)?$order->getQtyBySlotId($slotId):'').'</div>
                     </div>

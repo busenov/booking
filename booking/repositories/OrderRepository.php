@@ -130,8 +130,7 @@ class OrderRepository
             $result2[$item['slot_id']][$item['carType_id']] += $item['sum'];
             $result2[$item['slot_id']]['qty']+=$item['sum'];
         }
-
-        if (($slotId) and ($carTypeId)) {
+        if (($slotId) and ($carTypeId) and array_key_exists($slotId,$result2)) {
             return $result2[$slotId][$carTypeId];
         }
         return $result2;

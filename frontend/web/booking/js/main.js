@@ -137,7 +137,7 @@
         }
         //возвращаем числов в формате XX,XXX.XX
         Booking.prototype.getNumberFormat = function (number) {
-            return Intl.NumberFormat('ru-RU', { maximumSignificantDigits: 2 }).format(
+            return Intl.NumberFormat('ru-RU', { maximumSignificantDigits: 4 }).format(
                 number,
             );
         }
@@ -271,7 +271,7 @@
                         html+='' +
                         '<div class="result-table__info-block">'+
                             '<div class="result-table__time">'+this.getTimeBySec(slotsByDay[slotId]['begin'])+' - '+this.getTimeBySec(slotsByDay[slotId]['end'])+'</div>'+
-                            '<div class="result-table__info">'+icon+' Свободно: ' + slotsByDay[slotId]['free'] + ' мест</div>'+
+                            '<div class="result-table__info">'+icon+' Свободно мест: &nbsp; <span id="result-table__free_slot_id_'+slotId+'">' + slotsByDay[slotId]['free'] + '</span> </div>'+
                             '<div class="result-table__order" id="result-table__slot_id_'+slotId+'">'+ orderSlotQty+ '</div>'+
                         '</div>'+
                         '<button class="result-table__btn btn"'+buttonData+'>Забронировать</button>'
@@ -380,6 +380,11 @@
                             let resultTableSlotId = document.getElementById('result-table__slot_id_' + slotId);
                             if (resultTableSlotId) {
                                 resultTableSlotId.innerHTML = data.order.items[slotId]['qty'];
+                            }
+                            let resultTableSlotIdFree = document.getElementById('result-table__free_slot_id_' + slotId);
+                            if (resultTableSlotIdFree) {
+                                console.log(data.order.items[slotId]);
+                                resultTableSlotIdFree.innerHTML = data.order.items[slotId]['free'];
                             }
                         }
                         $(orderModal).modal('hide');
@@ -602,12 +607,13 @@ function buttonMinus() {
  * @param o
  */
 function btnInc(o) {
-
+    console.log('btnInc');
     let
         input =  o.parentNode.querySelector("input"),
         min,max,
         modalFormCars = document.getElementsByClassName("modal-form_car"),
-        modalTotalPrice=document.getElementById('modal-total-price');
+        modalTotalPrice=document.getElementById('modal-total-price'),
+        form = o.parentNode.closest('form');
     ;
 
     if (input.dataset.min) {
@@ -616,6 +622,27 @@ function btnInc(o) {
     if (input.dataset.max) {
         max = input.dataset.max;
     }
+
+    //проверяем можно ли менять
+    if (form) {
+        let count=0;
+        for (let i = 0; i < modalFormCars.length; i++) {
+            if (modalFormCars[i].value) {
+                count += parseInt(modalFormCars[i].value,10)
+            }
+        }
+        let n=0;
+        if (o.dataset.inc==='+') {
+            n=1;
+        } else if (o.dataset.inc==='-') {
+            n=-1;
+        }
+        if ((count+n) > form.dataset.max_slot) {
+            o.value=o.dataset.old_value;
+            return false;
+        }
+    }
+
 
     if (o.dataset.inc==='+') {
         if (max===undefined) {
@@ -643,10 +670,10 @@ function btnInc(o) {
             total += modalFormCars[i].value * modalFormCars[i].dataset.price
         }
         if (modalTotalPrice) {
-            modalTotalPrice.innerHTML = Intl.NumberFormat('ru-RU', { maximumSignificantDigits: 2 }).format(
+            modalTotalPrice.innerHTML = Intl.NumberFormat('ru-RU', { maximumSignificantDigits: 4 }).format(
                 ''+total,
             );
         }
-
     }
+    o.dataset.old_value=o.value;
 }

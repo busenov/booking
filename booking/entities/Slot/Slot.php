@@ -164,22 +164,22 @@ class Slot extends ActiveRecord
     public function getFree(int $carTypeId=null):int
     {
         $carType=CarTypeRepository::find_st($carTypeId);
-        if ($reserved=OrderRepository::findSumReservedCar_st($this->id) and $reserved[$this->id]['qty'] ) {
-            $allReservedCnt=$reserved[$this->id]['qty'];
-            $allFree=$this->qty-$allReservedCnt;
-
-            if ($carTypeId) {
-                $reservedCar=$reserved[$this->id][$carTypeId];
-                $freeCarByType=$carType->qty - $reservedCar;
-                if ($freeCarByType<$allFree) {
-                    return $freeCarByType;
-                }
+        if ($carTypeId) {
+            if ($reserved=OrderRepository::findSumReservedCar_st($this->id,$carTypeId)) {
+                return $carType->qty - $reserved;
+            } else {
+                return $carType->qty;
             }
-            return $allFree;
-
         } else {
-            return $this->qty;
+            if ($reserved=OrderRepository::findSumReservedCar_st($this->id) and $reserved[$this->id]['qty'] ) {
+                $allReservedCnt=$reserved[$this->id]['qty'];
+                return $this->qty-$allReservedCnt;
+
+            } else {
+                return $this->qty;
+            }
         }
+
     }
     public static function getIsChildLabels():array
     {
