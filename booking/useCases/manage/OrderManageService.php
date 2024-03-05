@@ -138,6 +138,9 @@ class OrderManageService
         if (!$entity=$form->_order) {
             $entity = Order::create();
         }
+
+        $this->guardCanAddItem($entity);
+
         foreach ($form->items as $item) {
             $entity->changeItem($form->slot_id, $item->carType_id, intval($item->qty));
         }
@@ -456,11 +459,6 @@ class OrderManageService
     {
         return \Yii::$app->user->can('admin');
     }
-
-    public static function guardCanAddItem($entityOrId)
-    {
-        return true;
-    }
     public static function guardCanRemoveItem($entityOrId)
     {
         return true;
@@ -469,7 +467,28 @@ class OrderManageService
     {
         return true;
     }
+    /**
+     * Можем ли мы добавить в заказ
+     * - Заказ статус Новый или В процессес наполнения
+     * - Итоговое кол-во не превышает разрешенное в заезде
+     * - Есть доступные машины на этот заезд
+     *
+     * @param Order $itemOrItemId
+     * @param int $newQty
+     * @param bool $return
+     * @return void
+     */
+    public static function guardCanAddItem($entityOrId, bool $return=false):bool
+    {
 
+        if (!$entityOrId->isNew() and !$entityOrId->isReservationProcess()) {
+            if ($return) {
+                return false;
+            }
+            throw new \DomainException('Ошибка! Заказ на этапе обработки. Запрет редактирования.');
+        }
+        return true;
+    }
 
     /**
      * Можем ли мы менять кол-во в позиции. Условия:

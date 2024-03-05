@@ -116,54 +116,48 @@ class SiteController extends Controller
         $this->layout = 'blank';
         $calendar=$this->slotRepository->calendarWeekly();
 
-        $order=null;
+        $order=$this->findOrderByCookies();
 
         $racersForm=null;
         $licenseForm=null;
         $customerOrder=null;
-        if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)){
-            $order=$this->findOrder($orderGuid);
-            $racersForm = new RacersForm($order);
-        }
-        if (empty($order)and $step!==1) {
-            return $this->redirect(['index','step'=>1]);
-        }
 
         if ($step==1) {
-            //эту констуркцию не вывел выше, что бы мы попали со старым заказом на шаг 4. По хорошему шаг 4 вывести в отдельный акшион
-            if (($order) and (!$order->isNew()) and (!$order->isReservationProcess())) {
-                $order=null;
-            }
             $licenseForm=new LicenseForm(($order and $order->customer)?$order->customer->license:null);
         } elseif ($step==2) {
-            //эту констуркцию не вывел выше, что бы мы попали со старым заказом на шаг 4. По хорошему шаг 4 вывести в отдельный акшион
-            if (($order) and (!$order->isNew()) and (!$order->isReservationProcess())) {
-                $order=null;
-                return $this->redirect(['index','step'=>1]);
-            }
-            if ($order) {
-                $customerOrder=new CustomerForm($order->customer);
-            } else {
-                $customerOrder=new CustomerForm();
-            }
+
+            if (empty($order)) return $this->redirect(['index','step'=>1]);
+
+            $customerOrder=new CustomerForm(($order?$order->customer:null));
+
             if ($this->request->isPost && $customerOrder->load($this->request->post())) {
                 $this->orderService->checkout($order,$customerOrder);
                 return $this->redirect(['index','step'=>3]);
             }
+
+        } elseif ($step==3) {
+            $order=$this->findOrderByCookies(true);
+            if (empty($order)) return $this->redirect(['index','step'=>1]);
         } elseif ($step==4) {
-            if ($this->request->isPost) {
-                if ($racersForm->load($this->request->post())) {
-                    try {
-                        $this->orderService->addAdditionalInfo($order,$racersForm);
-                        //очищаем куки от этого заказа
-                        $cookies=Yii::$app->response->cookies;
-                        $cookies->remove(Order::COOKIE_NAME_GUID);
+            if ($order=$this->findOrderByCookies(true)) {
+                $racersForm = new RacersForm($order);
+                if ($this->request->isPost) {
+                    if ($racersForm->load($this->request->post())) {
+                        try {
+                            $this->orderService->addAdditionalInfo($order,$racersForm);
+                            //очищаем куки от этого заказа
+//                            $cookies=Yii::$app->response->cookies;
+//                            $cookies->remove(Order::COOKIE_NAME_GUID);
 
-                        Yii::$app->session->setFlash('success', 'Данные успешно сохранены.');
-                    }catch (Exception $ex) {
-                        Yii::$app->session->setFlash('error', 'Ошибка при сохранение данных: '. $ex->getMessage());
+                            Yii::$app->session->setFlash('success', 'Данные успешно сохранены.');
+//                            return $this->render('success',[
+//                                'orderId'=>$order->id,
+//                            ]);
+                        }catch (Exception $ex) {
+                            Yii::$app->session->setFlash('error', 'Ошибка при сохранение данных: '. $ex->getMessage());
+                        }
+
                     }
-
                 }
             }
         }
@@ -187,12 +181,14 @@ class SiteController extends Controller
 //        \Yii::$app->response->format = Response::FORMAT_JSON;
         $order=null;
         try {
-            if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)) {
-                $order = $this->findOrder($orderGuid->value);
-                $orderForm=new SlotCreateForm($slot_id,$order);
-            } else {
-                $orderForm=new SlotCreateForm($slot_id);
-            }
+            $order=$this->findOrderByCookies();
+            $orderForm=new SlotCreateForm($slot_id,$order??null);
+//            if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)) {
+//                $order = $this->findOrder($orderGuid->value);
+//                $orderForm=new SlotCreateForm($slot_id,$order);
+//            } else {
+//                $orderForm=new SlotCreateForm($slot_id);
+//            }
             $orderForm->slot_id=$slot_id;
 
 
@@ -220,15 +216,10 @@ class SiteController extends Controller
     public function actionAddToOrderAjax(?int $slot_id=null)
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
-        $order=null;
-        if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)){
-            $order=$this->findOrder($orderGuid->value);
+        $order=$this->findOrderByCookies();
 
-            $form=new SlotCreateForm($slot_id,$order);
-        } else {
-            $form=new SlotCreateForm($slot_id);
-        }
 
+        $form=new SlotCreateForm($slot_id,$order);
 
         if ($this->request->isPost && $form->load($this->request->post())) {
 
@@ -383,8 +374,26 @@ class SiteController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
-//    private function checkOrderAndItem(int $orderItemId)
-//    {
-//
-//    }
+    /**
+     * Находим заказ по кукам. По умолчанию, можно находить только не выполненные заказы, т.е. заказ с которым можно работать
+     * При желани можно поставить force=true, тогда выдаст заказ в любом статусе
+     * @param $force
+     * @return Order|null
+     * @throws NotFoundHttpException
+     */
+    protected function findOrderByCookies($force=false):?Order
+    {
+        if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)){
+            $order=$this->findOrder($orderGuid);
+            if ($force) {
+                return $order;
+            } else {
+                if (OrderManageService::guardCanAddItem($order,true)) {
+                    return $order;
+                }
+            }
+        }
+        return null;
+    }
+
 }
