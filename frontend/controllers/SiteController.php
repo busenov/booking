@@ -120,6 +120,7 @@ class SiteController extends Controller
 
         $racersForm=null;
         $licenseForm=null;
+        $customerOrder=null;
         if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)){
             $order=$this->findOrder($orderGuid);
             $racersForm = new RacersForm($order);
@@ -127,20 +128,26 @@ class SiteController extends Controller
         if (empty($order)and $step!==1) {
             return $this->redirect(['index','step'=>1]);
         }
-        if ($order) {
-            $customerOrder=new CustomerForm($order->customer);
-        } else {
-            $customerOrder=new CustomerForm();
-        }
 
         if ($step==1) {
+            //эту констуркцию не вывел выше, что бы мы попали со старым заказом на шаг 4. По хорошему шаг 4 вывести в отдельный акшион
+            if (($order) and (!$order->isNew()) and (!$order->isReservationProcess())) {
+                $order=null;
+            }
             $licenseForm=new LicenseForm(($order and $order->customer)?$order->customer->license:null);
         } elseif ($step==2) {
+            //эту констуркцию не вывел выше, что бы мы попали со старым заказом на шаг 4. По хорошему шаг 4 вывести в отдельный акшион
+            if (($order) and (!$order->isNew()) and (!$order->isReservationProcess())) {
+                $order=null;
+                return $this->redirect(['index','step'=>1]);
+            }
+            if ($order) {
+                $customerOrder=new CustomerForm($order->customer);
+            } else {
+                $customerOrder=new CustomerForm();
+            }
             if ($this->request->isPost && $customerOrder->load($this->request->post())) {
-//                dump($customerOrder);
                 $this->orderService->checkout($order,$customerOrder);
-
-//                exit;
                 return $this->redirect(['index','step'=>3]);
             }
         } elseif ($step==4) {

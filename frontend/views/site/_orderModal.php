@@ -29,7 +29,7 @@ use yii\helpers\Url;
                 'id'=> 'modal-form',
                 'action'=>Url::to(['site/add-to-order-ajax','slot_id'=>$slot->id]),
                 'options'=>[
-                    'data-max_slot'=>$slot->getFree()+$order->getQtyBySlotId($slot->id)
+                    'data-max_slot'=>$slot->getFree()+($order?$order->getQtyBySlotId($slot->id):0)
                 ]
 
             ]); ?>

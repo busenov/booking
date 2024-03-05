@@ -562,23 +562,35 @@
                                 'birthday': birthday
                             });
                         }
+                        // console.log(name);
                     }
+
                 }
-                for (let i = 0; i < races.length; i++) {
-                    if (races[i].dataset.slot_id!==o.dataset.slot_id) {
-                        let racer=sources.shift()
-                        if (racer===undefined) break;
+                console.log(races);
+                console.log(o.dataset.slot_id);
+                //добавим в каждый заезд.
+                //список заездов
+                let raceCompleted=[];
+                for (let ii = 0; ii < sources.length; ii++) {
+                    let racer = sources[ii];
+                    let slots=[o.dataset.slot_id]
+                    for (let i = 0; i < races.length; i++) {
+                        // if (races[i].dataset.slot_id!==o.dataset.slot_id) {
+                        if (!slots.includes(races[i].dataset.slot_id) && !raceCompleted.includes(i)) {
+                            let
+                                name = races[i].getElementsByClassName('racer_name')[0],
+                                weight = races[i].getElementsByClassName('racer_weight')[0],
+                                height = races[i].getElementsByClassName('racer_height')[0],
+                                birthday = races[i].getElementsByClassName('racer_birthday')[0];
 
-                        let
-                            name=races[i].getElementsByClassName('racer_name')[0],
-                            weight=races[i].getElementsByClassName('racer_weight')[0],
-                            height=races[i].getElementsByClassName('racer_height')[0],
-                            birthday=races[i].getElementsByClassName('racer_birthday')[0];
+                            name.value = racer.name;
+                            weight.value = racer.weight;
+                            height.value = racer.height;
+                            birthday.value = racer.birthday;
 
-                        name.value=racer.name;
-                        weight.value=racer.weight;
-                        height.value=racer.height;
-                        birthday.value=racer.birthday;
+                            slots.push(races[i].dataset.slot_id);
+                            raceCompleted.push(i);
+                        }
                     }
                 }
             }

@@ -260,13 +260,13 @@ class OrderManageService
 //        dump($order);
 //        exit;
         //отправляем в АмоЦРМ
-        if ($credential=$this->credentialRepository->find(Credential::MAIN_ID)) {
-            $this->amoCRMService->setCredential($credential);
-
-            $this->amoCRMService->addLead(new LeadPipeline7665106($order));
-            $order->onSentAmoCRM();
-            $this->repository->save($order);
-        }
+//        if ($credential=$this->credentialRepository->find(Credential::MAIN_ID)) {
+//            $this->amoCRMService->setCredential($credential);
+//
+//            $this->amoCRMService->addLead(new LeadPipeline7665106($order));
+//            $order->onSentAmoCRM();
+//            $this->repository->save($order);
+//        }
 
     }
 
