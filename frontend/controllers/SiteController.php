@@ -139,6 +139,7 @@ class SiteController extends Controller
             if ($this->request->isPost && $customerOrder->load($this->request->post())) {
 //                dump($customerOrder);
                 $this->orderService->checkout($order,$customerOrder);
+
 //                exit;
                 return $this->redirect(['index','step'=>3]);
             }
@@ -147,6 +148,10 @@ class SiteController extends Controller
                 if ($racersForm->load($this->request->post())) {
                     try {
                         $this->orderService->addAdditionalInfo($order,$racersForm);
+                        //очищаем куки от этого заказа
+                        $cookies=Yii::$app->response->cookies;
+                        $cookies->remove(Order::COOKIE_NAME_GUID);
+
                         Yii::$app->session->setFlash('success', 'Данные успешно сохранены.');
                     }catch (Exception $ex) {
                         Yii::$app->session->setFlash('error', 'Ошибка при сохранение данных: '. $ex->getMessage());

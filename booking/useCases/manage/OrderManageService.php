@@ -172,11 +172,21 @@ class OrderManageService
         $entity->changeItem($orderItemForm->carType_id,$orderItemForm->qty);
         $this->repository->save($entity);
     }
-    public function removeItem($entityOrId,int $itemId)
+
+    /**
+     * @param Order|int $entityOrId
+     * @param int $itemId
+     * @return void
+     */
+    public function removeItem($entityOrId, int $itemId)
     {
         $entity=$this->repository->get($entityOrId);
         $this->guardCanRemoveItem($entity);
         $entity->removeItem($itemId);
+        if (empty($entity->items)) {
+            $entity->date_begin_reserve=null;
+            $entity->onNew();
+        }
         $this->repository->save($entity);
     }
     public function removeSlot($entityOrId,int $slotId)
@@ -185,7 +195,7 @@ class OrderManageService
         $this->guardCanRemoveSlot($entity);
         foreach ($entity->items as $item) {
             if ($item->slot->isIdEqualTo($slotId)) {
-                $entity->removeItem($item->id);
+                $this->removeItem($entity,$item->id);
             }
         }
         $this->repository->save($entity);
@@ -243,8 +253,8 @@ class OrderManageService
             $this->userRepository->save($customer);
             $order->setCustomer($customer);
             $order->onCheckout();
-
             $this->repository->save($order);
+            //очищаем куки
         });
 
 //        dump($order);

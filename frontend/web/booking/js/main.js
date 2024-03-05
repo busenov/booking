@@ -35,11 +35,15 @@
         function Booking() {
             if (this.getCookie('onlyChildren')==='true') {
                 onlyChildren = true;
-                onlyChildrenEl.checked=onlyChildren;
+                if (onlyChildrenEl) {
+                    onlyChildrenEl.checked=onlyChildren;
+                }
             }
             if (this.getCookie('clubRaces')==='true') {
                 clubRaces = true;
-                clubRacesEl.checked=clubRaces;
+                if (clubRacesEl) {
+                    clubRacesEl.checked=clubRaces;
+                }
             }
             let cSelectedDay=this.getCookie('selected_day')
             if (cSelectedDay) {
@@ -57,7 +61,7 @@
             if ($ykv_step===1) {
                 this.draw();
                 this.listenerStep1();
-                if ($ykv_order) {
+                if ($ykv_order && $ykv_order['date_begin_reserve']) {
                     this.timerOn();
                 }
             } else if ($ykv_step===2) {
@@ -212,6 +216,7 @@
                 currentTime=null,
                 hour=null
             ;
+            console.log($ykv_calendar[wDay]);
             if (slotsByDay=$ykv_calendar[wDay]) {
                 for(let slotId in slotsByDay) {
 
@@ -311,7 +316,7 @@
             this.drawRaces(selectedWDay);
         }
         Booking.prototype.changeClubRaces = function(o) {
-            console.log('changeClubRaces1');
+            console.log('changeClubRaces');
             clubRaces=o.checked;
             if (o.checked) {
                 console.log($ykv_order['license_number']);
@@ -326,6 +331,7 @@
             } else {
                 nomerPravEl.classList.add('hidden');
                 this.setCookie('clubRaces',clubRaces);
+                console.log(selectedWDay);
                 this.drawRaces(selectedWDay);
             }
         }

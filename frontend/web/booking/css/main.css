@@ -941,7 +941,7 @@ input {
     height: 21px;
     border: 2px solid #CED4DA;
     border-radius: 3px;
-    font-size: 8px;
+    font-size: 12px;
 }
 .pay-table__row input[name="name"] {
     width: 180px;

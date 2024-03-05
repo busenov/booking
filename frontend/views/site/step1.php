@@ -28,7 +28,7 @@ $onlyChildren= ((array_key_exists('onlyChildren',$_COOKIE))AND($_COOKIE['onlyChi
 $clubRaces= ((array_key_exists('clubRaces',$_COOKIE))AND($_COOKIE['clubRaces']==='true'));
 $urlPre='';
 $urlNxt=Url::to(['index','step'=>2]);
-
+$hasItems= $order && !empty($order->items);
 ?>
 <script type='text/javascript'>
     var $ykv_step=1;
@@ -85,7 +85,7 @@ $urlNxt=Url::to(['index','step'=>2]);
             Забронировано
         </div>
     </div>
-    <div class="head-timer <?=(($order && $order->isReservationProcess())?'':'hidden') ?>" id="timer-time-block">
+    <div class="head-timer <?=($hasItems?'':'hidden') ?>" id="timer-time-block">
         Время действия брони
         <div
                 class="timer-time"
