@@ -20,9 +20,9 @@ $urlWeekPre=Url::to(['get-calendar-ajax','week'=>$week+(-1*60*60*24*7)]);
             $colorLabel='busy';
         } elseif ($day['qty']<=100) {
             $colorLabel='malo';
-        } elseif($day['qty']<=200) {
-            $colorLabel='malo';
         } elseif($day['qty']<=400) {
+            $colorLabel='malo';
+        } elseif($day['qty']<=800) {
             $colorLabel='dostupno';
         }
     }
