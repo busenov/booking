@@ -21,7 +21,7 @@ class SlotCreateForm extends CompositeForm
     public ?int $order_id=null;
 
     public ?Order $_order=null;
-    public function __construct(int $slot_id, ?Order $order=null,$config = [])
+    public function __construct(Slot $slot, ?Order $order=null,$config = [])
     {
         parent::__construct($config);
         $this->items=[];
@@ -33,7 +33,7 @@ class SlotCreateForm extends CompositeForm
             $this->order_id=$order->id;
             //добавляем существующие позиции
             foreach ($order->items as $item) {
-                if ($slot_id!=$item->slot_id) continue;
+                if ($slot->id!=$item->slot_id) continue;
 
                 $items[] = new OrderItemForm($item);
                 $carTypeIdsUse[]=$item->carType_id;
@@ -42,10 +42,12 @@ class SlotCreateForm extends CompositeForm
         //добавляем позиций которых нет в заказе
         foreach (CarTypeRepository::findActive_st() as $carType) {
             if (!in_array($carType->id, $carTypeIdsUse)) {
-                $items[]=new OrderItemForm(null,[
-                    'carType_id'=>$carType->id,
-                    '_carType'=>$carType
-                ]);
+                if ($slot->type==$carType->type) {
+                    $items[]=new OrderItemForm(null,[
+                        'carType_id'=>$carType->id,
+                        '_carType'=>$carType
+                    ]);
+                }
             }
         }
         $this->items=$items;

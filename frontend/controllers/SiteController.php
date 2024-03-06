@@ -181,7 +181,8 @@ class SiteController extends Controller
         $order=null;
         try {
             $order=$this->findOrderByCookies();
-            $orderForm=new SlotCreateForm($slot_id,$order??null);
+            $slot=$this->findSlot($slot_id);
+            $orderForm=new SlotCreateForm($slot,$order??null);
 //            if ($orderGuid=Yii::$app->request->cookies->get(Order::COOKIE_NAME_GUID)) {
 //                $order = $this->findOrder($orderGuid->value);
 //                $orderForm=new SlotCreateForm($slot_id,$order);
@@ -192,7 +193,6 @@ class SiteController extends Controller
 
 
 
-            $slot=$this->findSlot($slot_id);
             $data=$this->renderAjax('_orderModal',[
                 'order'=>$order,
                 'slot'=>$slot,
@@ -212,13 +212,13 @@ class SiteController extends Controller
      * @return array|string[]
      * @throws NotFoundHttpException
      */
-    public function actionAddToOrderAjax(?int $slot_id=null)
+    public function actionAddToOrderAjax(int $slot_id=null)
     {
         \Yii::$app->response->format = Response::FORMAT_JSON;
         $order=$this->findOrderByCookies();
+        $slot=$this->findSlot($slot_id);
 
-
-        $form=new SlotCreateForm($slot_id,$order);
+        $form=new SlotCreateForm($slot,$order);
 
         if ($this->request->isPost && $form->load($this->request->post())) {
 
