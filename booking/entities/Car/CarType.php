@@ -192,7 +192,7 @@ class CarType extends ActiveRecord
             'pwr' => 'Мощность',
             'note' => 'Примечание',
             'type' => 'Тип',
-            'amocrm_field_id' => 'Соответствия поля в АмоЦРМ',
+            'amocrm_field_id' => 'Соответствия поля в amoCRM',
 
             'created_at' => 'Создано',
             'updated_at' => 'Отредактировано',
