@@ -95,6 +95,7 @@ class OrderRepository
             Order::STATUS_CHECKOUT,
             Order::STATUS_PAID,
             Order::STATUS_SENT_AMOCRM,
+            Order::STATUS_SAVED_ADDITION_INFO,
             Order::STATUS_COMPLETED,
         ];
         $query = new Query;

@@ -46,6 +46,7 @@ class Order extends ActiveRecord
     const STATUS_CHECKOUT=20;               //Оформление. Ожидает оплаты
     const STATUS_PAID=30;                   //Оплачен
     const STATUS_SENT_AMOCRM=35;            //Отправлен в AmoCRM
+    const STATUS_SAVED_ADDITION_INFO=37;    //Сохранена доп. инфомрация
     const STATUS_COMPLETED=40;              //Завершен
     const STATUS_DELETED=100;               //Удален
     const GUID_LENGTH=16;
@@ -105,6 +106,10 @@ class Order extends ActiveRecord
     {
         $this->status=self::STATUS_SENT_AMOCRM;
     }
+    public function onSavedAdditionInfo()
+    {
+        $this->status=self::STATUS_SAVED_ADDITION_INFO;
+    }
     public function onCompleted()
     {
         $this->status=self::STATUS_COMPLETED;
@@ -133,6 +138,10 @@ class Order extends ActiveRecord
     public function isSentAmoCRM():bool
     {
         return $this->status===self::STATUS_SENT_AMOCRM;
+    }
+    public function isSavedAdditionInfo():bool
+    {
+        return $this->status===self::STATUS_SAVED_ADDITION_INFO;
     }
     public function isCompleted():bool
     {
@@ -400,6 +409,7 @@ class Order extends ActiveRecord
             self::STATUS_RESERVATION_PROCESS => 'Заполняется',
             self::STATUS_CHECKOUT => 'Ожидает оплаты',
             self::STATUS_SENT_AMOCRM => 'Отправлен в АмоЦРМ',
+            self::STATUS_SAVED_ADDITION_INFO => 'Сохранена доп. информация',
             self::STATUS_PAID => 'Оплачен',
             self::STATUS_COMPLETED => 'Завершен',
             self::STATUS_DELETED => 'Удален',

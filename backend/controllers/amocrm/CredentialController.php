@@ -2,6 +2,9 @@
 
 namespace backend\controllers\amocrm;
 
+use AmoCRM\Exceptions\AmoCRMApiException;
+use AmoCRM\Filters\ContactsFilter;
+use AmoCRM\Filters\CustomFieldsFilter;
 use backend\forms\AmoCRM\CredentialSearch;
 use booking\entities\AmoCRM\Credential;
 use booking\entities\Order\Order;
@@ -162,8 +165,17 @@ class CredentialController extends Controller
         $credential=Credential::findOne(Credential::MAIN_ID);
         $amocrm->setCredential($credential);
 
-        $order=Order::findOne(99);
-        $amocrm->addLead(new LeadPipeline7665106($order));
+        $filter = new ContactsFilter();
+        $filter->setQuery('79832408439');
+        try {
+            dump($amocrm->apiClient->contacts()->get($filter));exit;
+        } catch (AmoCRMApiException $e) {
+            dump($e);
+            die;
+        }
+
+
+
         return 'tut';
     }
     /**

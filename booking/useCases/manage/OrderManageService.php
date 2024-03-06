@@ -336,10 +336,12 @@ class OrderManageService
         $order->additionalInfo=[];
         foreach ($racersForm->items as $item) {
             if (
-                $item->name OR
-                $item->weight OR
-                $item->height OR
-                $item->birthday
+                $item->name AND
+                (
+                    $item->weight OR
+                    $item->height OR
+                    $item->birthday
+                )
             ) {
                 if (!array_key_exists($item->slot_id,$order->additionalInfo)) {
                     $order->additionalInfo[$item->slot_id]=[];
@@ -353,7 +355,37 @@ class OrderManageService
                 ];
             }
         }
+
+        $order->onSavedAdditionInfo();
         $this->repository->save($order);
+
+        //обновляем данные в амоцрм по гонщикам
+        if ($credential=$this->credentialRepository->find(Credential::MAIN_ID)) {
+            $this->amoCRMService->setCredential($credential);
+            $allContacts = [];
+            $currentSlotId = null;
+            foreach ($order->items as $item) {
+                if ($item->slot_id == $currentSlotId) continue;
+                $currentSlotId = $item->slot_id;
+
+                $amocrm_leadId = $item->amocrm_lead_id;
+
+                if (array_key_exists($currentSlotId, $order->additionalInfo)) {
+                    if ($order->additionalInfo[$currentSlotId]) {
+                        foreach ($order->additionalInfo[$currentSlotId] as $item) {
+                            if (!array_key_exists($amocrm_leadId, $allContacts)) {
+                                $allContacts[$amocrm_leadId] = [];
+                            }
+                            $allContacts[$amocrm_leadId][] = $item;
+                        }
+                    }
+                }
+            }
+            foreach ($allContacts as $amocrm_leadId => $contacts) {
+                $this->amoCRMService->addContacts($amocrm_leadId, $contacts);
+            }
+        }
+
     }
     public function checkLicense(LicenseForm $form,?Order $order=null):bool
     {
@@ -525,6 +557,10 @@ class OrderManageService
     }
     private function guardCanAddAdditionalInfo(Order $order, bool $return=false):bool
     {
+        if (!$order->isSentAmoCRM()) {
+            if ($return) return true;
+            throw new \DomainException('Ошибка! Нельзя сохранять, уже сохранено');
+        }
         return true;
     }
     private function guardCanCheckLicense(bool $return=false)

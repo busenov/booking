@@ -160,6 +160,82 @@ class LeadPipeline7665106 extends LeadForms
         $contact->setCustomFieldsValues($customFields);
         return $contact;
     }
+    public static function getContact_st(array $contact): ContactModel
+    {
+        $amocrm_contact = new ContactModel();
+
+        if (array_key_exists('name',$contact))
+            $amocrm_contact->setName($contact['name']);
+
+
+        if (array_key_exists('firstName',$contact))
+            $amocrm_contact->setFirstName($contact['firstName']);
+
+        if (array_key_exists('lastName',$contact))
+            $amocrm_contact->setFirstName($contact['lastName']);
+
+        $customFields = new CustomFieldsValuesCollection();
+
+        if (array_key_exists('phone',$contact)) {
+            $phoneField = (new MultitextCustomFieldValuesModel())->setFieldCode('PHONE');
+            $customFields->add($phoneField);
+            //Установим значение поля
+            $phoneField->setValues(
+                (new MultitextCustomFieldValueCollection())
+                    ->add(
+                        (new MultitextCustomFieldValueModel())
+                            ->setEnum('WORKDD')
+                            ->setValue($contact['phone'])
+                    )
+            );
+        }
+
+        if (array_key_exists('email',$contact)) {
+            $emailField = (new MultitextCustomFieldValuesModel())->setFieldCode('EMAIL');
+            $customFields->add($emailField);
+            //Установим значение поля
+            $emailField->setValues(
+                (new MultitextCustomFieldValueCollection())
+                    ->add(
+                        (new MultitextCustomFieldValueModel())
+                            ->setEnum('WORK')
+                            ->setValue($contact['email'])
+                    )
+            );
+        }
+
+        if (array_key_exists('weight',$contact)) {
+            $field = (new TextCustomFieldValuesModel())->setFieldId(795421);
+            $customFields->add($field);
+            //Установим значение поля
+            $field->setValues(
+                (new TextCustomFieldValueCollection())
+                    ->add((new TextCustomFieldValueModel())->setValue($contact['weight']))
+            );
+        }
+        if (array_key_exists('height',$contact)) {
+            $field = (new MultitextCustomFieldValuesModel())->setFieldId(795423);
+            $customFields->add($field);
+            //Установим значение поля
+            $field->setValues(
+                (new TextCustomFieldValueCollection())
+                    ->add((new TextCustomFieldValueModel())->setValue($contact['height']))
+            );
+        }
+        if (array_key_exists('birthday',$contact)) {
+            $field = (new DateCustomFieldValuesModel())->setFieldId(795419);
+            $customFields->add($field);
+            //Установим значение поля
+            $field->setValues(
+                (new DateCustomFieldValueCollection())
+                    ->add((new DateCustomFieldValueModel())->setValue($contact['birthday']))
+            );
+        }
+
+        $amocrm_contact->setCustomFieldsValues($customFields);
+
+        return $amocrm_contact;
+    }
 
 ###
     private function fillData(): void

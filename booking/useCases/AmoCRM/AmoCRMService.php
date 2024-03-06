@@ -2,8 +2,17 @@
 namespace booking\useCases\AmoCRM;
 
 use AmoCRM\Client\AmoCRMApiClient;
+use AmoCRM\Collections\ContactsCollection;
+use AmoCRM\Collections\LinksCollection;
+use AmoCRM\Exceptions\AmoCRMApiException;
+use AmoCRM\Filters\ContactsFilter;
+use AmoCRM\Filters\CustomFieldsFilter;
+use AmoCRM\Models\CustomFieldsValues\MultitextCustomFieldValuesModel;
+use AmoCRM\Models\CustomFieldsValues\ValueCollections\MultitextCustomFieldValueCollection;
+use AmoCRM\Models\CustomFieldsValues\ValueModels\MultitextCustomFieldValueModel;
 use booking\entities\AmoCRM\Credential;
 use booking\entities\Order\Order;
+use booking\forms\AmoCRM\hipsorurzu\LeadPipeline7665106;
 use booking\forms\AmoCRM\LeadFormsInterface;
 use Exception;
 use League\OAuth2\Client\Token\AccessToken;
@@ -325,13 +334,51 @@ class AmoCRMService
     public function addLead(LeadFormsInterface $lead):int
     {
         $this->log(__FUNCTION__);
-        $contact=$this->apiClient->contacts()->addOne($lead->getContact());
+
+        //ищем контакт
+        $contact=null;
+        if (property_exists($lead, 'contact_telephone')) {
+            try {
+                $filter = new ContactsFilter();
+                $filter->setQuery($lead->contact_telephone);
+                $contacts=$this->apiClient->contacts()->get($filter);
+                $contact=$contacts->first();
+            } catch (AmoCRMApiException $e) {
+            }
+        }
+        if (!$contact) {
+            $contact=$this->apiClient->contacts()->addOne($lead->getContact());
+        }
         $lead->setContactId($contact->getId());
         $result=$this->apiClient->leads()->addOne($lead->getLead());
 
         $this->apiClient->notes('leads')->add($lead->getNotes());
 
         return $result->getId();
+    }
+
+    public function addContacts(int $amocrm_leadId, array $contacts)
+    {
+        $this->log(__FUNCTION__);
+        try {
+            if ($lead=$this->apiClient->leads()->getOne($amocrm_leadId)) {
+                $contactsCollection=new ContactsCollection();
+                foreach ($contacts as $contact) {
+                    $contactsCollection->add(LeadPipeline7665106::getContact_st($contact));
+                }
+                if ($contactsCollection->count()>0) {
+                    $contactsCollection=$this->apiClient->contacts()->add($contactsCollection);
+                    $links = new LinksCollection();
+                    foreach ($contactsCollection->all() as $contactModel) {
+                        $links->add($contactModel);
+                    }
+                    $this->apiClient->leads()->link($lead,$links);
+                }
+            }
+        } catch (AmoCRMApiException $e) {
+            dump($e);
+            die;
+        }
     }
 
 }

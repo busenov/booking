@@ -33,9 +33,12 @@ $urlNxt='';
     </div>
     <div class="order-result__block">
         <div class="order-result__text">Номер брони: <div class="order-result__number"><?=$order->id?></div>. Для подтверждения с вами свяжутся наши менеджеры.</div>
-        <div class="order-result__text">Заполните дополнительную информацию о заезде:</div>
+
     </div>
-    <? if ($order->items):?>
+    <? if ($order->items and !$order->isSavedAdditionInfo()):?>
+        <div class="order-result__block">
+            <div class="order-result__text">Заполните дополнительную информацию о заезде:</div>
+        </div>
         <?php $form = ActiveForm::begin([
             'options'=>[
                 'class'=>"pay-table__form",
@@ -96,10 +99,11 @@ $urlNxt='';
         <?endforeach;?>
         <?php ActiveForm::end(); ?>
         <button class="pay-table__btn" data-slot_id="<?=$currentSlotId?>">Копировать данные на все заезды</button>
-    <?endif;?>
-    </div>
+        </div>
 
-    <div class="save-block">
-        <button class="save-block__btn" id="save-block__btn">Сохранить</button>
-    </div>
+        <div class="save-block">
+            <button class="save-block__btn" id="save-block__btn">Сохранить</button>
+        </div>
+    <?endif;?>
+
 </section>
