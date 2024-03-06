@@ -24,7 +24,9 @@ AppAsset::register($this);
 
 <main role="main">
     <div class="container-fluid" style="padding-left: 0px;padding-right: 0px;">
-        <?= Alert::widget() ?>
+        <div class="container">
+            <?= Alert::widget() ?>
+        </div>
         <?= $content ?>
     </div>
 </main>
