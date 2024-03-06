@@ -20,16 +20,22 @@ class OrderHelper
                 $class = 'badge bg-warning';
                 break;
             case Order::STATUS_CHECKOUT:
-                $class = 'badge bg-warning';
+                $class = 'badge bg-info';
+                break;
+            case Order::STATUS_SENT_AMOCRM:
+                $class = 'badge bg-info';
+                break;
+            case Order::STATUS_SAVED_ADDITION_INFO:
+                $class = 'badge bg-dark';
                 break;
             case Order::STATUS_COMPLETED:
                 $class = 'badge bg-success';
                 break;
             case Order::STATUS_DELETED:
-                $class = 'badge bg-warning text-dark';
+                $class = 'badge bg-danger';
                 break;
             default:
-                $class = 'badge label-default';
+                $class = 'badge bg-light';
         }
 
         return Html::tag('span', ArrayHelper::getValue(Order::getStatusList(), $status), [
