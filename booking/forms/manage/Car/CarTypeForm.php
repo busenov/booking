@@ -18,7 +18,7 @@ class CarTypeForm extends Model
     public ?int $qty=null;
     public ?float $pwr=null;
     public ?int $type=null;
-    public ?int $amocrm_field_id=null;
+    public ?string $amocrm_field_id=null;
     public ?CarType $_carType;
     public function __construct(CarType $carType=null, $config = [])
     {
