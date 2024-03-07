@@ -74,15 +74,15 @@ $hasItems= $order && !empty($order->items);
         </div>
         <div class="label-item">
             <div class="label-color orange"></div>
-            Осталось мало
+            Осталось менее 400 мест
         </div>
         <div class="label-item">
             <div class="label-color grey"></div>
-            Неактивно
+            Заезды не доступны
         </div>
         <div class="label-item">
             <div class="label-color red"></div>
-            Забронировано
+            Осталось менее 100 мест
         </div>
     </div>
     <div class="head-timer <?=($hasItems?'':'hidden') ?>" id="timer-time-block">
@@ -133,7 +133,7 @@ $hasItems= $order && !empty($order->items);
                     'template'=>'{input}',
                     'id'=>'license_number222'
                 ])->label(false) ?>
-                    <button>Проверить</button>
+                    <button>Проверить права и показать</button>
                 <?php ActiveForm::end(); ?>
             </div>
         </div>
@@ -228,7 +228,7 @@ $hasItems= $order && !empty($order->items);
 <!-- Modal -->
 
 <pre>
-    <?dump($order);?>
+<!--    --><?//dump($order);?>
 <!--    --><?//if ($order) :?>
 <!--    --><?//dump($order->statusName($order->status));?>
 <!--    --><?//dump($order->customer);?>

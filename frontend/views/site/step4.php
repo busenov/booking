@@ -32,8 +32,8 @@ $urlNxt='';
         </div>
     </div>
     <div class="order-result__block">
-        <div class="order-result__text">Номер брони: <div class="order-result__number"><?=$order->id?></div>. Для подтверждения с вами свяжутся наши менеджеры.</div>
-
+        <div class="order-result__text">Номер брони: <div class="order-result__number"><?=$order->id?></div>.<br><br>
+            Для подтверждения с вами свяжутся наши менеджеры.</div><br>
     </div>
     <? if ($order->items and !$order->isSavedAdditionInfo()):?>
         <div class="order-result__block">

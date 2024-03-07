@@ -222,7 +222,7 @@ class LeadPipeline7665106 extends LeadForms
                     ->add((new TextCustomFieldValueModel())->setValue($contact['height']))
             );
         }
-        if (array_key_exists('birthday',$contact)) {
+        if (array_key_exists('birthday',$contact) and $contact['birthday']) {
             $field = (new DateCustomFieldValuesModel())->setFieldId(795419);
             $customFields->add($field);
             //Установим значение поля

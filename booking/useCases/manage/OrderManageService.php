@@ -262,12 +262,10 @@ class OrderManageService
             //очищаем куки
         });
 
-//        dump($order);
-//        exit;
+
         //отправляем в АмоЦРМ
         if ($credential=$this->credentialRepository->find(Credential::MAIN_ID)) {
             $this->amoCRMService->setCredential($credential);
-
 
             if ($order->items) {
                 $racers=[];
@@ -296,7 +294,7 @@ class OrderManageService
                                 'title'=>$order->getName().', заезд: '. $racer['slot']->getName(),
                                 'contact_name' => $order->customer->name,
                                 'contact_secondName' => $order->customer->surname,
-                                'contact_lastName' => $order->customer->name,
+                                'contact_lastName' => $order->customer->patronymic,
                                 'contact_telephone' => $order->customer->telephone,
                                 'contact_email' => $order->customer->email,
                                 'budget' => $racer['total'],

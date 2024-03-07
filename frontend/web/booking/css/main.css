@@ -32,7 +32,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-bottom: 20px
+    padding-bottom: 20px;
+    padding-top: 20px;
 }
 .month::after {
     content: '';
@@ -352,7 +353,7 @@ input:checked + .slider:before {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    margin-top: 5px;
+    margin-top: 20px;
 }
 .nomer-prav.hidden {
     visibility: hidden;
@@ -364,12 +365,12 @@ input:checked + .slider:before {
 }
 #form-check_license .field-licenseform-number {
     margin-bottom: 0 !important;
-    margin-right: 24px;
+    margin-right: 5px;
 }
 .nomer-prav label {
     font-size: 14px;
     color: #000000;
-    margin-right: 24px;
+    margin-right: 5px;
 }
 #form-check_license .field-licenseform-number .form-control {
     height: 30px;
@@ -387,12 +388,12 @@ input:checked + .slider:before {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 70px;
+    /*width: 70px;*/
     height: 30px;
     border: 0px;
     background: #000000;
     color: #ffffff;
-    font-size: 10px;
+    font-size: 12px;
     border-radius: 3px;
 }
 .result-table {
@@ -852,7 +853,7 @@ input {
 .order-result__block {
     width: 90%;
     max-width: 873px;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
 }
 .order-result__text {
     font-size: 15px;
@@ -912,7 +913,7 @@ input {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
     box-sizing: border-box;
     padding: 0 5px;
 }
